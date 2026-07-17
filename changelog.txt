@@ -1,5 +1,12 @@
 *** Renewed Village Growth GS Changelog ***
 
+Version 13.0 (2026/07/17)
+- new: Infrastructure tax, companies pay a monthly tax for their rail/road infrastructure (opt-in setting)
+- perf: Major speedups on large maps (main loop no longer busy-spins, monthly work hoisted and deduplicated)
+- mod: Removed the unused Script Communication (SCP) library dependency
+- mod: Added continuous integration (language check and package build)
+- mod: Save format updated, games from earlier versions reset RVG data on load
+
 Version 12.1 (2025/07/12)
 - new: Ukrainian translation (mortiy)
 

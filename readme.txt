@@ -3,7 +3,7 @@
                 *  A GameScript for OpenTTD  *
                 ******************************
 
-Version: 12.1
+Version: 13.0
 
 Usefull URL's:
 - forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052
@@ -224,6 +224,19 @@ Subsidies:
   from biggest town to a closest unclaimed town. Cargo subsidy creates link
   from unused industry to a contributed town's industry.
 
+Taxes:
+These settings add a monthly infrastructure tax. The tax is a money sink
+and has no solvency check, so companies can go into debt.
+- "Taxes: Charge companies a monthly infrastructure tax": enable/disable the
+  tax. Off by default.
+- "Taxes: Rate per rail/road infrastructure piece": base charge per rail and
+  road infrastructure piece the company owns. The total is also scaled by the
+  "Difficulty level" setting.
+- "Taxes: Extra percentage per contributed town over 500 population": adds this
+  percentage to the bill for each town the company contributes to that is
+  larger than 500 population.
+The cumulative tax paid is shown in each company's Goal statistics.
+
 Category settings:
 These settings change the cargo category values and can only be changed
 before the game start.
@@ -265,8 +278,8 @@ they can safely be changed while the game is running:
 3. Requirements
 
 - OpenTTD, v. 14.x or newer.
-- GS SuperLib, v. 40, ToyLib v. 2, Script Communication for GS v. 45 
-  (you can find it on BaNaNaS, also accessible through OTTD's "Online 
+- GS SuperLib, v. 40, ToyLib v. 2
+  (you can find it on BaNaNaS, also accessible through OTTD's "Online
   Content").
 - Industry sets: you can use any industry NewGRF
     - these are specifically supported industry NewGRF: Baseset

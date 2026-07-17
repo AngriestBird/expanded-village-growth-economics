@@ -21,12 +21,12 @@ gs_name = "Renewed_Village_Growth"
 # Script:
 mainversion = -1
 subversion = -1
-with open("version.nut", 'r+') as file:
+with open("version.nut", 'r') as file:
     for line in file:
-        r = re.search('SELF_MAJORVERSION\s+<-\s+([0-9]+)', line)
+        r = re.search(r'SELF_MAJORVERSION\s+<-\s+([0-9]+)', line)
         if(r != None):
             mainversion = r.group(1)
-        r2 = re.search('SELF_MINORVERSION\s+<-\s+([0-9]+)', line)
+        r2 = re.search(r'SELF_MINORVERSION\s+<-\s+([0-9]+)', line)
         if(r2 != None):
             subversion = r2.group(1)
 
@@ -46,7 +46,7 @@ for file in files:
     if os.path.isfile(file):
         copy2(file, tmp_dir)
 copy2('readme.txt', tmp_dir)
-#copy2('license.txt', tmp_dir)
+copy2('license.txt', tmp_dir)
 copy2('changelog.txt', tmp_dir)
 copytree('lang', os.path.join(tmp_dir, 'lang'))
 

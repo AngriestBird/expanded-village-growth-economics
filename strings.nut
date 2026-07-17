@@ -185,23 +185,22 @@ function GoalTown::TownTextCargos(display_all)
 }
 
 /* Building the text for towns' signtexts. */
-function GoalTown::TownSignText()
+function GoalTown::TownSignText(growth_rate)
 {
     local text_townsign = null;
-    if (GSTown.GetGrowthRate(this.id) > 880) {
+    if (growth_rate > 880) {
         text_townsign = GSText(GSText.STR_TOWNSIGN_NOTGROWING);
     } else {
-        local growth_rate = GSTown.GetGrowthRate(this.id);
         if (::SettingsTable.wallclock_timekeeping == 1) { // Wallclock Timekeeping
             if (growth_rate > 300)
-                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, GSTown.GetGrowthRate(this.id) / 30, GSText(GSText.STR_TOWNSIGN_MINUTES));
+                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, growth_rate / 30, GSText(GSText.STR_TOWNSIGN_MINUTES));
             else
-                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, GSTown.GetGrowthRate(this.id) * 2, GSText(GSText.STR_TOWNSIGN_SECONDS));
+                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, growth_rate * 2, GSText(GSText.STR_TOWNSIGN_SECONDS));
         } else {
             if (growth_rate > 360)
-                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, GSTown.GetGrowthRate(this.id) / 30, GSText(GSText.STR_TOWNSIGN_MONTHS));
+                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, growth_rate / 30, GSText(GSText.STR_TOWNSIGN_MONTHS));
             else
-                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, GSTown.GetGrowthRate(this.id), GSText(GSText.STR_TOWNSIGN_DAYS));
+                text_townsign = GSText(GSText.STR_TOWNSIGN_GROWTHRATE, growth_rate, GSText(GSText.STR_TOWNSIGN_DAYS));
         }
     }
     return text_townsign;
@@ -237,13 +236,6 @@ function GoalTown::DebugCargoCatInfo(i)
          +" Stockpiled="+this.town_stockpiled_cat[i], Log.LVL_DEBUG);
 }
 
-/* Debug function: print the general goals achievement before calculating the new TGR. */
-function GoalTown::DebugGoalsResult(sum_goals, goal_diff, goal_diff_percent)
-{
-    Log.Info(GSTown.GetName(this.id)+": sum_goals="+sum_goals+" goal_diff="+goal_diff+" goal_diff_percent="
-         +goal_diff_percent, Log.LVL_DEBUG);
-}
-
 /* Debug function: print the content of the TGR array. */
 function GoalTown::DebugTgrArray()
 {
@@ -252,18 +244,6 @@ function GoalTown::DebugTgrArray()
         array_text = array_text+"i"+i+"="+val+" ";
     }
     Log.Info(GSTown.GetName(this.id)+": "+array_text+"Average="+this.tgr_average, Log.LVL_DEBUG);
-}
-
-function GoalTown::DebugCargoHash(hash)
-{
-    local cargo_text = "";
-    for (local i = 0; i < 64; i++)
-    {
-        if (hash & (1 << i)) {
-            cargo_text += GSCargo.GetCargoLabel(i) + ",";
-        }
-    }
-    Log.Info(GSTown.GetName(this.id) + ": " + cargo_text, Log.LVL_DEBUG);
 }
 
 function GoalTown::DebugCargoTable(cargo_table)
@@ -309,18 +289,6 @@ function DebugIndustryLists()
         str += industry + " " + GSIndustryType.GetName(industry) + " | ";
     }
     Log.Info(str, Log.LVL_DEBUG);
-}
-
-function GoalTown::DebugRandomizationIndustry(categories)
-{
-    local str = "";
-    foreach (index, category in categories) {
-        str += "  " + (index + 1) + ": ";
-        foreach (industry in category) {
-            str += GSIndustryType.GetName(industry) + ",";
-        }
-    }
-    Log.Info(GSTown.GetName(this.id) + ": " + str, Log.LVL_SUB_DECISIONS);
 }
 
 function DebugTownIndustries(town_industries)

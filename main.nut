@@ -4,6 +4,7 @@ require("industry.nut");
 require("town.nut");
 require("company.nut");
 require("subsidies.nut")
+require("taxes.nut");
 require("story.nut");
 require("strings.nut");
 
@@ -14,7 +15,6 @@ Helper <- SuperLib.Helper;
 
 // Import ToyLib
 import("Library.GSToyLib", "GSToyLib", 2);
-import("Library.SCPLib", "SCPLib", 45);
 
 enum Randomization {
     NONE = 1,
@@ -142,6 +142,9 @@ function MainClass::Start()
 
         this.HandleEvents();
         this.ManageTowns();
+
+        // Yield instead of busy-spinning; small enough to keep the 3s text scroll responsive
+        GSController.Sleep(37);
     }
 }
 
@@ -159,12 +162,9 @@ function MainClass::Init()
         ::SettingsTable.randomization <- GSController.GetSetting("cargo_randomization");
         ::SettingsTable.display_cargo <- GSController.GetSetting("display_cargo");
         ::SettingsTable.cargo_6_category <- GSController.GetSetting("cargo_6_category");
-        ::SettingsTable.category_min_pop <- [GSController.GetSetting("category_1_min_pop"),
-                                             GSController.GetSetting("category_2_min_pop"),
-                                             GSController.GetSetting("category_3_min_pop"),
-                                             GSController.GetSetting("category_4_min_pop"),
-                                             GSController.GetSetting("category_5_min_pop"),
-                                             GSController.GetSetting("category_6_min_pop")];
+        ::SettingsTable.category_min_pop <- [];
+        for (local i = 1; i <= 6; i++)
+            ::SettingsTable.category_min_pop.append(GSController.GetSetting("category_" + i + "_min_pop"));
     }
 
     // Set current date
@@ -408,32 +408,37 @@ function MainClass::CreateTownList()
  */
 function MainClass::UpdateTownList(town_id)
 {
-    // Create list of cargos/industries near each town
+    // Compute cargos/industries near just this new town, not the whole map
     local near_town;
     if (::SettingsTable.randomization == Randomization.INDUSTRY_DESC ||
         ::SettingsTable.randomization == Randomization.INDUSTRY_ASC)
-        near_town = GetTownsNearbyIndustryPerCategory();
+        near_town = GetTownNearbyIndustryPerCategory(town_id);
     else
-        near_town = GetTownsNearbyCargoPerCategory();
+        near_town = GetTownNearbyCargoPerCategory(town_id);
 
     local min_transport = GSController.GetSetting("limit_min_transport");
     local near_cargo_probability = GSController.GetSetting("near_cargo_probability");
-    this.towns.append(GoalTown(town_id, false, min_transport, near_town[town_id], near_cargo_probability));
+    this.towns.append(GoalTown(town_id, false, min_transport, near_town, near_cargo_probability));
     Log.Info("New town founded: "+GSTown.GetName(town_id)+" (id: "+town_id+")", Log.LVL_DEBUG);
 }
 
 function MainClass::DailyManageTownPopulation()
 {
+    // Company id -> Company for O(1) contributor lookup instead of a linear scan per town
+    local company_by_id = {};
+    foreach (company in this.companies) {
+        company_by_id[company.id] <- company;
+    }
+
     foreach (town in this.towns) {
         local new_population = GSTown.GetPopulation(town.id);
         if (new_population > town.max_population) {
-            foreach (company in companies) {
-                if (company.id == town.contributor) {
-                    company.AddPoints(new_population - town.max_population);
-                    Log.Info(GSTown.GetName(town.id)
-                             + " increased population by " + (new_population - town.max_population)
-                             + " which was added to " + GSCompany.GetName(company.id), Log.LVL_DEBUG);
-                }
+            if (company_by_id.rawin(town.contributor)) {
+                local company = company_by_id[town.contributor];
+                company.AddPoints(new_population - town.max_population);
+                Log.Info(GSTown.GetName(town.id)
+                         + " increased population by " + (new_population - town.max_population)
+                         + " which was added to " + GSCompany.GetName(company.id), Log.LVL_DEBUG);
             }
 
             town.max_population = new_population;
@@ -484,9 +489,30 @@ function MainClass::ManageTowns()
 
         local threshold_setting = GSController.GetSetting("town_size_threshold");
         local min_transport = GSController.GetSetting("limit_min_transport");
+
+        // Reuse the already-maintained company list instead of re-scanning company slots per town
+        local valid_companies = [];
+        foreach (company in this.companies)
+            valid_companies.append(company.id);
+
+        // Read per-month settings once here instead of once per town in MonthlyManageTown
+        local monthly_settings = {
+            d_factor = GSController.GetSetting("goal_scale_factor") / 100.0,
+            g_factor = GSController.GetSetting("town_growth_factor"),
+            e_factor = GSController.GetSetting("exponentiality_factor"),
+            sup_imp_part = GSController.GetSetting("supply_impacting_part") / 100.0,
+            lowest_tgr = GSController.GetSetting("lowest_town_growth_rate"),
+            allow_0_days_growth = GSController.GetSetting("allow_0_days_growth"),
+            landscape = GSGameSettings.GetValue("game_creation.landscape"),
+            info_mode = this.actual_town_info_mode,
+            valid_companies = valid_companies
+        };
+
+        // Bucket towns by contributor so each company's GUI update is a single pass, not towns x companies
+        local towns_by_contributor = {};
         foreach (town in this.towns) {
             town.ManageTownLimiting(threshold_setting, min_transport);
-            town.MonthlyManageTown();
+            town.MonthlyManageTown(monthly_settings);
             if (this.actual_town_info_mode > 1) {
                 town.UpdateTownText(this.actual_town_info_mode);
             }
@@ -494,10 +520,18 @@ function MainClass::ManageTowns()
             if (eternal_love > 0) {
                 town.EternalLove(eternal_love_rating);
             }
+
+            if (!towns_by_contributor.rawin(town.contributor))
+                towns_by_contributor[town.contributor] <- [];
+            towns_by_contributor[town.contributor].append(town);
         }
 
+        // Charge the infrastructure tax before updating the GUI so the stat reflects it
+        ChargeTaxes(this.companies, towns_by_contributor);
+
         foreach (company in this.companies) {
-            company.MonthlyUpdateGUIGoals(this.towns);
+            company.MonthlyUpdateGUIGoals(towns_by_contributor.rawin(company.id)
+                                          ? towns_by_contributor[company.id] : []);
         }
 
         this.current_month = month;

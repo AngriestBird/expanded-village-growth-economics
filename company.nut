@@ -6,6 +6,7 @@ enum Statistics
     AVERAGE_CATEGORY,
     NUM_TOWNS,
     NUM_NOT_GROWING_TOWNS,
+    TAX_PAID,
     END
 }
 
@@ -13,6 +14,7 @@ class Company
 {
     id = null;              // company id
     points = null;          // achieved points from growing towns
+    tax_paid = null;        // cumulative infrastructure tax paid
     statistics = null;      // contains texts for statistics in goal gui
     global_goal = null;     // global goal showing achieved points in the goal gui
     sp_welcome = null;      // story page welcome
@@ -24,11 +26,13 @@ class Company
         if (!load_data)
         {
             this.points = 0;
+            this.tax_paid = 0;
             this.InitGUIGoals();
         }
         else
         {
             this.points = ::CompanyDataTable[this.id].points;
+            this.tax_paid = ::CompanyDataTable[this.id].tax_paid;
             this.global_goal = ::CompanyDataTable[this.id].global_goal;
             this.statistics = ::CompanyDataTable[this.id].statistics;
         }
@@ -39,6 +43,7 @@ function Company::SavingCompanyData()
 {
     local company_data = {};
     company_data.points <- this.points;
+    company_data.tax_paid <- this.tax_paid;
     company_data.global_goal <- this.global_goal;
     company_data.statistics <- this.statistics;
 
@@ -75,6 +80,9 @@ function Company::InitGUIGoals()
     this.statistics[Statistics.NUM_NOT_GROWING_TOWNS] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_NOT_GROWING), GSGoal.GT_NONE, 0);
     GSGoal.SetProgress(this.statistics[Statistics.NUM_NOT_GROWING_TOWNS], GSText(GSText.STR_NUM, 0));
 
+    this.statistics[Statistics.TAX_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_PAID), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID], GSText(GSText.STR_CURRENCY, this.tax_paid));
+
     // Reset to previous settings
     GSGameSettings.SetValue("construction.command_pause_level", pause_level);
 
@@ -90,6 +98,11 @@ function Company::RemoveGUIGoals()
 function Company::AddPoints(points)
 {
     this.points += points > 0 ? points : 0;
+}
+
+function Company::AddTaxPaid(amount)
+{
+    this.tax_paid += amount > 0 ? amount : 0;
 }
 
 function Company::MonthlyUpdateGUIGoals(towns)
@@ -110,9 +123,6 @@ function Company::MonthlyUpdateGUIGoals(towns)
     local num_not_growing_towns = 0;
 
     foreach (town in towns) {
-        if (town.contributor != this.id)
-            continue;
-        
         local population = GSTown.GetPopulation(town.id);
         if (population > biggest_town_population) {
             biggest_town_population = population;
@@ -172,6 +182,7 @@ function Company::MonthlyUpdateGUIGoals(towns)
     GSGoal.SetProgress(this.statistics[Statistics.AVERAGE_CATEGORY], GSText(GSText.STR_COMMA, average_category));
     GSGoal.SetProgress(this.statistics[Statistics.NUM_TOWNS], GSText(GSText.STR_NUM, num_towns));
     GSGoal.SetProgress(this.statistics[Statistics.NUM_NOT_GROWING_TOWNS], GSText(GSText.STR_NUM, num_not_growing_towns));
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID], GSText(GSText.STR_CURRENCY, this.tax_paid));
 }
 
 function GetColorText(company_id)

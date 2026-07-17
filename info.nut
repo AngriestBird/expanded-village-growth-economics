@@ -173,58 +173,42 @@ class MainClass extends GSInfo
                 _3 = "Cargo"});
 
         AddSetting({
-            name = "category_1_min_pop",
-            description = "Category 1: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+            name = "tax_enable",
+            description = "Taxes: Charge companies a monthly infrastructure tax",
+            easy_value = 0,
+            medium_value = 0,
+            hard_value = 0,
+            custom_value = 0,
+            flags = CONFIG_BOOLEAN | CONFIG_INGAME});
 
         AddSetting({
-            name = "category_2_min_pop",
-            description = "Category 2: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+            name = "tax_rate",
+            description = "Taxes: Rate per rail/road infrastructure piece",
+            easy_value = 1,
+            medium_value = 2,
+            hard_value = 4,
+            custom_value = 2,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
         AddSetting({
-            name = "category_3_min_pop",
-            description = "Category 3: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+            name = "tax_big_town_bonus",
+            description = "Taxes: Extra percentage per contributed town over 500 population",
+            easy_value = 5,
+            medium_value = 5,
+            hard_value = 10,
+            custom_value = 5,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 100, step_size = 1});
 
-        AddSetting({
-            name = "category_4_min_pop",
-            description = "Category 4: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
-
-        AddSetting({
-            name = "category_5_min_pop",
-            description = "Category 5: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
-
-        AddSetting({
-            name = "category_6_min_pop",
-            description = "Category 6: Minimum population demand (-1 = default)",
-            easy_value = -1,
-            medium_value = -1,
-            hard_value = -1,
-            custom_value = -1,
-            flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+        for (local i = 1; i <= 6; i++) {
+            AddSetting({
+                name = "category_" + i + "_min_pop",
+                description = "Category " + i + ": Minimum population demand (-1 = default)",
+                easy_value = -1,
+                medium_value = -1,
+                hard_value = -1,
+                custom_value = -1,
+                flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+        }
 
         AddSetting({ name = "town_growth_factor",
                 description = "Expert: town growth factor",

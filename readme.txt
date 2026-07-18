@@ -278,8 +278,8 @@ they can safely be changed while the game is running:
 3. Requirements
 
 - OpenTTD, v. 14.x or newer.
-- GS SuperLib, v. 40, ToyLib v. 2
-  (you can find it on BaNaNaS, also accessible through OTTD's "Online
+- GS SuperLib, v. 40, ToyLib v. 2, Script Communication for GS v. 45
+  (you can find them on BaNaNaS, also accessible through OTTD's "Online
   Content").
 - Industry sets: you can use any industry NewGRF
     - these are specifically supported industry NewGRF: Baseset

@@ -11,7 +11,7 @@ GitHub: <https://github.com/jfkuayue/NewRenewedVillageGrowth><br/>
 ## Requirements
 
 - OpenTTD, v. 14.x or newer.
-- GS SuperLib v. 40, ToyLib v. 2 (you can find it on BaNaNaS, also accessible
+- GS SuperLib v. 40, ToyLib v. 2, Script Communication for GS v. 45 (you can find them on BaNaNaS, also accessible
   through OTTD's "Online Content").
 - Industry sets: you can use any industry NewGRF
   - these are specifically supported industry NewGRF: Baseset (all climates), FIRS 1.4, 2, 3, 4.3
@@ -21,7 +21,7 @@ GitHub: <https://github.com/jfkuayue/NewRenewedVillageGrowth><br/>
   - using EVGE with any other unsupported industry set will contain proceduraly generated categories
 
 To test your build quickly on Linux, run `python3 make_tar.py --install` to copy
-`Renewed_Village_Growth-<version>.tar` into `~/.local/share/openttd/game`.
+`Expanded_Village_Growth_Economics-<version>.tar` into `~/.local/share/openttd/game`.
 
 ## Translations
 

@@ -2,3 +2,5 @@
 *.tar
 slnx.sqlite
 .suo
+.opencode/
+.claude/

@@ -20,6 +20,9 @@ GitHub: <https://github.com/jfkuayue/NewRenewedVillageGrowth><br/>
   Real Beta, Minimalist, PIRS 2022
   - using RVG with any other unsupported industry set will contain proceduraly generated categories
 
+To test your build quickly on Linux, run `python3 make_tar.py --install` to copy
+`Renewed_Village_Growth-<version>.tar` into `~/.local/share/openttd/game`.
+
 ## Translations
 
 Currently available languages:

@@ -22,6 +22,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generate manual page from readme.txt
+        run: |
+          {
+            echo '---'
+            echo 'title: Expanded Village Growth + Economics Readme'
+            echo 'description: "Manual and game settings from the bundled readme.txt"'
+            echo '---'
+            echo
+            echo '# Expanded Village Growth + Economics Readme'
+            echo
+            echo '```text'
+            cat readme.txt
+            echo '```'
+          } > docs/readme.md
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

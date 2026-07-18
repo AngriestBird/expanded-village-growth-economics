@@ -3,7 +3,7 @@
                 *       A GameScript for OpenTTD        *
                 *****************************************
 
-Version: 1.0.0
+Version: 1.1.0
 
 Usefull URL's:
 - forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052
@@ -187,7 +187,16 @@ Normal settings:
 
 Cargo settings:
 - "Cargo: Use 6 cargo categories for supported economies": supported
-  economies are: AXIS 2.2 Steel City, FIRS4/5 Steeltown
+  economies are: AXIS 2.2 Steel City and Tropical Paradise, AXIS 2.3
+  Extreme Classic, FIRS4/5 Steeltown
+- "Cargo: Force economy (instead of auto detection)": override the
+  economy detection. 0 auto detects (default), values in between pick a
+  specific supported economy, and the last value forces the procedurally
+  generated categories. A forced economy still has to match the game's
+  cargo list exactly; on mismatch the script logs an error and falls
+  back to auto detection. Useful when detection is ambiguous (for
+  example two industry sets with identical cargo lists) or to run the
+  generated categories on a supported set.
 
 Randomization settings:
 - "Randomization: Type": all towns will have randomly selected
@@ -290,10 +299,11 @@ they can safely be changed while the game is running:
   Content").
 - Industry sets: you can use any industry NewGRF
     - these are specifically supported industry NewGRF: Baseset
-    (all climates), FIRS 1.4, 2, 3, 4.3, 5 (all economies), ECS 1.2
-    (any combination), YETI 0.1.6 (all except Simplified),
-    NAIS 1.0.6, ITI 1.6, 2.14, XIS 0.6 AXIS 2.2, OTIS 05, IOTC 0.1,
-    LJI 0.1, WRBI 1200, Real Beta, Minimalist, PIRS 2022.
+    (all climates), FIRS 1.4, 2, 3, 4.3, 5.2 (all economies),
+    FIRS Forked: Oil Town, ECS 1.2 (any combination), YETI 0.1.6
+    (all except Simplified), NAIS 1.0.6, ITI 1.6, 2.17, XIS 0.6,
+    AXIS 2.2, 2.3, OTIS 05, IOTC 0.1, LJI 0.1, WRBI 1200, Real Beta,
+    Minimalist, PIRS 2022, Default Industries Plus (temperate).
   Using RVG with any other unsupported industry set will contain
   proceduraly generated categories
 

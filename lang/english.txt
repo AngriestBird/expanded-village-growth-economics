@@ -145,9 +145,11 @@ STR_ECONOMY_FIRS5_ARCTIC        :FIRS 5 Arctic
 STR_ECONOMY_FIRS5_TROPIC        :FIRS 5 Tropic
 STR_ECONOMY_FIRS5_STEELTOWN     :FIRS 5 Steeltown
 STR_ECONOMY_FIRS5_IAHC          :FIRS 5 In A Hot Country
+STR_ECONOMY_FIRS_OILTOWN        :FIRS Forked: Oil Town
 STR_ECONOMY_XIS_LOT             :XIS The Lot
 STR_ECONOMY_AXIS_STEELTOWN      :AXIS Steel City
 STR_ECONOMY_AXIS_TROPICAL       :AXIS Tropical Paradise
+STR_ECONOMY_AXIS_EXTREME        :AXIS Extreme Classic
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :Industries of the Caribbean
 STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
@@ -156,6 +158,7 @@ STR_ECONOMY_ITI2                :Improved Town Industries
 STR_ECONOMY_REAL                :Real Industries
 STR_ECONOMY_MINIMALIST          :Minimalist Industries
 STR_ECONOMY_PIRS                :Pikka's Industries Redux Set (PIRS 2022)
+STR_ECONOMY_DEFAULTINDPLUS_TEMPERATE:DefaultIndustriesPlus Temperate
 
 ##### ETERNAL LOVE #####
 STR_ETERNAL_LOVE_OUTSTANDING    :outstanding

@@ -1,5 +1,14 @@
 Expanded Village Growth + Economics Changelog
 
+Version 1.1.0 (2026-07-18)
+- added: force economy setting to override auto detection or force generated categories
+- added: rating-based infrastructure tax discount and adjusted tax rate defaults
+- added: support for FIRS Forked: Oil Town, AXIS 2.3 Extreme Classic, and Default Industries Plus
+- fixed: FIRS 5.2 cargo renames (RFPR to CHEM) and FIRS 5 Steeltown missing cargos with corrected categories
+- fixed: Improved Town Industries 2.17 chemicals cargo label
+- fixed: French translation
+- credits: merged from open upstream pull requests, see CREDITS.md
+
 Version 1.0.0 (2026-07-18)
 - added: category-based town growth over cargo and category fulfillment
 - added: support for multiple industry sets, including procedural fallback categories

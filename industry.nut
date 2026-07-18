@@ -78,7 +78,7 @@ function InitIndustryLists()
 
     ::CargoLimiter <- [0, 2];
     ::CargoCatNum <- (list_4.len() > 0 || (list_3.len() > 6 && (list_1.len() + list_raw.len()) > 9)) ? 5 : 4;
-    ::Economy <- DiscoverEconomyType();
+    ::Economy <- ResolveEconomyType();
 
     if (::CargoCatNum == 4) {
         ::CargoMinPopDemand <- [0, 1000, 4000, 8000];

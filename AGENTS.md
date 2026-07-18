@@ -23,6 +23,7 @@
 
 - For language changes, edit `lang/english.txt` first and keep other languages aligned by key.
 - Do not hand-edit generated or ignored artifacts (`*.tar`).
+- The manual lives in `readme.txt` only. The Pages workflow generates `docs/readme.md` from it at deploy; do not create or edit that file by hand.
 - Keep changes minimal and scoped to the requested behavior.
 
 ## Validation

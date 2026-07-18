@@ -17,7 +17,7 @@ class MainClass extends GSInfo
     function GetName()                  { return "Expanded Village Growth + Economics"; }
     function GetShortName()             { return "EVGE"; }
     function GetDescription()           { return "Towns require various cargo deliveries to grow. Required cargos can be randomized. Town growth is limited by percentage of transported specific cargos. Supporting most Industry NewGRF sets."; }
-    function GetURL()                   { return "https://www.tt-forums.net/viewtopic.php?f=65&t=87052"; }
+    function GetURL()                   { return "https://angriestbird.github.io/expanded-village-growth-economics/"; }
     function GetVersion()               { return SELF_VERSION; }
     function GetDate()                  { return SELF_DATE; }
     function GetAPIVersion()            { return "14"; }
@@ -75,6 +75,66 @@ class MainClass extends GSInfo
                 hard_value = 1,
                 custom_value = 1,
                 flags = CONFIG_BOOLEAN | CONFIG_INGAME });
+
+        // Values map 1:1 to the Economies enum in cargo.nut; the last value forces generated categories
+        AddSetting({ name = "force_economy",
+                description = "Cargo: Force economy (instead of auto detection)",
+                easy_value = 0,
+                medium_value = 0,
+                hard_value = 0,
+                custom_value = 0,
+                flags = CONFIG_INGAME, min_value = 0, max_value = 49 });
+        AddLabels("force_economy", {
+                _0 = "Auto detect",
+                _1 = "Base Temperate",
+                _2 = "Base Arctic",
+                _3 = "Base Tropical",
+                _4 = "Base Toyland",
+                _5 = "FIRS 1 FIRS",
+                _6 = "FIRS 1 Temperate",
+                _7 = "FIRS 1 Arctic",
+                _8 = "FIRS 1 Tropic",
+                _9 = "FIRS 1 Hearth Of Darkness",
+                _10 = "ECS",
+                _11 = "FIRS 2 Temperate",
+                _12 = "FIRS 2 Arctic",
+                _13 = "FIRS 2 Tropic",
+                _14 = "FIRS 2 In A Hot Country",
+                _15 = "FIRS 2 Extreme",
+                _16 = "YETI",
+                _17 = "FIRS 3 Temperate",
+                _18 = "FIRS 3 Arctic",
+                _19 = "FIRS 3 Tropic",
+                _20 = "FIRS 3 Steeltown",
+                _21 = "FIRS 3 In A Hot Country",
+                _22 = "FIRS 3 Extreme",
+                _23 = "NAIS North America",
+                _24 = "Improved Town Industries",
+                _25 = "FIRS 4 Temperate",
+                _26 = "FIRS 4 Arctic",
+                _27 = "FIRS 4 Tropic",
+                _28 = "FIRS 4 Steeltown",
+                _29 = "FIRS 4 In A Hot Country",
+                _30 = "FIRS 5 Temperate",
+                _31 = "FIRS 5 Arctic",
+                _32 = "FIRS 5 Tropic",
+                _33 = "FIRS 5 Steeltown",
+                _34 = "FIRS 5 In A Hot Country",
+                _35 = "FIRS Forked: Oil Town",
+                _36 = "XIS The Lot",
+                _37 = "AXIS Steel City",
+                _38 = "AXIS Tropical Paradise",
+                _39 = "AXIS Extreme Classic",
+                _40 = "OTIS",
+                _41 = "Industries of the Caribbean",
+                _42 = "Lumberjack Industries",
+                _43 = "Wannaroo Basic Industries",
+                _44 = "Improved Town Industries 2",
+                _45 = "Real Industries",
+                _46 = "Minimalist Industries",
+                _47 = "Pikka's Industries Redux Set (PIRS 2022)",
+                _48 = "DefaultIndustriesPlus Temperate",
+                _49 = "Generated categories" });
 
         AddSetting({ name = "cargo_randomization",
                 description = "Randomization: Type",
@@ -184,10 +244,10 @@ class MainClass extends GSInfo
         AddSetting({
             name = "tax_rate",
             description = "Taxes: Rate per rail/road infrastructure piece",
-            easy_value = 1,
-            medium_value = 2,
-            hard_value = 4,
-            custom_value = 2,
+            easy_value = 2,
+            medium_value = 3,
+            hard_value = 5,
+            custom_value = 3,
             flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
         AddSetting({
@@ -197,6 +257,15 @@ class MainClass extends GSInfo
             medium_value = 5,
             hard_value = 10,
             custom_value = 5,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 100, step_size = 1});
+
+        AddSetting({
+            name = "tax_rating_discount",
+            description = "Taxes: Max rating-based discount from contributed towns",
+            easy_value = 30,
+            medium_value = 30,
+            hard_value = 30,
+            custom_value = 30,
             flags = CONFIG_INGAME, min_value = 0, max_value = 100, step_size = 1});
 
         AddSetting({

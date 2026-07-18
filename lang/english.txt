@@ -53,7 +53,7 @@ STR_SB_WELCOME_LIMIT_GROWTH         :{SILVER}{CARGO_LIST}{BLACK} from that town 
 STR_SB_WELCOME_LIMIT_GROWTH_DELAY   :The growth stops after {SILVER}{NUM} months{BLACK} of not fulfilling this requirement.
 STR_SB_WELCOME_STATISTICS           :Company providing the majority of cargo to a town becomes its {ORANGE}Contributor{BLACK}. Every new population above largest population of that town is counted towards {ORANGE}growth points{BLACK} of that company. See the growth points and statistics in the {ORANGE}Goal list{BLACK}.
 STR_SB_WELCOME_ETERNAL_LOVE         :{SILVER}Eternal Love{BLACK} changes {ORANGE}local authority rating{BLACK} of each town once per month to at least {SILVER}{STRING}{BLACK}.
-STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: each month you pay a tax based on your total {ORANGE}rail and road{BLACK} infrastructure, increased for each contributed town above {SILVER}500{BLACK} population.
+STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail and road{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates.
 STR_SB_WELCOME_END                  :Have fun!
 
 ##### CUSTOM STORY BOOK #####
@@ -145,9 +145,11 @@ STR_ECONOMY_FIRS5_ARCTIC        :FIRS 5 Arctic
 STR_ECONOMY_FIRS5_TROPIC        :FIRS 5 Tropic
 STR_ECONOMY_FIRS5_STEELTOWN     :FIRS 5 Steeltown
 STR_ECONOMY_FIRS5_IAHC          :FIRS 5 In A Hot Country
+STR_ECONOMY_FIRS_OILTOWN        :FIRS Forked: Oil Town
 STR_ECONOMY_XIS_LOT             :XIS The Lot
 STR_ECONOMY_AXIS_STEELTOWN      :AXIS Steel City
 STR_ECONOMY_AXIS_TROPICAL       :AXIS Tropical Paradise
+STR_ECONOMY_AXIS_EXTREME        :AXIS Extreme Classic
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :Industries of the Caribbean
 STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
@@ -156,6 +158,7 @@ STR_ECONOMY_ITI2                :Improved Town Industries
 STR_ECONOMY_REAL                :Real Industries
 STR_ECONOMY_MINIMALIST          :Minimalist Industries
 STR_ECONOMY_PIRS                :Pikka's Industries Redux Set (PIRS 2022)
+STR_ECONOMY_DEFAULTINDPLUS_TEMPERATE:DefaultIndustriesPlus Temperate
 
 ##### ETERNAL LOVE #####
 STR_ETERNAL_LOVE_OUTSTANDING    :outstanding

@@ -1,6 +1,5 @@
-
 ##### TOWN SIGN #####
-STR_TOWNSIGN_GROWTHRATE     :Croissance: {NUM} {STRING}
+STR_TOWNSIGN_GROWTHRATE     :Croissance : {NUM} {STRING}
 STR_TOWNSIGN_MONTHS         :mois
 STR_TOWNSIGN_DAYS           :jours
 STR_TOWNSIGN_MINUTES        :minutes
@@ -29,7 +28,7 @@ STR_CARGOCAT_LABEL_16    :Produits finis et véhicules
 ##### STORY BOOK #####
 STR_SB_TITLE_1           :Catégories de marchandises
 STR_SB_EXPLAIN_1         :Voici les catégories de marchandises requises par les villes, chaque catégorie comprenant différents types de marchandises. Pour satisfaire la demande pour une catégorie, vous pouvez fournir n’importe quelle marchandise qui la compose.
-STR_SB_EXPLAIN_2         :Voici les catégories de marchandises requises par les villes, chaque catégorie comprenant différents types de marchandises. Chaque ville a une sélection aléatoire de {STRING} par catégorie. Pour satisfaire la demande pour une catégorie, vous pouvez fournir n’importe quelle marchandise demandée par la ville pour cette catégorie visible dans les informations de la ville.
+STR_SB_EXPLAIN_2         :Voici les catégories de marchandises requises par les villes, chaque catégorie comprenant différents types de marchandises. Chaque ville a une sélection aléatoire de {STRING} par catégorie. Pour satisfaire la demande pour une catégorie, vous pouvez fournir n’importe quelle marchandise demandée par la ville pour cette catégorie, visible dans les informations de la ville.
 STR_SB_EXPLAIN_RANDOM_0  :{SILVER}{NUM} type{P "" s} de marchandise{BLACK}{STRING}
 STR_SB_EXPLAIN_RANDOM_2  :{SILVER}{NUM} - {NUM} types de marchandise {BLACK}
 STR_SB_CARGOCAT_CAT      :Catégorie
@@ -43,12 +42,12 @@ STR_SB_WARNING_3         :L’initialisation de la liste des marchandises a éch
 STR_SB_WARNING_4         :Vous devez définir le paramètre {ORANGE}Environnement->Villes->Vitesse de croissance des villes{BLACK} à une autre valeur que Aucun. {RED}Le script de jeu est désactivé.{BLACK}
 STR_SB_WELCOME_TITLE     :Renewed Village Growth {NUM}.{NUM}
 STR_SB_WELCOME_DESC      :{SILVER}Renewed Village Growth (RVG){BLACK} est un script de jeu qui {ORANGE}change la logique de croissance des villes{BLACK} dans OpenTTD. Des marchandises diverses sont demandées par chaque ville, qui doivent être approvisionnées mensuellement - partiellement ou complètement - pour accélérer la croissance urbaine. Pour plus d’information, lire le {ORANGE}fichier Readme (en anglais){BLACK}.
-STR_SB_WELCOME_CARGO     :L’économie {SILVER}{STRING}{BLACK} consiste en {SILVER}{NUM} catégories{BLACK}. Pour satisfaire la demande pour une catégorie, délivrez-en au moins une marchandise à une {ORANGE}station qui accepte cette marchandise près de la ville{BLACK}. Satisfaites plus de {SILVER}{NUM}%{BLACK} de la demande pour {ORANGE}faire croître la ville plus vite{BLACK}. Plus d’information sur les catégories de marchandises peuvent être trouvées dans {ORANGE}la page des catégories de marchandises du Livre d’histoire{BLACK}.
+STR_SB_WELCOME_CARGO     :L’économie {SILVER}{STRING}{BLACK} consiste en {SILVER}{NUM} catégories{BLACK}. Pour satisfaire la demande pour une catégorie, livrez au moins une marchandise à une {ORANGE}gare qui accepte cette marchandise près de la ville{BLACK}. Satisfaites plus de {SILVER}{NUM}%{BLACK} de la demande pour {ORANGE}faire croître la ville plus vite{BLACK}. Plus d’information sur les catégories de marchandises peuvent être trouvées dans {ORANGE}la page des catégories de marchandises du Livre d’histoire{BLACK}.
 STR_SB_WELCOME_LIMIT_GROWTH         :Les demandes en {SILVER}{CARGO_LIST}{BLACK} de cette ville {ORANGE}peuvent bloquer sa croissance{BLACK}. Transportez au moins {SILVER}{NUM}%{BLACK} de ces types de marchandises {ORANGE}pour débloquer la croissance de la ville{BLACK}. {STRING}
 STR_SB_WELCOME_LIMIT_GROWTH_DELAY   :La croissance s’arrête après {SILVER}{NUM} mois{BLACK} sans que la demande n’ait été satisfaite.
 STR_SB_WELCOME_STATISTICS           :La société fournissant le plus de marchandises à une ville devient son {ORANGE}Fournisseur{BLACK}. Chaque nouvel habitant au dessus du record de population de cette ville est compté dans les {ORANGE}points de croissance{BLACK} de cette société. Consultez les points de croissances et les statistiques dans la {ORANGE}Liste des objectifs{BLACK}.
 STR_SB_WELCOME_ETERNAL_LOVE         :Le paramètre {SILVER}Eternal Love{BLACK} verrouille chaque mois {ORANGE}la qualité de service{BLACK} d’une ville à {SILVER}{STRING}{BLACK} au minimum.
-STR_SB_WELCOME_END                  :Amusez-vous bien !
+STR_SB_WELCOME_END                  :Amusez-vous bien !
 
 ##### CUSTOM STORY BOOK #####
 STR_SB_CUSTOM_WELCOME       :Veuillez trouver les règles du serveur dans {ORANGE}{STRING} le livre d’histoire{BLACK}.
@@ -59,24 +58,24 @@ STR_SB_CUSTOM_END           :
 
 ##### GOAL #####
 STR_STATISTICS_GROWTH_POINTS    :{BLACK}Points de croissance de {STRING}{COMPANY}{ORANGE}
-STR_STATISTICS_BIGGEST_TOWN     :{BLACK}La plus grande ville {SILVER}{TOWN}{ORANGE}
+STR_STATISTICS_BIGGEST_TOWN     :{BLACK}Plus grande ville {SILVER}{TOWN}{ORANGE}
 STR_STATISTICS_GROWTH_TOWN      :{BLACK}Ville à la croissance la plus rapide en jours {SILVER}{TOWN}{ORANGE}
 STR_STATISTICS_AVERAGE_CATEGORY :{BLACK}Catégorie moyenne des villes{ORANGE}
 STR_STATISTICS_NUM_TOWNS        :{BLACK}Nombre de villes fournies{ORANGE}
 STR_STATISTICS_NOT_GROWING      :{BLACK}Nombre de villes ne croissant pas{ORANGE}
 
 ##### TOWNBOX #####
-STR_TOWNBOX_CONTRIBUTOR         :La plus grande population {SILVER}{NUM}{BLACK}{} * {SILVER}{COMPANY}{BLACK}
-STR_TOWNBOX_NO_CONTRIBUTOR      :La plus grande population {SILVER}{NUM}{BLACK}{STRING}
+STR_TOWNBOX_CONTRIBUTOR         :Plus grande population {SILVER}{NUM}{BLACK}{} * {SILVER}{COMPANY}{BLACK}
+STR_TOWNBOX_NO_CONTRIBUTOR      :Plus grande population {SILVER}{NUM}{BLACK}{STRING}
 
-STR_TOWNBOX_CATEGORY            :Informations de marchandise : disponible / requis{STRING}
-STR_TOWNBOX_CATEGORY_STOP       :Pas assez d’exportations :{} * {RED}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
-STR_TOWNBOX_CATEGORY_LOW        :Infrastructures de transport insuffisante:{} * {SILVER}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
-STR_TOWNBOX_CATEGORY_DELAYED    :Pas assez transporté hors de la ville:{} * {GOLD}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
-STR_TOWNBOX_CARGO               :Catégories de marchandise :{STRING}
-STR_TOWNBOX_CARGO_STOP          :Pas assez d’exportations :{} * {RED}{CARGO_LIST}{BLACK}{}Catégories de marchandise :
-STR_TOWNBOX_CARGO_LOW           :Infrastructures de transport insuffisantes :{} * {SILVER}{CARGO_LIST}{BLACK}{}Catégories de marchandise :
-STR_TOWNBOX_CARGO_DELAYED       :Pas assez d’exportations :{} * {GOLD}{CARGO_LIST}{BLACK}{}Catégories de marchandises:
+STR_TOWNBOX_CATEGORY            :Informations de marchandise : disponible / requis{STRING}
+STR_TOWNBOX_CATEGORY_STOP       :Pas assez d’exportations :{} * {RED}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
+STR_TOWNBOX_CATEGORY_LOW        :Infrastructures de transport insuffisantes :{} * {SILVER}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
+STR_TOWNBOX_CATEGORY_DELAYED    :Pas assez transporté hors de la ville :{} * {GOLD}{CARGO_LIST}{BLACK}{}Informations de marchandise : disponible / requis
+STR_TOWNBOX_CARGO               :Catégories de marchandise :{STRING}
+STR_TOWNBOX_CARGO_STOP          :Pas assez d’exportations :{} * {RED}{CARGO_LIST}{BLACK}{}Catégories de marchandise :
+STR_TOWNBOX_CARGO_LOW           :Infrastructures de transport insuffisantes :{} * {SILVER}{CARGO_LIST}{BLACK}{}Catégories de marchandise :
+STR_TOWNBOX_CARGO_DELAYED       :Pas assez d’exportations :{} * {GOLD}{CARGO_LIST}{BLACK}{}Catégories de marchandises:
 STR_TOWNBOX_NOGROWTH            :Transportez {SILVER}{CARGO_LIST}{BLACK} depuis cette ville pour la faire croître.
 
 ##### ECONOMIES #####
@@ -117,6 +116,9 @@ STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
 STR_ECOMONY_WRBI                :Wannaroo Basic Industries
 STR_ECONOMY_ITI2                :Improved Town Industries
 STR_ECONOMY_REAL                :Real Industries
+STR_ECONOMY_MINIMALIST          :Minimalist Industries
+STR_ECONOMY_PIRS                :Pikka's Industries Redux Set (PIRS 2022)
+STR_ECONOMY_DEFAULTINDPLUS_TEMPERATE:DefaultIndustriesPlus - Environnement tempéré
 
 ##### ETERNAL LOVE #####
 STR_ETERNAL_LOVE_OUTSTANDING    :exceptionnel

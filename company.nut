@@ -7,6 +7,8 @@ enum Statistics
     NUM_TOWNS,
     NUM_NOT_GROWING_TOWNS,
     TAX_PAID,
+    TAX_PAID_LAST_MONTH,
+    TAX_REBATE_LAST_MONTH,
     END
 }
 
@@ -15,6 +17,9 @@ class Company
     id = null;              // company id
     points = null;          // achieved points from growing towns
     tax_paid = null;        // cumulative infrastructure tax paid
+    tax_last_month = null;  // infrastructure tax charged in the most recent month (transient, recomputed monthly)
+    tax_rebate_last_month = null; // infrastructure tax rebate in the most recent month (transient, recomputed monthly)
+    points_this_month = null; // population gained by contributed towns this month (transient, reset monthly)
     statistics = null;      // contains texts for statistics in goal gui
     global_goal = null;     // global goal showing achieved points in the goal gui
     sp_welcome = null;      // story page welcome
@@ -27,14 +32,23 @@ class Company
         {
             this.points = 0;
             this.tax_paid = 0;
+            this.tax_last_month = 0;
+            this.tax_rebate_last_month = 0;
+            this.points_this_month = 0;
             this.InitGUIGoals();
         }
         else
         {
             this.points = ::CompanyDataTable[this.id].points;
             this.tax_paid = ::CompanyDataTable[this.id].tax_paid;
+            this.tax_last_month = 0; // recomputed on the next month tick
+            this.tax_rebate_last_month = 0; // recomputed on the next month tick
+            this.points_this_month = 0; // reset on the next month tick
             this.global_goal = ::CompanyDataTable[this.id].global_goal;
             this.statistics = ::CompanyDataTable[this.id].statistics;
+            // Older saves predate newer statistics slots; pad so they can be created lazily instead of indexing out of range
+            while (this.statistics.len() < Statistics.END)
+                this.statistics.append(-1);
         }
     }
 }
@@ -83,6 +97,12 @@ function Company::InitGUIGoals()
     this.statistics[Statistics.TAX_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_PAID), GSGoal.GT_NONE, 0);
     GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID], GSText(GSText.STR_CURRENCY, this.tax_paid));
 
+    this.statistics[Statistics.TAX_PAID_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_last_month));
+
+    this.statistics[Statistics.TAX_REBATE_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_REBATE), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_REBATE_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rebate_last_month));
+
     // Reset to previous settings
     GSGameSettings.SetValue("construction.command_pause_level", pause_level);
 
@@ -97,7 +117,9 @@ function Company::RemoveGUIGoals()
 
 function Company::AddPoints(points)
 {
-    this.points += points > 0 ? points : 0;
+    local gain = points > 0 ? points : 0;
+    this.points += gain;
+    this.points_this_month += gain;
 }
 
 function Company::AddTaxPaid(amount)
@@ -183,6 +205,15 @@ function Company::MonthlyUpdateGUIGoals(towns)
     GSGoal.SetProgress(this.statistics[Statistics.NUM_TOWNS], GSText(GSText.STR_NUM, num_towns));
     GSGoal.SetProgress(this.statistics[Statistics.NUM_NOT_GROWING_TOWNS], GSText(GSText.STR_NUM, num_not_growing_towns));
     GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID], GSText(GSText.STR_CURRENCY, this.tax_paid));
+
+    // Created lazily so saves that predate this stat get the row on their first month tick
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_PAID_LAST_MONTH]))
+        this.statistics[Statistics.TAX_PAID_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_PAID_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_last_month));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_REBATE_LAST_MONTH]))
+        this.statistics[Statistics.TAX_REBATE_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_REBATE), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_REBATE_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rebate_last_month));
 }
 
 function GetColorText(company_id)

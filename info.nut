@@ -1,6 +1,6 @@
 /*
  * This file is part of Renewed Village Growth, a GameScript for OpenTTD.
- * Credits keoz (Renewed City Growth), Sylf (City Growth Limiter)
+ * Credits Firrel (original Renewed Village Growth), keoz (Renewed City Growth), Sylf (City Growth Limiter)
  *
  * It's free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the
@@ -13,9 +13,9 @@ require("version.nut");
 
 class MainClass extends GSInfo
     {
-    function GetAuthor()                { return "Firrel"; }
-    function GetName()                  { return "Renewed Village Growth"; }
-    function GetShortName()             { return "REVI"; }
+    function GetAuthor()                { return "AngriestBird"; }
+    function GetName()                  { return "Expanded Village Growth + Economics"; }
+    function GetShortName()             { return "EVGE"; }
     function GetDescription()           { return "Towns require various cargo deliveries to grow. Required cargos can be randomized. Town growth is limited by percentage of transported specific cargos. Supporting most Industry NewGRF sets."; }
     function GetURL()                   { return "https://www.tt-forums.net/viewtopic.php?f=65&t=87052"; }
     function GetVersion()               { return SELF_VERSION; }
@@ -198,6 +198,15 @@ class MainClass extends GSInfo
             hard_value = 10,
             custom_value = 5,
             flags = CONFIG_INGAME, min_value = 0, max_value = 100, step_size = 1});
+
+        AddSetting({
+            name = "tax_growth_rebate",
+            description = "Taxes: Rebate per population your towns gained last month",
+            easy_value = 0,
+            medium_value = 0,
+            hard_value = 0,
+            custom_value = 0,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
         for (local i = 1; i <= 6; i++) {
             AddSetting({

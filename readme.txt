@@ -1,7 +1,7 @@
-                ******************************
-                *   Renewed Village Growth   *
-                *  A GameScript for OpenTTD  *
-                ******************************
+                *****************************************
+                *  Expanded Village Growth + Economics  *
+                *       A GameScript for OpenTTD        *
+                *****************************************
 
 Version: 13.0
 
@@ -21,7 +21,7 @@ Content:
 
 1. How the script works
 
-Renewed Village Growth (RVG) is a game script which changes the way towns
+Expanded Village Growth + Economics (EVGE) is a game script which changes the way towns
 grow in OTTD. Various cargo requirements and passenger/mail percentage
 transported are defined - monthly - for each town. Towns only grow
 if those requirements are - partially or completely - satisfied. RVG
@@ -293,7 +293,7 @@ they can safely be changed while the game is running:
 
 4. License
 
-Renewed Village Growth is free software; you can redistribute it and/or
+Expanded Village Growth + Economics is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, version 2 of the License
 (see file license.txt).
@@ -301,9 +301,13 @@ published by the Free Software Foundation, version 2 of the License
 
 5. Credits
 
-Author: Firrel
+Author: AngriestBird
+
+Renewed Village Growth was originally created by Firrel. This version
+continues that work.
 
 Thanks to:
+- Firrel for the original Renewed Village Growth GS
 - keoz for the Renewed City Growth GS
 - Sylf for the City Growth Limiter GS
 

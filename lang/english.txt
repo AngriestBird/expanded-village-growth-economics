@@ -71,6 +71,8 @@ STR_STATISTICS_AVERAGE_CATEGORY :{BLACK}Average town category{ORANGE}
 STR_STATISTICS_NUM_TOWNS        :{BLACK}Number of contributed towns{ORANGE}
 STR_STATISTICS_NOT_GROWING      :{BLACK}Number of not growing towns{ORANGE}
 STR_STATISTICS_TAX_PAID         :{BLACK}Infrastructure taxes paid{ORANGE}
+STR_STATISTICS_TAX_LAST_MONTH   :{BLACK}Infrastructure tax last month{ORANGE}
+STR_STATISTICS_TAX_REBATE       :{BLACK}Infrastructure tax rebate last month{ORANGE}
 
 ##### TOWNBOX #####
 STR_TOWNBOX_CONTRIBUTOR         :Largest population {SILVER}{NUM}{BLACK}{} * {SILVER}{COMPANY}{BLACK}

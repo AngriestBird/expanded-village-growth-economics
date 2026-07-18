@@ -1,4 +1,4 @@
-*** Renewed Village Growth GS Changelog ***
+*** Expanded Village Growth + Economics GS Changelog ***
 
 Version 13.0 (2026/07/17)
 - new: Infrastructure tax, companies pay a monthly tax for their rail/road infrastructure (opt-in setting)

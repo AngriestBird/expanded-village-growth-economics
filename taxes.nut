@@ -7,6 +7,12 @@
 
 function ChargeTaxes(companies, towns_by_contributor)
 {
+    // Clear the previous month's figure first so companies not charged this month show 0
+    foreach (company in companies) {
+        company.tax_last_month = 0;
+        company.tax_rebate_last_month = 0;
+    }
+
     if (!GSController.GetSetting("tax_enable"))
         return;
 
@@ -17,6 +23,7 @@ function ChargeTaxes(companies, towns_by_contributor)
     // Reuse the same difficulty knob as cargo requirements
     local difficulty = GSController.GetSetting("goal_scale_factor") / 100.0;
     local big_town_bonus = GSController.GetSetting("tax_big_town_bonus") / 100.0;
+    local rebate_rate = GSController.GetSetting("tax_growth_rebate");
 
     foreach (company in companies) {
         if (GSCompany.ResolveCompanyID(company.id) == GSCompany.COMPANY_INVALID)
@@ -40,14 +47,20 @@ function ChargeTaxes(companies, towns_by_contributor)
             }
         }
 
-        local tax = (tax_rate * difficulty * infra * (1.0 + big_town_bonus * num_big_towns)).tointeger();
+        local gross_tax = (tax_rate * difficulty * infra * (1.0 + big_town_bonus * num_big_towns)).tointeger();
+        local rebate = (rebate_rate * difficulty * company.points_this_month).tointeger();
+        if (rebate > gross_tax)
+            rebate = gross_tax;
+        company.tax_rebate_last_month = rebate;
+        local tax = gross_tax - rebate;
         if (tax <= 0)
             continue;
 
         GSCompany.ChangeBankBalance(company.id, -tax, GSCompany.EXPENSES_PROPERTY, tile);
         company.AddTaxPaid(tax);
+        company.tax_last_month = tax;
 
         Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (pieces: "
-                 + infra + ", big towns: " + num_big_towns + ")", Log.LVL_DEBUG);
+                 + infra + ", big towns: " + num_big_towns + ", rebate: " + rebate + ")", Log.LVL_DEBUG);
     }
 }

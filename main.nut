@@ -15,6 +15,7 @@ Helper <- SuperLib.Helper;
 
 // Import ToyLib
 import("Library.GSToyLib", "GSToyLib", 2);
+import("Library.SCPLib", "SCPLib", 45); // GSToyLib(null) instantiates SCPLib from the root table
 
 enum Randomization {
     NONE = 1,
@@ -528,6 +529,10 @@ function MainClass::ManageTowns()
 
         // Charge the infrastructure tax before updating the GUI so the stat reflects it
         ChargeTaxes(this.companies, towns_by_contributor);
+
+        // Reset the monthly growth accumulator after the tax rebate has read it
+        foreach (company in this.companies)
+            company.points_this_month = 0;
 
         foreach (company in this.companies) {
             company.MonthlyUpdateGUIGoals(towns_by_contributor.rawin(company.id)

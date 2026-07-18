@@ -1,7 +1,7 @@
 /*
  * Infrastructure tax. Each month, companies pay a tax scaled by their
  * total rail and road infrastructure, with a bonus for each large town
- * they contribute to. The money is a sink and there is no solvency
+ * they actively serve. The money is a sink and there is no solvency
  * check, so companies may go into debt.
  */
 
@@ -28,12 +28,12 @@ function ChargeTaxes(companies, towns_by_contributor)
         if (infra <= 0)
             continue;
 
-        // Bonus for each contributed town above the large-town threshold (matches the raw-food threshold)
+        // Bonus for each large town the company actively serves (monitored, above the raw-food threshold)
         local num_big_towns = 0;
         local tile = GSCompany.GetCompanyHQ(company.id);
         if (towns_by_contributor.rawin(company.id)) {
             foreach (town in towns_by_contributor[company.id]) {
-                if (GSTown.GetPopulation(town.id) > 500)
+                if (town.is_monitored && GSTown.GetPopulation(town.id) > 500)
                     ++num_big_towns;
                 if (!GSMap.IsValidTile(tile))
                     tile = GSTown.GetLocation(town.id);

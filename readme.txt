@@ -233,8 +233,8 @@ and has no solvency check, so companies can go into debt.
   road infrastructure piece the company owns. The total is also scaled by the
   "Difficulty level" setting.
 - "Taxes: Extra percentage per contributed town over 500 population": adds this
-  percentage to the bill for each town the company contributes to that is
-  larger than 500 population.
+  percentage to the bill for each town the company actively serves (still
+  monitored) that is larger than 500 population.
 The cumulative tax paid is shown in each company's Goal statistics.
 
 Category settings:

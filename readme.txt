@@ -1,9 +1,9 @@
-                ******************************
-                *   Renewed Village Growth   *
-                *  A GameScript for OpenTTD  *
-                ******************************
+                *****************************************
+                *  Expanded Village Growth + Economics  *
+                *       A GameScript for OpenTTD        *
+                *****************************************
 
-Version: 12.1
+Version: 1.0.0
 
 Usefull URL's:
 - forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052
@@ -21,7 +21,7 @@ Content:
 
 1. How the script works
 
-Renewed Village Growth (RVG) is a game script which changes the way towns
+Expanded Village Growth + Economics (EVGE) is a game script which changes the way towns
 grow in OTTD. Various cargo requirements and passenger/mail percentage
 transported are defined - monthly - for each town. Towns only grow
 if those requirements are - partially or completely - satisfied. RVG
@@ -224,6 +224,19 @@ Subsidies:
   from biggest town to a closest unclaimed town. Cargo subsidy creates link
   from unused industry to a contributed town's industry.
 
+Taxes:
+These settings add a monthly infrastructure tax. The tax is a money sink
+and has no solvency check, so companies can go into debt.
+- "Taxes: Charge companies a monthly infrastructure tax": enable/disable the
+  tax. Off by default.
+- "Taxes: Rate per rail/road infrastructure piece": base charge per rail and
+  road infrastructure piece the company owns. The total is also scaled by the
+  "Difficulty level" setting.
+- "Taxes: Extra percentage per contributed town over 500 population": adds this
+  percentage to the bill for each town the company actively serves (still
+  monitored) that is larger than 500 population.
+The cumulative tax paid is shown in each company's Goal statistics.
+
 Category settings:
 These settings change the cargo category values and can only be changed
 before the game start.
@@ -265,8 +278,8 @@ they can safely be changed while the game is running:
 3. Requirements
 
 - OpenTTD, v. 14.x or newer.
-- GS SuperLib, v. 40, ToyLib v. 2, Script Communication for GS v. 45 
-  (you can find it on BaNaNaS, also accessible through OTTD's "Online 
+- GS SuperLib, v. 40, ToyLib v. 2, Script Communication for GS v. 45
+  (you can find them on BaNaNaS, also accessible through OTTD's "Online
   Content").
 - Industry sets: you can use any industry NewGRF
     - these are specifically supported industry NewGRF: Baseset
@@ -280,7 +293,7 @@ they can safely be changed while the game is running:
 
 4. License
 
-Renewed Village Growth is free software; you can redistribute it and/or
+Expanded Village Growth + Economics is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, version 2 of the License
 (see file license.txt).
@@ -288,9 +301,13 @@ published by the Free Software Foundation, version 2 of the License
 
 5. Credits
 
-Author: Firrel
+Author: AngriestBird
+
+Renewed Village Growth was originally created by Firrel. This version
+continues that work.
 
 Thanks to:
+- Firrel for the original Renewed Village Growth GS
 - keoz for the Renewed City Growth GS
 - Sylf for the City Growth Limiter GS
 

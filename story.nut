@@ -4,6 +4,7 @@ class StoryEditor
     eternal_love = null;
     limit_min_transport = null;
     limiter_delay = null;
+    tax_enable = null;
 
     sp_cargo = null;
     sp_custom = null;
@@ -14,6 +15,7 @@ class StoryEditor
         this.eternal_love = GSController.GetSetting("eternal_love");
         this.limit_min_transport = GSController.GetSetting("limit_min_transport");
         this.limiter_delay = GSController.GetSetting("limiter_delay");
+        this.tax_enable = GSController.GetSetting("tax_enable");
     }
 }
 
@@ -24,11 +26,13 @@ function StoryEditor::CheckParameters(companies)
     local eternal_love = GSController.GetSetting("eternal_love");
     local limit_min_transport = GSController.GetSetting("limit_min_transport");
     local limiter_delay = GSController.GetSetting("limiter_delay");
+    local tax_enable = GSController.GetSetting("tax_enable");
 
     if (this.supply_impacting_part != supply_impacting_part
             || this.eternal_love != eternal_love
             || this.limit_min_transport != limit_min_transport
-            || this.limiter_delay != limiter_delay) {
+            || this.limiter_delay != limiter_delay
+            || this.tax_enable != tax_enable) {
 
         foreach (company in companies) {
             local sp_welcome_elements = GSStoryPageElementList(company.sp_welcome);
@@ -40,6 +44,7 @@ function StoryEditor::CheckParameters(companies)
             this.eternal_love = eternal_love;
             this.limit_min_transport = limit_min_transport;
             this.limiter_delay = limiter_delay;
+            this.tax_enable = tax_enable;
 
             this.WelcomePage(company.sp_welcome);
         }
@@ -70,6 +75,10 @@ function StoryEditor::WelcomePage(sp_welcome)
 
     if (this.eternal_love > 0) {
         GSStoryPage.NewElement(sp_welcome, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WELCOME_ETERNAL_LOVE, GSText(GSText.STR_ETERNAL_LOVE_OUTSTANDING + this.eternal_love - 1)));
+    }
+
+    if (this.tax_enable) {
+        GSStoryPage.NewElement(sp_welcome, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WELCOME_TAX));
     }
 
     GSStoryPage.NewElement(sp_welcome, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WELCOME_END));

@@ -6,6 +6,7 @@ class GoalTown
 {
     id = null;                  // Town id
     sign_id = null;             // Id for extra text under town name
+    sign_growth_rate = null;    // Last growth rate rendered on the sign (transient, skips unchanged redraws)
     contributor = null;         // company that contributed most to the growth of this town in the last month
     max_population = null;      // maximum achieved population of this town
     is_monitored = null;        // Whether the town is already under monitoring. True if town exchanges pax.
@@ -134,7 +135,7 @@ function GoalTown::SavingTownData()
 }
 
 /* Main town management function. Called each month. */
-function GoalTown::MonthlyManageTown()
+function GoalTown::MonthlyManageTown(settings)
 {
     // Finish initialization of the town
     if (!this.initialized)
@@ -151,40 +152,37 @@ function GoalTown::MonthlyManageTown()
     local cur_pop = GSTown.GetPopulation(this.id);
     local parsed_cat = 0;   // index of parsed category
     local new_town_growth_rate = null;
-    // Defining difficulty and calculation factors
-    local d_factor = GSController.GetSetting("goal_scale_factor") / 100.0;
-    local g_factor = GSController.GetSetting("town_growth_factor");
-    local e_factor = GSController.GetSetting("exponentiality_factor");
-    local sup_imp_part = GSController.GetSetting("supply_impacting_part") / 100.0;
-    local lowest_tgr = GSController.GetSetting("lowest_town_growth_rate");
-    local allow_0_days_growth = GSController.GetSetting("allow_0_days_growth");
+    // Difficulty and calculation factors, read once per month by the caller
+    local d_factor = settings.d_factor;
+    local g_factor = settings.g_factor;
+    local e_factor = settings.e_factor;
+    local sup_imp_part = settings.sup_imp_part;
+    local lowest_tgr = settings.lowest_tgr;
+    local allow_0_days_growth = settings.allow_0_days_growth;
     // Clearing the arrays
     this.town_supplied_cat = array(::CargoCatNum, 0);
     this.town_goals_cat = array(::CargoCatNum, 0);
 
     // Allow small towns to grow
-    if (GSTown.GetPopulation(this.id) < 100) {
+    if (cur_pop < 100) {
         GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NORMAL);
         return;
     }
 
     // Check whether specific cargo goals have been enabled for tropical towns growing over 60
-    if (GSGameSettings.GetValue("game_creation.landscape") == 2
+    if (settings.landscape == 2
         && GSTown.GetCargoGoal(this.id, GSCargo.TE_WATER) != 0) {
         GSTown.SetCargoGoal(this.id, GSCargo.TE_WATER, 0);
         GSTown.SetCargoGoal(this.id, GSCargo.TE_FOOD, 0);
     }
 
     // Checking whether we should enable or disable town monitoring
-    if (!this.CheckMonitoring(this.is_monitored)) return;
+    if (!this.CheckMonitoring(this.is_monitored, settings.valid_companies)) return;
 
     // Calculate supplied cargo
     local companies_supplied = {};
     foreach (index, category in this.town_cargo_cat) {
-        for (local cid = GSCompany.COMPANY_FIRST; cid <= GSCompany.COMPANY_LAST; cid++) {
-            if (GSCompany.ResolveCompanyID(cid) == GSCompany.COMPANY_INVALID)
-                continue;
-
+        foreach (cid in settings.valid_companies) {
             if (!companies_supplied.rawin(cid))
                 companies_supplied[cid] <- [];
 
@@ -332,7 +330,7 @@ function GoalTown::MonthlyManageTown()
     this.contributor = company_id;
 
     this.UpdateSignText();
-    GSTown.SetText(this.id, this.TownBoxText(true, GSController.GetSetting("town_info_mode"), true));
+    GSTown.SetText(this.id, this.TownBoxText(true, settings.info_mode, true));
 }
 
 function GoalTown::ManageTownLimiting(threshold_setting, min_transported) {
@@ -371,7 +369,7 @@ function GoalTown::ManageTownLimiting(threshold_setting, min_transported) {
  * towns which are not supplied with pax. Returns true if the town
  * must be monitored, false otherwise.
  */
-function GoalTown::CheckMonitoring(monitored)
+function GoalTown::CheckMonitoring(monitored, valid_companies)
 {
     /* To enable monitoring it is better to check the delivery
      * from the town and not to the town. This is necessary for
@@ -381,12 +379,10 @@ function GoalTown::CheckMonitoring(monitored)
      * GSTown.GetLastMonth[Supply/TransportedPercentage].
      */
     local delivery_check = 0;
-    for (local cid = GSCompany.COMPANY_FIRST; cid <= GSCompany.COMPANY_LAST; cid++) {
-        if (GSCompany.ResolveCompanyID(cid) != GSCompany.COMPANY_INVALID) {
-            foreach (cargo in ::CargoLimiter) {
-                delivery_check += GSCargoMonitor.GetTownPickupAmount(cid, cargo, this.id, true);
-                if (delivery_check > 0) break;
-            }
+    foreach (cid in valid_companies) {
+        foreach (cargo in ::CargoLimiter) {
+            delivery_check += GSCargoMonitor.GetTownPickupAmount(cid, cargo, this.id, true);
+            if (delivery_check > 0) break;
         }
     }
 
@@ -421,7 +417,7 @@ function GoalTown::CheckMonitoring(monitored)
             this.town_stockpiled_cat = array(::CargoCatNum, 0);
             this.tgr_array = array(tgr_array_len, 0);
             this.tgr_average = null;
-            this.StopMonitors();
+            this.StopMonitors(valid_companies);
             this.RemoveSignText();
             Log.Info("City of "+GSTown.GetName(this.id)+" is not monitored anymore", Log.LVL_DEBUG);
             return false;
@@ -429,15 +425,13 @@ function GoalTown::CheckMonitoring(monitored)
     }
 }
 
-function GoalTown::StopMonitors()
+function GoalTown::StopMonitors(valid_companies)
 {
     for (local i = 0; i < ::CargoIDList.len(); i++) {
         if (::CargoIDList[i] == null)
             continue;
-        for (local cid = GSCompany.COMPANY_FIRST; cid <= GSCompany.COMPANY_LAST; cid++) {
-            if (GSCompany.ResolveCompanyID(cid) != GSCompany.COMPANY_INVALID) {
-                GSCargoMonitor.GetTownDeliveryAmount(cid, i, this.id, false);
-            }
+        foreach (cid in valid_companies) {
+            GSCargoMonitor.GetTownDeliveryAmount(cid, i, this.id, false);
         }
     }
 }
@@ -465,7 +459,13 @@ function GoalTown::UpdateSignText()
 {
     // Add a sign by the town to display the current growth
     if (::SettingsTable.use_town_sign) {
-        local sign_text = TownSignText();
+        local growth_rate = GSTown.GetGrowthRate(this.id);
+        // Skip the redraw when the displayed growth rate hasn't changed
+        if (GSSign.IsValidSign(this.sign_id) && growth_rate == this.sign_growth_rate)
+            return;
+        this.sign_growth_rate = growth_rate;
+
+        local sign_text = TownSignText(growth_rate);
         if (GSSign.IsValidSign(this.sign_id)) {
             GSSign.SetName(this.sign_id, sign_text);
         } else {

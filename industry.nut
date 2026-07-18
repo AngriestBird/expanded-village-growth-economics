@@ -701,32 +701,7 @@ function GetTownsNearbyIndustryPerCategory()
             local industry_type_id = GSIndustry.GetIndustryType(industry_id);
 
             // Determine the category of this industry type
-            local cargo_list = GSIndustryType.GetAcceptedCargo(industry_type_id);
-            cargo_list.RemoveItem(0); // exclude PASS
-            cargo_list.RemoveItem(2); // exclude MAIL
-            local category = -1;
-            switch (cargo_list.Count())
-            {
-                case 0:
-                    break;
-                case 1:
-                    if (GSIndustryType.IsRawIndustry(industry_type_id))
-                        category = 0;
-                    else
-                        category = 1;
-                    break;
-                case 2:
-                    if (GSIndustryType.IsRawIndustry(industry_type_id))
-                        category = 0;
-                    else
-                        category = 2;
-                    break;
-                case 3:
-                    category = 3;
-                    break;
-                default:
-                    category = 4;
-            }
+            local category = ClassifyIndustryCategory(industry_type_id);
 
             // No accepting cargo
             if (category < 0)
@@ -749,6 +724,64 @@ function GetTownsNearbyIndustryPerCategory()
 
     // Print results
     DebugNearTownIndustryTypes(town_industry_category);
+
+    return town_industry_category;
+}
+
+/* Classify an industry type into a category index (0-4), or -1 if it accepts no cargo. */
+function ClassifyIndustryCategory(industry_type_id)
+{
+    local cargo_list = GSIndustryType.GetAcceptedCargo(industry_type_id);
+    cargo_list.RemoveItem(0); // exclude PASS
+    cargo_list.RemoveItem(2); // exclude MAIL
+    switch (cargo_list.Count())
+    {
+        case 0: return -1;
+        case 1: return GSIndustryType.IsRawIndustry(industry_type_id) ? 0 : 1;
+        case 2: return GSIndustryType.IsRawIndustry(industry_type_id) ? 0 : 2;
+        case 3: return 3;
+        default: return 4;
+    }
+}
+
+/* Industries whose closest town is town_id. */
+function GetIndustriesNearTown(town_id)
+{
+    local industries = [];
+    local industry_list = GSIndustryList();
+    foreach (industry_id, _ in industry_list) {
+        if (GSTile.GetClosestTown(GSIndustry.GetLocation(industry_id)) == town_id)
+            industries.append(industry_id);
+    }
+    return industries;
+}
+
+/* Single-town version of GetTownsNearbyIndustryPerCategory, used when one town is founded. */
+function GetTownNearbyIndustryPerCategory(town_id)
+{
+    local town_industry_category = [];
+    for (local i = 0; i < 5; ++i) {
+        town_industry_category.append([]);
+    }
+
+    foreach (industry_id in GetIndustriesNearTown(town_id)) {
+        local industry_type_id = GSIndustry.GetIndustryType(industry_id);
+        local category = ClassifyIndustryCategory(industry_type_id);
+        if (category < 0)
+            continue;
+
+        local found = false;
+        foreach (saved_industry_type in town_industry_category[category]) {
+            if (saved_industry_type == industry_type_id) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            town_industry_category[category].append(industry_type_id);
+        }
+    }
 
     return town_industry_category;
 }

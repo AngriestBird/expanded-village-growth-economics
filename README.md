@@ -1,26 +1,32 @@
-# Renewed Village Growth (RVG)
+# Expanded Village Growth + Economics (EVGE)
 
-![Renewed Village Growth](https://i.imgur.com/37J9Kn4.png)
+![Expanded Village Growth + Economics](https://i.imgur.com/37J9Kn4.png)
 
-RVG is a Game Script for OpenTTD that manages towns growth in a new and balanced way, making growth depend on varied cargo delivery (passengers, food, goods, ...) and sustained transportation of passangers and mails. The script supports all NewGRF industry replacement sets. It is born as a combination of [keoz's Renewed City Growth GS](https://www.tt-forums.net/viewtopic.php?f=65&t=69827) and [Sylf's City Growth Limiter GS](https://www.tt-forums.net/viewtopic.php?t=58238).
+EVGE is a Game Script for OpenTTD that manages towns growth in a new and balanced way, making growth depend on varied cargo delivery (passengers, food, goods, ...) and sustained transportation of passangers and mails. The script supports all NewGRF industry replacement sets. It is born as a combination of [keoz's Renewed City Growth GS](https://www.tt-forums.net/viewtopic.php?f=65&t=69827) and [Sylf's City Growth Limiter GS](https://www.tt-forums.net/viewtopic.php?t=58238).
 
-Forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052<br/>
-BaNaNaS: https://bananas.openttd.org/package/game-script/52455649
+Forum topic: <https://www.tt-forums.net/viewtopic.php?f=65&t=87052><br/>
+BaNaNaS: <https://bananas.openttd.org/package/game-script/52455649><br/>
+GitHub: <https://github.com/jfkuayue/NewRenewedVillageGrowth><br/>
 
 ## Requirements
 
 - OpenTTD, v. 14.x or newer.
-- GS SuperLib v. 40, ToyLib v. 2, Script Communication for GS v. 45 (you can find it on BaNaNaS, also accessible
+- GS SuperLib v. 40, ToyLib v. 2, Script Communication for GS v. 45 (you can find them on BaNaNaS, also accessible
   through OTTD's "Online Content").
 - Industry sets: you can use any industry NewGRF
-    - these are specifically supported industry NewGRF: Baseset (all climates), FIRS 1.4, 2, 3, 4.3
+  - these are specifically supported industry NewGRF: Baseset (all climates), FIRS 1.4, 2, 3, 4.3
   (all economies), ECS 1.2 (any combination), YETI 0.1.6
   (all except Simplified), NAIS 1.0.6, ITI 1.6, 2.14, XIS 0.6, AXIS 2.2, OTIS 05, IOTC 0.1, LJI 0.1, WRBI 1200,
   Real Beta, Minimalist, PIRS 2022
-    - using RVG with any other unsupported industry set will contain proceduraly generated categories
+  - using EVGE with any other unsupported industry set will contain proceduraly generated categories
+
+To test your build quickly on Linux, run `python3 make_tar.py --install` to copy
+`Expanded_Village_Growth_Economics-<version>.tar` into `~/.local/share/openttd/game`.
 
 ## Translations
+
 Currently available languages:
+
 - English
 - French (rmnvgr, Elarcis)
 - Slovak
@@ -38,19 +44,23 @@ If you want to contribute to a translation, you can do it by modifying a file [e
 
 ## License
 
-Renewed Village Growth is free software; you can redistribute it and/or
+Expanded Village Growth + Economics is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, version 2 of the License
 (see file license.txt).
 
 ## Credits
 
-Author: Firrel<br><br>
+Author: AngriestBird<br><br>
+Renewed Village Growth was originally created by Firrel. This version continues that work.<br><br>
 Thanks to:
+
+- Firrel for the original Renewed Village Growth GS
 - keoz for the Renewed City Growth GS
 - Sylf for the City Growth Limiter GS
 
 Thanks to contributors:
+
 - rmnvgr
 - pr0saic
 - audunmaroey

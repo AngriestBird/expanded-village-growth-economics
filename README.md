@@ -6,7 +6,8 @@ EVGE is a Game Script for OpenTTD that manages towns growth in a new and balance
 
 Forum topic: <https://www.tt-forums.net/viewtopic.php?f=65&t=87052><br/>
 BaNaNaS: <https://bananas.openttd.org/package/game-script/52455649><br/>
-GitHub: <https://github.com/jfkuayue/NewRenewedVillageGrowth><br/>
+GitHub: <https://github.com/AngriestBird/expanded-village-growth-economics><br/>
+Docs: <https://angriestbird.github.io/expanded-village-growth-economics/><br/>
 
 ## Requirements
 
@@ -51,31 +52,4 @@ published by the Free Software Foundation, version 2 of the License
 
 ## Credits
 
-Author: AngriestBird<br><br>
-Renewed Village Growth was originally created by Firrel. This version continues that work.<br><br>
-Thanks to:
-
-- Firrel for the original Renewed Village Growth GS
-- keoz for the Renewed City Growth GS
-- Sylf for the City Growth Limiter GS
-
-Thanks to contributors:
-
-- rmnvgr
-- pr0saic
-- audunmaroey
-- SuperCirno
-- qamil95
-- 2TallTyler
-- pvillaverde
-- pnkrtz
-- fmang
-- Elarcis
-- lezzano000
-- WenSimEHRP
-- Shkarlatov
-- JGRennison
-- bigyihsuan
-- rhoun
-- skye0e
-- mortiy
+See [CREDITS.md](CREDITS.md).

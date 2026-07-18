@@ -1,3 +1,11 @@
+---
+title: Expanded Village Growth + Economics Readme
+description: "Manual and game settings from the bundled readme.txt"
+---
+
+# Expanded Village Growth + Economics Readme
+
+```text
                 *****************************************
                 *  Expanded Village Growth + Economics  *
                 *       A GameScript for OpenTTD        *
@@ -368,3 +376,4 @@ A: Some economies cannot be procedurally industry generated. This can be
    industries. Another cause is that an industry is not considered raw
    until it is placed on the map. Having at least one of each raw industry
    on map will improved procedural generation.
+```

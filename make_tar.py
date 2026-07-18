@@ -66,6 +66,7 @@ args = parser.parse_args()
 
 mainversion = -1
 subversion = -1
+patchversion = -1
 try:
     with open("version.nut", "r") as file:
         for line in file:
@@ -75,6 +76,9 @@ try:
             r2 = re.search(r"SELF_MINORVERSION\s+<-\s+([0-9]+)", line)
             if r2 is not None:
                 subversion = r2.group(1)
+            r3 = re.search(r"SELF_PATCHVERSION\s+<-\s+([0-9]+)", line)
+            if r3 is not None:
+                patchversion = r3.group(1)
 except OSError as exc:
     print(f"Couldn't read version.nut: {exc}")
     raise SystemExit(1)
@@ -83,7 +87,12 @@ if mainversion == -1 or subversion == -1:
     print("Couldn't find " + gs_name + " version in version.nut!")
     raise SystemExit(1)
 
-tmp_dir = gs_name + "-" + str(mainversion) + "." + str(subversion)
+if patchversion == -1:
+    patchversion = 0
+
+tmp_dir = (
+    gs_name + "-" + str(mainversion) + "." + str(subversion) + "." + str(patchversion)
+)
 tar_name = tmp_dir + ".tar"
 
 tmp_path = Path(tmp_dir)
@@ -98,6 +107,7 @@ for file in files:
 copy2("readme.txt", tmp_path)
 copy2("license.txt", tmp_path)
 copy2("changelog.txt", tmp_path)
+copy2("CREDITS.md", tmp_path)
 copytree("lang", tmp_path / "lang")
 
 with tarfile.open(tar_name, "w:") as tar_handle:

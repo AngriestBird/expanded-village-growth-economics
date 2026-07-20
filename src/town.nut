@@ -45,7 +45,7 @@ class GoalTown
             this.town_goals_cat = array(::CargoCatNum, 0);
             this.town_supplied_cat = array(::CargoCatNum, 0);
             this.town_stockpiled_cat = array(::CargoCatNum, 0);
-            this.tgr_array = array(tgr_array_len, 0);
+            this.tgr_array = array(this.tgr_array_len, 0);
             this.limit_transported = 0;
             this.limit_delay = 0;
             this.Randomization(near_town, near_town_probability);
@@ -177,7 +177,7 @@ function GoalTown::MonthlyManageTown(settings)
     }
 
     // Checking whether we should enable or disable town monitoring
-    if (!this.CheckMonitoring(this.is_monitored, settings.valid_companies)) return;
+    if (!this.CheckMonitoring(this.is_monitored, settings.valid_companies, settings.monitoring_timeout)) return;
 
     // Calculate supplied cargo
     local companies_supplied = {};
@@ -271,27 +271,35 @@ function GoalTown::MonthlyManageTown(settings)
     // Defining the new town growth rate, calculated as the moving average of the TGR array, update only if town growth requirements are fulfilled
     local sum_array = 0.0;
     local i = 0;
-    while (this.tgr_array[i] > 0) {
+    while (i < this.tgr_array_len && this.tgr_array[i] > 0) {
         sum_array += this.tgr_array[i];
         i++;
     }
-    this.tgr_array[i] = new_town_growth_rate;
-    sum_array += this.tgr_array[i];
-    this.tgr_average = (sum_array/(i+1)).tointeger();
 
-    // Shift the array by one element when full
-    this.DebugTgrArray() // Debug info: print the array's content
-    if (this.tgr_array[this.tgr_array_len-1] > 0) {
-        this.tgr_array = this.tgr_array.slice(1); // efface element [0] de l'array
-        this.tgr_array.push(0);                   // ajoute 0 en dernier element
+    if (i < this.tgr_array_len) {
+        this.tgr_array[i] = new_town_growth_rate;
+        sum_array += new_town_growth_rate;
+        this.tgr_average = (sum_array / (i + 1)).tointeger();
     }
+    else {
+        // The array is full, drop the oldest sample and append the new one.
+        sum_array = 0.0;
+        for (local j = 0; j < this.tgr_array_len - 1; j++) {
+            this.tgr_array[j] = this.tgr_array[j + 1];
+            sum_array += this.tgr_array[j];
+        }
+        this.tgr_array[this.tgr_array_len - 1] = new_town_growth_rate;
+        sum_array += new_town_growth_rate;
+        this.tgr_average = (sum_array / this.tgr_array_len).tointeger();
+    }
+
+    this.DebugTgrArray() // Debug info: print the array's content
 
     if (this.allowGrowth) {
         GSTown.SetGrowthRate(this.id, this.tgr_average);
     } else {
         GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NONE);
     }
-
     // Find the biggest contributor
     local max_contrib = 0.0;
     local total_contrib = 0.0;
@@ -369,7 +377,7 @@ function GoalTown::ManageTownLimiting(threshold_setting, min_transported) {
  * towns which are not supplied with pax. Returns true if the town
  * must be monitored, false otherwise.
  */
-function GoalTown::CheckMonitoring(monitored, valid_companies)
+function GoalTown::CheckMonitoring(monitored, valid_companies, monitoring_timeout)
 {
     /* To enable monitoring it is better to check the delivery
      * from the town and not to the town. This is necessary for
@@ -400,22 +408,26 @@ function GoalTown::CheckMonitoring(monitored, valid_companies)
         }
     } else {
         /* For monitored towns: if there isn't passengers
-         * delivery from the town since more than 1 year, we
-         * stop the monitoring. This is necessary for very
-         * little towns, which otherwise could never grow.
+         * delivery from the town for too long, we stop monitoring.
+         * This is necessary for very little towns, which otherwise
+         * could never grow.
          */
         if (delivery_check > 0) {
             this.last_delivery = GSDate.GetCurrentDate();
             return true;
         }
 
-        if ((GSDate.GetCurrentDate()-this.last_delivery) < 365) {
+        if (monitoring_timeout == 0) {
+            return true;
+        }
+
+        if ((GSDate.GetCurrentDate()-this.last_delivery) < monitoring_timeout) {
             return true;
         } else {
             GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NONE);
             this.is_monitored = false;
             this.town_stockpiled_cat = array(::CargoCatNum, 0);
-            this.tgr_array = array(tgr_array_len, 0);
+            this.tgr_array = array(this.tgr_array_len, 0);
             this.tgr_average = null;
             this.StopMonitors(valid_companies);
             this.RemoveSignText();

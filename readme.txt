@@ -5,7 +5,7 @@
 
 Version: 1.1.0
 
-Usefull URL's:
+Useful URLs:
 - forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052
 - github: https://github.com/AngriestBird/expanded-village-growth-economics
 - docs: https://angriestbird.github.io/expanded-village-growth-economics/
@@ -25,14 +25,14 @@ Content:
 Expanded Village Growth + Economics (EVGE) is a game script which changes the way towns
 grow in OTTD. Various cargo requirements and passenger/mail percentage
 transported are defined - monthly - for each town. Towns only grow
-if those requirements are - partially or completely - satisfied. RVG
+if those requirements are - partially or completely - satisfied. EVGE
 supports all industry sets.
 
 The script only defines requirements for towns who are exchanging
 passengers (meaning that a delivery of passengers coming from a town
 is detected). Unless a town exchange passengers, it is not monitored
 and you will not see any cargo requirement. The check is done
-monthly. When a town stops exchanging passengers for six month, it
+monthly. When a town stops exchanging passengers for six months, it
 gets out from the list of monitored towns.
 
 If passenger delivery is detected, the script defines some cargo
@@ -41,7 +41,7 @@ by cargo types but by more general cargo categories, each of them
 containing several cargo types. For example, cargo category 1 contains
 Passengers and Mail cargo types. To achieve a cargo category
 requirement, you can deliver to the town any of the category's cargo
-type (for category 1, you can deliver indifferently Passengers or
+type (for category 1, you can deliver interchangeably Passengers or
 Mail). If you delivery more cargo than necessary, the surplus is
 stockpiled to be consumed next month (towns can stockpile a quantity
 of 10 * cargotype requirement). Note that the cargo requirements
@@ -78,7 +78,7 @@ size. Passengers and mail are required whatever the town's size is,
 while Raw food cargos are required only for towns bigger
 500. Raw materials cargos, for towns bigger than 1500.
 Hence, little towns only need Cat.1 cargos (Public services) to
-grow, while towns with at least 500 habitants also need - increasingly
+grow, while towns with at least 500 inhabitants also need increasingly
 - raw food. When cities grow more, other categories come in play. That
 means, that in the end, you can only expect to have a full - and long
 term - city growth when developing some local industry, to which
@@ -95,7 +95,7 @@ Player 1 supplies category 1 to 80%, category 2 to 40% and category 3 to 0%.
 Player 2 supplies category 1 to 100%, category 2 to 20% and category 3 to 15%.
 Player 1 contributes 120%, Player 2 contributes 135% and is the Contributor.
 
-The informations that the script gives are:
+The script gives this information:
 - Under each town name, a text indicates the actual town growth
   rate, only for the monitored towns; the number indicates how many
   days will you'll have to wait between each town expansion.
@@ -104,7 +104,7 @@ The informations that the script gives are:
     - Contributor - company name that contributed the most to the town
     - Limiter - information about the cargo that limits the growth
     - Categories - cargo categories and their supplied/required info
-  Note that the town window only displays informations for cargo
+  Note that the town window only displays information for cargo
   categories which are required in a given town at a given
   moment. Thus, in little towns, it is normal to only see an
   indication for category 1.
@@ -115,10 +115,10 @@ The informations that the script gives are:
     - Combined
     - Full cargo list
   See "Town info display mode" GS setting.
-- The StoryBook also gives informations:
+- The StoryBook also gives information:
     - Cargo page - there you can find a general description of
       the categories used in the game, according to your settings.
-      It also gives you some additional informations, such as the
+      It also gives you some additional information, such as the
       population limit at which each category becomes necessary for
       towns to grow.
     - Welcome page - shows description how this GS works and where
@@ -126,7 +126,7 @@ The informations that the script gives are:
     - Custom page - if enabled, shows custom information like server
       rules.
 - The Goals display statistics of a player containing:
-    - Growth points - receive a point for every new habitant of a town
+    - Growth points - receive a point for every new resident of a town
                       over the maximum achieved town size
     - Average town category - average of number of categories of
                               contributed towns
@@ -180,7 +180,7 @@ Normal settings:
   load. (locked on start)
 - "Eternal love from towns": Every month, change the rating of all
   local authorities to be at least of the set level
-- "Debug": allows to define the amount of informations which are
+- "Debug": allows you to define the amount of information that is
   printed in GS' log. Set it to 2 if you want to see current cargo
   labels and their index numbers. Set it to 3 if you want check
   details about calculations.
@@ -225,12 +225,14 @@ Limit growth settings:
   cargo generated by the town that month must be transported
 - "Minimum size of town before the limit rules kicks in": at what
   population of the town the growth limitation will start
+- "Monitoring timeout": how many days a town stays monitored after no
+  more passengers are picked up from it
 - "Stop growth after set amount of months": keep growing for the amount
   of months after limiter stops the growth
 
 Subsidies:
 - "Subsidies: Create subsidies for contributed towns": enable/disable/select
-  which type of subsidy should be generated. Passanger subsidy creates link
+  which type of subsidy should be generated. Passenger subsidy creates a link
   from biggest town to a closest unclaimed town. Cargo subsidy creates link
   from unused industry to a contributed town's industry.
 
@@ -279,7 +281,7 @@ they can safely be changed while the game is running:
 - "TGR growth exponentiality factor": when the script scales the town
   growth rate to the percentage of achieved requirement, this relation
   is not linear but exponential. By increasing this setting you can
-  increase exponentiality. To put it simple: the higher is this
+  increase exponentiality. To put it simply: the higher is this
   number, the more you need to approach a 100% supply to have a decent
   growth.
 - "lowest TGR if requirements are not met": for some reason, when
@@ -304,8 +306,8 @@ they can safely be changed while the game is running:
     (all except Simplified), NAIS 1.0.6, ITI 1.6, 2.17, XIS 0.6,
     AXIS 2.2, 2.3, OTIS 05, IOTC 0.1, LJI 0.1, WRBI 1200, Real Beta,
     Minimalist, PIRS 2022, Default Industries Plus (temperate).
-  Using RVG with any other unsupported industry set will contain
-  proceduraly generated categories
+  Using EVGE with any other unsupported industry set will contain
+  procedurally generated categories
 
 
 4. License
@@ -365,7 +367,7 @@ A: If no industry accepts the cargo, the industry has to be funded
    as the town, the industry placed there will be near enough the town.
 
 Q: What to do when procedural cargo generation fails?
-A: Some economies cannot be proceduraly created. You can choose from more
+A: Some economies cannot be procedurally created. You can choose from more
    than 30 supported economies or submit issue to github/tt-forums stating
    the unsupported economy. Another cause is that an industry is not
    considered raw until it is placed on the map. Having at least

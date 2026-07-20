@@ -9,7 +9,7 @@
  */
 
 
-require("version.nut");
+require("src/version.nut");
 
 class MainClass extends GSInfo
     {
@@ -208,6 +208,15 @@ class MainClass extends GSInfo
             hard_value = 350,
             custom_value = 350,
             flags = CONFIG_INGAME, min_value = 0, max_value = 50000, step_size = 25});
+
+        AddSetting({
+            name = "town_monitoring_timeout",
+            description = "Monitoring: Keep towns active for this many days without pick-up (0 = never)",
+            easy_value = 365,
+            medium_value = 365,
+            hard_value = 365,
+            custom_value = 365,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 3650, step_size = 5});
 
         AddSetting({
             name = "limiter_delay",

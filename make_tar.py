@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from glob import iglob
+
 from pathlib import Path
 import platform
 import re
@@ -67,8 +67,12 @@ args = parser.parse_args()
 mainversion = -1
 subversion = -1
 patchversion = -1
+version_path = Path("src/version.nut")
+if not version_path.exists():
+    version_path = Path("version.nut")
+
 try:
-    with open("version.nut", "r") as file:
+    with open(version_path, "r") as file:
         for line in file:
             r = re.search(r"SELF_MAJORVERSION\s+<-\s+([0-9]+)", line)
             if r is not None:
@@ -80,11 +84,11 @@ try:
             if r3 is not None:
                 patchversion = r3.group(1)
 except OSError as exc:
-    print(f"Couldn't read version.nut: {exc}")
+    print(f"Couldn't read {version_path}: {exc}")
     raise SystemExit(1)
 
 if mainversion == -1 or subversion == -1:
-    print("Couldn't find " + gs_name + " version in version.nut!")
+    print("Couldn't find " + gs_name + " version in " + str(version_path) + "!")
     raise SystemExit(1)
 
 if patchversion == -1:
@@ -100,14 +104,19 @@ if tmp_path.exists():
     rmtree(tmp_path)
 tmp_path.mkdir()
 
-files = iglob("*.nut")
-for file in files:
-    if os.path.isfile(file):
-        copy2(file, tmp_path)
-copy2("readme.txt", tmp_path)
-copy2("license.txt", tmp_path)
-copy2("changelog.txt", tmp_path)
-copy2("CREDITS.md", tmp_path)
+for file in ["readme.txt", "license.txt", "changelog.txt", "CREDITS.md"]:
+    copy2(file, tmp_path)
+
+for file in Path(".").glob("*.nut"):
+    if file.is_file():
+        copy2(str(file), tmp_path)
+
+# Copy all Squirrel files in src/ while keeping directory layout.
+for file in Path("src").rglob("*.nut"):
+    dest = tmp_path / file.relative_to(".")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    copy2(str(file), dest)
+
 copytree("lang", tmp_path / "lang")
 
 with tarfile.open(tar_name, "w:") as tar_handle:

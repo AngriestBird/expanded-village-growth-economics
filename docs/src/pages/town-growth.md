@@ -1,4 +1,5 @@
 ---
+layout: ../layouts/DocsLayout.astro
 title: Town growth mechanics
 description: "How EVGE decides when and how fast towns grow"
 ---

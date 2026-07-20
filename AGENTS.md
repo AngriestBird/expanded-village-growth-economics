@@ -23,8 +23,17 @@
 
 - For language changes, edit `lang/english.txt` first and keep other languages aligned by key.
 - Do not hand-edit generated or ignored artifacts (`*.tar`).
-- The manual lives in `readme.txt` only. The Pages workflow generates `docs/readme.md` from it at deploy; do not create or edit that file by hand.
+- The manual lives in `readme.txt` only. The Pages workflow generates `docs/src/pages/readme.md` from it at deploy; do not create or hand-edit that file.
 - Keep changes minimal and scoped to the requested behavior.
+
+## Website and docs iteration
+
+- The docs site now uses Astro + Bun in `docs/`.
+- Website docs are in `docs/` and published via `.github/workflows/pages.yml`.
+- The manual for the website is generated from `readme.txt` into `docs/src/pages/readme.md` during deployment.
+- Visual updates should be made through Astro docs files in `docs/src/layouts`, `docs/src/styles`, and `docs/astro.config.mjs`, while content updates live in `docs/src/pages/`.
+- Use a standard, readable palette for UI updates before introducing custom color systems.
+- Keep website/UX work on a dedicated branch so it does not mix with gameplay logic changes.
 
 ## Validation
 

@@ -1,0 +1,13 @@
+{
+  "name": "expanded-village-growth-economics-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bunx astro dev",
+    "generate-readme": "bun run scripts/generate-readme.mjs",
+    "build": "bunx astro build"
+  },
+  "dependencies": {
+    "astro": "^5.11.0"
+  }
+}

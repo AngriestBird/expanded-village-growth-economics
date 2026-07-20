@@ -1,0 +1,48 @@
+---
+const { frontmatter } = Astro.props;
+import '../styles/site.css';
+
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: `${base}`, label: 'Home' },
+  { href: `${base}town-growth/`, label: 'Town growth' },
+  { href: `${base}goal-stats/`, label: 'Goal stats' },
+  { href: `${base}what-is-this/`, label: 'Taxes and economy' },
+  { href: `${base}settings-guide/`, label: 'Settings guide' },
+  { href: `${base}readme/`, label: 'Manual' },
+];
+
+const title = frontmatter?.title ?? 'Expanded Village Growth + Economics';
+const description = frontmatter?.description ?? '';
+const current = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href={base}>EVGE Documentation</a>
+        <nav class="top-nav" aria-label="Primary">
+          {links.map((link) => (
+            <a href={link.href} class:list={{ 'current': current === link.href || current === `${link.href.replace(/\/$/, '')}/` }}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      <article class="doc-card">
+        <slot />
+        <footer class="site-footer">Expanded Village Growth + Economics documentation.</footer>
+      </article>
+    </main>
+  </body>
+</html>

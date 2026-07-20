@@ -1,4 +1,5 @@
 ---
+layout: ../layouts/DocsLayout.astro
 title: Goal stats and interpretation
 description: "Understanding what EVGE writes into company goals"
 ---

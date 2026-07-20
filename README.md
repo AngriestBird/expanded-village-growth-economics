@@ -17,9 +17,9 @@ This makes local industry and route planning matter much more than just populati
 
 - [Full manual](readme.txt)
 - [GitHub Pages documentation](https://angriestbird.github.io/expanded-village-growth-economics/)
-- [How town growth works](docs/town-growth.md)
-- [Goal stat guide](docs/goal-stats.md)
-- [Settings playbook](docs/settings-guide.md)
+- [How town growth works](https://angriestbird.github.io/expanded-village-growth-economics/town-growth/)
+- [Goal stat guide](https://angriestbird.github.io/expanded-village-growth-economics/goal-stats/)
+- [Settings playbook](https://angriestbird.github.io/expanded-village-growth-economics/settings-guide/)
 
 ## Project layout
 

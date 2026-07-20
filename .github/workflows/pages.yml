@@ -22,45 +22,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate manual page from readme.txt
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          lines = Path("readme.txt").read_text().splitlines()
-          out = [
-              "---",
-              "title: Expanded Village Growth + Economics Readme",
-              "description: \"Manual and game settings from the bundled readme.txt\"",
-              "---",
-              "",
-          ]
-
-          header = re.compile(r"^[1-6]\.\s+.*$")
-          for line in lines:
-              match = header.match(line)
-              if match:
-                  out.append(f"## {line}")
-              else:
-                  out.append(line)
-
-          Path("docs/readme.md").write_text("\n".join(out) + "\n")
-          PY
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Build site
-        uses: actions/jekyll-build-pages@v1
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          source: docs
-          destination: docs/_site
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: docs
+
+      - name: Generate manual page from readme.txt
+        run: bun run generate-readme
+        working-directory: docs
+
+      - name: Build site
+        run: bun run build
+        working-directory: docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/_site
+          path: docs/dist
 
   deploy:
     needs: build

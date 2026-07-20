@@ -4,4 +4,8 @@ slnx.sqlite
 .suo
 .opencode/
 .claude/
-docs/readme.md
+docs/src/pages/readme.md
+docs/dist/
+docs/.astro/
+docs/node_modules/
+docs/bun.lock

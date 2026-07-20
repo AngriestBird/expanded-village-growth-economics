@@ -1,4 +1,5 @@
 ---
+layout: ../layouts/DocsLayout.astro
 title: Settings playbook
 description: "Quick guide to EVGE settings and tuning"
 ---

@@ -83,7 +83,7 @@ grow, while towns with at least 500 inhabitants also need increasingly
 means, that in the end, you can only expect to have a full - and long
 term - city growth when developing some local industry, to which
 deliver raw and transformed industrial materials. For details about
-each industry set watch at cargo.nut.
+each industry set watch at src/cargo.nut.
 
 Each town decides on a new Contributor at the start of a new month. This
 Contributor is chosen by the level of contribution to the categories of

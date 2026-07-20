@@ -2,46 +2,63 @@
 
 ![Expanded Village Growth + Economics](https://i.imgur.com/37J9Kn4.png)
 
-EVGE is a Game Script for OpenTTD that manages towns growth in a new and balanced way, making growth depend on varied cargo delivery (passengers, food, goods, ...) and sustained transportation of passangers and mails. The script supports all NewGRF industry replacement sets. It is born as a combination of [keoz's Renewed City Growth GS](https://www.tt-forums.net/viewtopic.php?f=65&t=69827) and [Sylf's City Growth Limiter GS](https://www.tt-forums.net/viewtopic.php?t=58238).
+EVGE replaces default OpenTTD growth with a cargo-based model.
+Towns start being managed once they export passengers, then they need the right mix of cargo to keep growing.
+This makes local industry and route planning matter much more than just population pumping.
 
-Forum topic: <https://www.tt-forums.net/viewtopic.php?f=65&t=87052><br/>
-BaNaNaS: <https://bananas.openttd.org/package/game-script/52455649><br/>
-GitHub: <https://github.com/AngriestBird/expanded-village-growth-economics><br/>
-Docs: <https://angriestbird.github.io/expanded-village-growth-economics/><br/>
+## Documentation and player notes
+
+- Docs site: <https://angriestbird.github.io/expanded-village-growth-economics/>
+- GitHub: <https://github.com/AngriestBird/expanded-village-growth-economics>
+- Forum topic: <https://www.tt-forums.net/viewtopic.php?f=65&t=87052>
+- BaNaNaS: <https://bananas.openttd.org/package/game-script/52455649>
+
+## Quick links
+
+- [Full manual](readme.txt)
+- [GitHub Pages documentation](https://angriestbird.github.io/expanded-village-growth-economics/)
+- [How town growth works](docs/town-growth.md)
+- [Goal stat guide](docs/goal-stats.md)
+- [Settings playbook](docs/settings-guide.md)
+
+## Project layout
+
+- `main.nut` is a loader that boots the actual script from `src/main.nut`.
+- Core GameScript logic now lives under `src/` (for example, `src/town.nut`, `src/cargo.nut`, `src/info.nut`).
 
 ## Requirements
 
-- OpenTTD, v. 14.x or newer.
-- GS SuperLib v. 40, ToyLib v. 2, Script Communication for GS v. 45 (you can find them on BaNaNaS, also accessible
-  through OTTD's "Online Content").
-- Industry sets: you can use any industry NewGRF
-  - these are specifically supported industry NewGRF: Baseset (all climates), FIRS 1.4, 2, 3, 4.3, 5.2
-  (all economies), FIRS Forked: Oil Town, ECS 1.2 (any combination), YETI 0.1.6
-  (all except Simplified), NAIS 1.0.6, ITI 1.6, 2.17, XIS 0.6, AXIS 2.2, 2.3, OTIS 05, IOTC 0.1, LJI 0.1, WRBI 1200,
-  Real Beta, Minimalist, PIRS 2022, Default Industries Plus (temperate)
-  - using EVGE with any other unsupported industry set will contain proceduraly generated categories
+- OpenTTD 14.x or newer.
+- GS SuperLib v. 40, ToyLib v. 2, Script Communication for GS v. 45 (also available through OTTD Online Content).
+- Industry sets: most common NewGRFs are supported, from base sets to FIRS, ECS, YETI, NAIS, FIRS Forked, and more.
+  - unsupported sets still work with generated category fallbacks.
 
-To test your build quickly on Linux, run `python3 make_tar.py --install` to copy
-`Expanded_Village_Growth_Economics-<version>.tar` into `~/.local/share/openttd/game`.
+## Testing your build
+
+Build and install quickly on Linux with:
+
+```bash
+python3 make_tar.py --install
+```
 
 ## Translations
 
-Currently available languages:
+Available languages:
 
 - English
-- French (rmnvgr, Elarcis)
+- French
 - Slovak
 - Czech
-- Simplified Chinese (SuperCirno, WenSimEHRP)
-- Polish (qamil95)
-- Galician (pvillaverde)
-- German (pnkrtz)
-- Japanese (fmang)
-- Traditional Chinese (WenSimEHRP)
-- Russian (Shkarlatov)
-- Ukrainian (mortiy)
+- Simplified Chinese
+- Polish
+- Galician
+- German
+- Japanese
+- Traditional Chinese
+- Russian
+- Ukrainian
 
-If you want to contribute to a translation, you can do it by modifying a file [english.txt](lang/english.txt) and posting it to the forum topic or creating a new issue/pull request with this file included. All instances of `{STRING[number]}` need to be replaced by `{STRING}` in all other languages.
+To update translation text, edit `lang/english.txt` and sync matching placeholders in the other language files.
 
 ## License
 

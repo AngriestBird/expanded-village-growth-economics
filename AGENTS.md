@@ -4,17 +4,17 @@
 
 ## Repo map
 
-- `main.nut`: game-script entry and wiring
-- `cargo.nut`: cargo handling and category mapping
-- `industry.nut`: industry discovery and utility
-- `town.nut`: town growth core logic
-- `company.nut`: company-related logic
-- `subsidies.nut`: subsidy generation
-- `taxes.nut`: infrastructure tax feature
-- `story.nut`: StoryBook pages and intro text
-- `strings.nut`: localized string IDs and settings labels
-- `info.nut`: metadata for NewGRF metadata (`desc`, supported versions, deps)
-- `version.nut`: version and save compatibility numbers
+- `main.nut`: loader that boots the script from `src/main.nut`
+- `src/cargo.nut`: cargo handling and category mapping
+- `src/industry.nut`: industry discovery and utility
+- `src/town.nut`: town growth core logic
+- `src/company.nut`: company-related logic
+- `src/subsidies.nut`: subsidy generation
+- `src/taxes.nut`: infrastructure tax feature
+- `src/story.nut`: StoryBook pages and intro text
+- `src/strings.nut`: localized string IDs and settings labels
+- `src/info.nut`: metadata for NewGRF metadata (`desc`, supported versions, deps)
+- `src/version.nut`: version and save compatibility numbers
 - `lang/`: translation files
 - `tools/check_lang.py`: translation validator
 - `make_tar.py`: packaging script for release tarballs
@@ -39,4 +39,4 @@ CI runs both steps on push/PR.
 
 ## Version/release notes
 
-- Bump `version.nut` before release work; keep `readme.txt`/`changelog.txt` and packaged version references consistent with it.
+- Bump `src/version.nut` before release work; keep `readme.txt`/`changelog.txt` and packaged version references consistent with it.

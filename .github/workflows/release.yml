@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Read and validate tag against version.nut
+      - name: Read and validate tag against src/version.nut
         id: version
         run: |
           python3 - <<'PY'
@@ -30,20 +30,20 @@ jobs:
 
           tag = os.environ["GITHUB_REF_NAME"]
 
-          version_text = Path("version.nut").read_text(encoding="utf-8")
+          version_text = Path("src/version.nut").read_text(encoding="utf-8")
           major = re.search(r"SELF_MAJORVERSION\s*<-\s*(\d+)", version_text)
           minor = re.search(r"SELF_MINORVERSION\s*<-\s*(\d+)", version_text)
           patch = re.search(r"SELF_PATCHVERSION\s*<-\s*(\d+)", version_text)
 
           if major is None or minor is None:
-              raise SystemExit("Could not read SELF_MAJORVERSION or SELF_MINORVERSION from version.nut")
+              raise SystemExit("Could not read SELF_MAJORVERSION or SELF_MINORVERSION from src/version.nut")
 
           patch_version = patch.group(1) if patch is not None else "0"
           expected = f"v{major.group(1)}.{minor.group(1)}.{patch_version}"
           beta_pattern = re.compile(rf"^{re.escape(expected)}-beta(?:\.[0-9A-Za-z-]+)*$")
           if tag != expected and not beta_pattern.match(tag):
               raise SystemExit(
-                  f"Tag {tag} does not match version.nut {expected}. "
+                  f"Tag {tag} does not match src/version.nut {expected}. "
                   "Expected tag format: "
                   f"{expected} or {expected}-beta[.<suffix>]"
               )

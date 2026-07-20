@@ -1,4 +1,5 @@
 ---
+layout: ../layouts/DocsLayout.astro
 title: What is this?
 description: "Expanded Village Growth + Economics taxation and town investment notes"
 ---

@@ -1,9 +1,57 @@
 /*
- * Infrastructure tax. Each month, companies pay a tax scaled by their
- * total rail, road, and dock infrastructure, with a bonus for each large town
- * they actively serve. Better town ratings reduce taxes. The money is a
- * sink and there is no solvency check, so companies may go into debt.
+ * Infrastructure tax. Each month, companies pay a tax scaled by their rail,
+ * road and canal network plus their dock and airport stations, with a bonus for
+ * each large town they actively serve. Better town ratings reduce taxes. The
+ * money is a sink and there is no solvency check, so companies may go into debt.
+ *
+ * The two buckets are stored under the historic tax_rail_road_* and tax_dock_*
+ * names so that savegames from 1.2.0 keep loading.
  */
+
+/* Split a month's tax between the network and station buckets. Kept free of GS
+ * API calls so tests/ can exercise the arithmetic without a running game.
+ */
+function CalculateTaxBill(network_base, station_base, difficulty, big_town_bonus,
+                          num_big_towns, rating_multiplier, rebate_rate, growth_points)
+{
+    local bill = { network = 0, stations = 0, rebate = 0, total = 0 };
+
+    local taxable = network_base + station_base;
+    if (taxable <= 0)
+        return bill;
+
+    local gross = (taxable * difficulty * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
+    if (gross <= 0)
+        return bill;
+
+    local rebate = (rebate_rate * difficulty * growth_points).tointeger();
+    if (rebate < 0)
+        rebate = 0;
+    else if (rebate > gross)
+        rebate = gross;
+
+    local network_gross = (gross * network_base.tofloat() / taxable).tointeger();
+    local station_gross = gross - network_gross;
+    local network_rebate = (rebate * network_gross.tofloat() / gross).tointeger();
+    local station_rebate = rebate - network_rebate;
+
+    bill.network = network_gross - network_rebate;
+    bill.stations = station_gross - station_rebate;
+    bill.rebate = rebate;
+    bill.total = bill.network + bill.stations;
+
+    return bill;
+}
+
+/* GSController.GetSetting hands back -1 for a setting the running config does
+ * not know, which happens for a rate added after the savegame was made. A
+ * negative rate would pay the company instead of charging it.
+ */
+function GetTaxRateSetting(name)
+{
+    local value = GSController.GetSetting(name);
+    return value < 0 ? 0 : value;
+}
 
 function GetTownTaxMultiplier(town_id, company_id, rating_discount)
 {
@@ -37,9 +85,11 @@ function ChargeTaxes(companies, towns_by_contributor, date)
     if (!GSController.GetSetting("tax_enable"))
         return;
 
-    local tax_rate = GSController.GetSetting("tax_rate");
-    local dock_tax_rate = GSController.GetSetting("tax_dock_rate");
-    if (tax_rate <= 0 && dock_tax_rate <= 0)
+    local tax_rate = GetTaxRateSetting("tax_rate");
+    local dock_tax_rate = GetTaxRateSetting("tax_dock_rate");
+    local airport_tax_rate = GetTaxRateSetting("tax_airport_rate");
+    local canal_tax_rate = GetTaxRateSetting("tax_canal_rate");
+    if (tax_rate <= 0 && dock_tax_rate <= 0 && airport_tax_rate <= 0 && canal_tax_rate <= 0)
         return;
 
     // Reuse the same difficulty knob as cargo requirements
@@ -54,15 +104,18 @@ function ChargeTaxes(companies, towns_by_contributor, date)
         if (GSCompany.ResolveCompanyID(company.id) == GSCompany.COMPANY_INVALID)
             continue;
 
-        // Whole-map rail + road infrastructure and dock stations the company owns
+        // Whole-map network pieces and the terminal stations the company owns
         local infra = GSInfrastructure.GetInfrastructurePieceCount(company.id, GSInfrastructure.INFRASTRUCTURE_RAIL)
                     + GSInfrastructure.GetInfrastructurePieceCount(company.id, GSInfrastructure.INFRASTRUCTURE_ROAD);
+        local canals = GSInfrastructure.GetInfrastructurePieceCount(company.id, GSInfrastructure.INFRASTRUCTURE_CANAL);
         local docks = 0;
+        local airports = 0;
         {
             local dummy = GSCompanyMode(company.id);
             docks = GSStationList(GSStation.STATION_DOCK).Count();
+            airports = GSStationList(GSStation.STATION_AIRPORT).Count();
         }
-        if (infra <= 0 && docks <= 0) {
+        if (infra <= 0 && canals <= 0 && docks <= 0 && airports <= 0) {
             company.RecordTaxHistory(year, month, 0, 0, 0);
             continue;
         }
@@ -87,37 +140,29 @@ function ChargeTaxes(companies, towns_by_contributor, date)
                 rating_multiplier = town_rating_total / rated_towns;
         }
 
-        local rail_road_base = tax_rate * infra;
-        local infrastructure_tax = rail_road_base + dock_tax_rate * docks;
-        local gross_tax = (infrastructure_tax * difficulty * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
-        local rebate = (rebate_rate * difficulty * company.points_this_month).tointeger();
-        if (rebate > gross_tax)
-            rebate = gross_tax;
+        local network_base = tax_rate * infra + canal_tax_rate * canals;
+        local station_base = dock_tax_rate * docks + airport_tax_rate * airports;
+        local bill = CalculateTaxBill(network_base, station_base, difficulty, big_town_bonus,
+                                      num_big_towns, rating_multiplier, rebate_rate,
+                                      company.points_this_month);
 
-        local rail_road_gross = gross_tax > 0 ? (gross_tax * rail_road_base.tofloat() / infrastructure_tax).tointeger() : 0;
-        local dock_gross = gross_tax - rail_road_gross;
-        local rail_road_rebate = rebate > 0 ? (rebate * rail_road_gross.tofloat() / gross_tax).tointeger() : 0;
-        local dock_rebate = rebate - rail_road_rebate;
-        local rail_road_tax = rail_road_gross - rail_road_rebate;
-        local dock_tax = dock_gross - dock_rebate;
-        local tax = rail_road_tax + dock_tax;
-
-        company.tax_rebate_last_month = rebate;
-        company.tax_rail_road_last_month = rail_road_tax;
-        company.tax_dock_last_month = dock_tax;
-        company.tax_last_month = tax;
-        company.RecordTaxHistory(year, month, rail_road_tax, dock_tax, rebate);
-        if (tax <= 0)
+        company.tax_rebate_last_month = bill.rebate;
+        company.tax_rail_road_last_month = bill.network;
+        company.tax_dock_last_month = bill.stations;
+        company.tax_last_month = bill.total;
+        company.RecordTaxHistory(year, month, bill.network, bill.stations, bill.rebate);
+        if (bill.total <= 0)
             continue;
 
-        GSCompany.ChangeBankBalance(company.id, -tax, GSCompany.EXPENSES_OTHER, tile);
-        company.tax_rail_road_paid += rail_road_tax;
-        company.tax_dock_paid += dock_tax;
-        company.tax_paid += tax;
+        GSCompany.ChangeBankBalance(company.id, -bill.total, GSCompany.EXPENSES_OTHER, tile);
+        company.tax_rail_road_paid += bill.network;
+        company.tax_dock_paid += bill.stations;
+        company.tax_paid += bill.total;
 
-        Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (rail/road: "
-                 + rail_road_tax + ", docks: " + dock_tax + ", pieces: " + infra + ", dock stations: "
-                 + docks + ", big towns: " + num_big_towns + ", rating: x"
-                 + rating_multiplier + ", rebate: " + rebate + ")", Log.LVL_DEBUG);
+        Log.Info(GSCompany.GetName(company.id) + " paid " + bill.total + " infrastructure tax (network: "
+                 + bill.network + ", stations: " + bill.stations + ", pieces: " + infra + ", canals: "
+                 + canals + ", dock stations: " + docks + ", airports: " + airports + ", big towns: "
+                 + num_big_towns + ", rating: x" + rating_multiplier + ", rebate: " + bill.rebate + ")",
+                 Log.LVL_DEBUG);
     }
 }

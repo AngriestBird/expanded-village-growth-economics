@@ -471,26 +471,56 @@ function GetCargoCatFromIndustryCat(industry_cat)
     return cargo_cat;
 }
 
+/* One packed integer per category, 9 bits per industry id stored as id+1 so that
+ * a zero slot means "empty". Categories hold at most two industries, so a value
+ * never grows past 18 bits.
+ *
+ * The old format packed the whole table into a single integer, 9 bits per
+ * industry with an 8 bit id field. That capped ids at 255 and left room for
+ * exactly seven industries on a 64-bit build (three on a 32-bit one), which is
+ * the widest table RandomizeIndustry can currently emit. No headroom at all.
+ */
 function GetIndustryHash(industry_cat)
 {
-    local hash = 0;
-    local index = 0;
-    foreach (cat_idx, cat in industry_cat)
+    local hash = [];
+    foreach (cat in industry_cat)
     {
-        local new_cat = 0x01;
-        foreach (ind_idx, ind in cat)
+        local packed = 0;
+        local shift = 0;
+        foreach (ind in cat)
         {
-            local industry = ((ind & 0xff) << 1) | new_cat; // | industry id 8 bit | new category flag 1 bit |
-            hash = hash | (industry << index);
-            index += 9;
-            new_cat = 0x00;
+            packed = packed | (((ind + 1) & 0x1ff) << shift);
+            shift += 9;
         }
+        hash.append(packed);
     }
 
     return hash;
 }
 
 function GetIndustryTable(hash)
+{
+    if (typeof hash != "array")
+        return GetLegacyIndustryTable(hash);
+
+    local industry_cat = [];
+    foreach (packed in hash) {
+        local cat = [];
+        while (packed > 0) {
+            local industry = (packed & 0x1ff) - 1;
+            if (industry < 0)
+                break;
+            cat.append(industry);
+            packed = packed >> 9;
+        }
+        industry_cat.append(cat);
+    }
+
+    return industry_cat;
+}
+
+/* Decoder for the single-integer format written by 1.2.0 and earlier. */
+function GetLegacyIndustryTable(hash)
 {
     local industry_cat = [];
     local cat_idx = 0;

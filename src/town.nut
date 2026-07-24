@@ -35,7 +35,7 @@ class GoalTown
         /* If there isn't saved data for the towns, we
          * initialize them. Otherwise, we load saved data.
          */
-        if (!load_town_data || this.id >= ::TownDataTable.len()) {
+        if (!load_town_data || !::TownDataTable.rawin(this.id)) {
             this.sign_id = -1;
             this.contributor = -1;
             this.max_population = GSTown.GetPopulation(this.id);
@@ -341,7 +341,7 @@ function GoalTown::MonthlyManageTown(settings)
     GSTown.SetText(this.id, this.TownBoxText(true, settings.info_mode, true));
 }
 
-function GoalTown::ManageTownLimiting(threshold_setting, min_transported) {
+function GoalTown::ManageTownLimiting(threshold_setting, min_transported, limiter_delay) {
     // if the town limiting is turned off or the size of the town is below the threshold, set requirements to zero
     local townPopulation = GSTown.GetPopulation(this.id);
 
@@ -363,7 +363,7 @@ function GoalTown::ManageTownLimiting(threshold_setting, min_transported) {
 
     if (sum_transported / ::CargoLimiter.len() < min_transported) {
         ++this.limit_delay;
-        if (this.limit_delay > GSController.GetSetting("limiter_delay")) {
+        if (this.limit_delay > limiter_delay) {
             this.limit_delay = 0;
             this.allowGrowth = false;
         }

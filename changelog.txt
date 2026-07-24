@@ -1,5 +1,16 @@
 Expanded Village Growth + Economics Changelog
 
+Unreleased
+- added: airports and canals are now taxed, so air and water networks no longer
+  dodge the infrastructure tax. Two new rate settings, tax buckets are now
+  "network" (rail, road, canals) and "stations" (docks, airports)
+- added: unit tests and a compile check for every script, run in CI
+- changed: town cargo requirements are stored per category instead of packed
+  into one integer, which removes the 255 industry id ceiling. Savegames from
+  1.2.0 still load
+- fixed: towns with non-contiguous ids could lose their saved cargo
+  requirements on load and get re-randomized
+
 Version 1.2.0 (2026-07-24)
 - added: Docks are now properly taxed like every other asset
 - added: Taxes story book for more detailed information with respects to taxes

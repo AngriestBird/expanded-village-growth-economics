@@ -30,7 +30,8 @@ Use the randomization type to control local variety.
 
 ## Taxes and subsidies
 
-- Taxes apply on owned rail/road infrastructure.
+- Taxes apply to owned rail/road infrastructure and dock stations. Set each
+  rate separately.
 - Growth rebate can convert last month population gain into a partial refund.
 - Subsidies can be enabled to spawn useful passenger or cargo routes toward contributed towns.
 

@@ -244,6 +244,9 @@ and has no solvency check, so companies can go into debt.
 - "Taxes: Rate per rail/road infrastructure piece": base charge per rail and
   road infrastructure piece the company owns. The total is also scaled by the
   "Difficulty level" setting.
+- "Taxes: Rate per dock station": base charge per dock station the company
+  owns. A station with one or more docks is charged once. This is scaled by the
+  "Difficulty level" setting too.
 - "Taxes: Extra percentage per contributed town over 500 population": adds this
   percentage to the bill for each town the company actively serves (still
   monitored) that is larger than 500 population.

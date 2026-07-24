@@ -1,6 +1,6 @@
 /*
  * Infrastructure tax. Each month, companies pay a tax scaled by their
- * total rail and road infrastructure, with a bonus for each large town
+ * total rail, road, and dock infrastructure, with a bonus for each large town
  * they actively serve. Better town ratings reduce taxes. The money is a
  * sink and there is no solvency check, so companies may go into debt.
  */
@@ -36,7 +36,8 @@ function ChargeTaxes(companies, towns_by_contributor)
         return;
 
     local tax_rate = GSController.GetSetting("tax_rate");
-    if (tax_rate <= 0)
+    local dock_tax_rate = GSController.GetSetting("tax_dock_rate");
+    if (tax_rate <= 0 && dock_tax_rate <= 0)
         return;
 
     // Reuse the same difficulty knob as cargo requirements
@@ -49,10 +50,15 @@ function ChargeTaxes(companies, towns_by_contributor)
         if (GSCompany.ResolveCompanyID(company.id) == GSCompany.COMPANY_INVALID)
             continue;
 
-        // Whole-map rail + road infrastructure the company owns
+        // Whole-map rail + road infrastructure and dock stations the company owns
         local infra = GSInfrastructure.GetInfrastructurePieceCount(company.id, GSInfrastructure.INFRASTRUCTURE_RAIL)
                     + GSInfrastructure.GetInfrastructurePieceCount(company.id, GSInfrastructure.INFRASTRUCTURE_ROAD);
-        if (infra <= 0)
+        local docks = 0;
+        {
+            local dummy = GSCompanyMode(company.id);
+            docks = GSStationList(GSStation.STATION_DOCK).Count();
+        }
+        if (infra <= 0 && docks <= 0)
             continue;
 
         // Bonus for each large town the company actively serves (monitored, above the raw-food threshold)
@@ -75,7 +81,8 @@ function ChargeTaxes(companies, towns_by_contributor)
                 rating_multiplier = town_rating_total / rated_towns;
         }
 
-        local gross_tax = (tax_rate * difficulty * infra * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
+        local infrastructure_tax = tax_rate * infra + dock_tax_rate * docks;
+        local gross_tax = (infrastructure_tax * difficulty * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
         local rebate = (rebate_rate * difficulty * company.points_this_month).tointeger();
         if (rebate > gross_tax)
             rebate = gross_tax;
@@ -89,7 +96,7 @@ function ChargeTaxes(companies, towns_by_contributor)
         company.tax_last_month = tax;
 
         Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (pieces: "
-                 + infra + ", big towns: " + num_big_towns + ", rating: x"
+                 + infra + ", docks: " + docks + ", big towns: " + num_big_towns + ", rating: x"
                  + rating_multiplier + ", rebate: " + rebate + ")", Log.LVL_DEBUG);
     }
 }

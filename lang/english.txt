@@ -53,7 +53,7 @@ STR_SB_WELCOME_LIMIT_GROWTH         :{SILVER}{CARGO_LIST}{BLACK} from that town 
 STR_SB_WELCOME_LIMIT_GROWTH_DELAY   :The growth stops after {SILVER}{NUM} months{BLACK} of not fulfilling this requirement.
 STR_SB_WELCOME_STATISTICS           :Company providing the majority of cargo to a town becomes its {ORANGE}Contributor{BLACK}. Every new population above largest population of that town is counted towards {ORANGE}growth points{BLACK} of that company. See the growth points and statistics in the {ORANGE}Goal list{BLACK}.
 STR_SB_WELCOME_ETERNAL_LOVE         :{SILVER}Eternal Love{BLACK} changes {ORANGE}local authority rating{BLACK} of each town once per month to at least {SILVER}{STRING}{BLACK}.
-STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail and road{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates.
+STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail, road, and dock{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates.
 STR_SB_WELCOME_END                  :Have fun!
 
 ##### CUSTOM STORY BOOK #####

@@ -10,8 +10,10 @@ This script has two tax-related mechanics you can tune in Advanced Game Settings
 
 ## Taxes
 
-- Base infrastructure tax is charged on rail and road pieces.
-  - Formula: `tax_rate * goal_scale_factor * (rail + road) * (1 + big_town_bonus * contributed_towns)`.
+- Base infrastructure tax is charged on rail and road pieces, plus dock stations.
+  - Formula: `(tax_rate * (rail + road) + tax_dock_rate * docks) *`
+    `goal_scale_factor / 100 * (1 + big_town_bonus * contributed_towns)`.
+  - A station with one or more docks is charged once.
 - The bill is multiplied by the average of all contributed towns' local authority ratings.
   - With `tax_rating_discount = 30`, an excellent town rating gives ~30% off.
   - At low or missing ratings, no discount is applied.

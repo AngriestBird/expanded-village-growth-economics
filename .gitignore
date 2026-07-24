@@ -9,3 +9,4 @@ docs/dist/
 docs/.astro/
 docs/node_modules/
 docs/bun.lock
+.pi-subagents/

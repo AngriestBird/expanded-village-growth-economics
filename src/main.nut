@@ -516,11 +516,12 @@ function MainClass::ManageTowns()
             valid_companies = valid_companies,
             monitoring_timeout = GSController.GetSetting("town_monitoring_timeout")
         };
+        local limiter_delay = GSController.GetSetting("limiter_delay");
 
         // Bucket towns by contributor so each company's GUI update is a single pass, not towns x companies
         local towns_by_contributor = {};
         foreach (town in this.towns) {
-            town.ManageTownLimiting(threshold_setting, min_transport);
+            town.ManageTownLimiting(threshold_setting, min_transport, limiter_delay);
             town.MonthlyManageTown(monthly_settings);
             if (this.actual_town_info_mode > 1) {
                 town.UpdateTownText(this.actual_town_info_mode);

@@ -17,6 +17,8 @@
 - `src/version.nut`: version and save compatibility numbers
 - `lang/`: translation files
 - `tools/check_lang.py`: translation validator
+- `tools/run_tests.py`: compile check for every script plus the unit tests
+- `tests/run_tests.nut`: unit tests for the pure helpers in `src/`
 - `make_tar.py`: packaging script for release tarballs
 
 ## Common workflow
@@ -40,11 +42,18 @@
 Run before finishing:
 
 ```bash
+python3 tools/run_tests.py
 python3 tools/check_lang.py
 python3 make_tar.py
 ```
 
-CI runs both steps on push/PR.
+CI runs all three steps on push/PR.
+
+`run_tests.py` needs a standalone Squirrel interpreter (`apt-get install
+squirrel3`, or set `SQ=/path/to/sq`). It compiles every `.nut` file before
+running the tests, which catches syntax slips such as using a reserved word
+like `base` for a local. Only add files to `tests/run_tests.nut` that are safe
+to load outside OpenTTD: no GS API calls or `this` access at file scope.
 
 ## Version/release notes
 

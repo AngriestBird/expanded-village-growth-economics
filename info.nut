@@ -269,6 +269,24 @@ class MainClass extends GSInfo
             flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
         AddSetting({
+            name = "tax_airport_rate",
+            description = "Taxes: Rate per airport station",
+            easy_value = 2,
+            medium_value = 3,
+            hard_value = 5,
+            custom_value = 3,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
+
+        AddSetting({
+            name = "tax_canal_rate",
+            description = "Taxes: Rate per canal infrastructure piece",
+            easy_value = 2,
+            medium_value = 3,
+            hard_value = 5,
+            custom_value = 3,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
+
+        AddSetting({
             name = "tax_big_town_bonus",
             description = "Taxes: Extra percentage per contributed town over 500 population",
             easy_value = 5,

@@ -244,6 +244,9 @@ and has no solvency check, so companies can go into debt.
 - "Taxes: Rate per rail/road infrastructure piece": base charge per rail and
   road infrastructure piece the company owns. The total is also scaled by the
   "Difficulty level" setting.
+- "Taxes: Rate per dock station": base charge per dock station the company
+  owns. A station with one or more docks is charged once. This is scaled by the
+  "Difficulty level" setting too.
 - "Taxes: Extra percentage per contributed town over 500 population": adds this
   percentage to the bill for each town the company actively serves (still
   monitored) that is larger than 500 population.
@@ -252,8 +255,9 @@ and has no solvency check, so companies can go into debt.
   when this is set (for example 30 for a 30% maximum discount at top rating).
 - "Taxes: Rebate per population your towns gained last month": turns town growth
   into a tax rebate for the same month.
-The cumulative tax paid, last month paid, and last month rebate are shown in each
-company's Goal statistics.
+Each company's Goal statistics show total, rail/road, and dock tax paid, plus
+last month's breakdown and rebate. The Tax history Goal opens a Story Book page
+with up to 36 months of history. Use the Older and Newer buttons to browse it.
 
 Category settings:
 These settings change the cargo category values and can only be changed

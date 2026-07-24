@@ -235,6 +235,11 @@ function MainClass::HandleEvents()
             this.UpdateCompanyList();
             break;
 
+        case GSEvent.ET_STORYPAGE_BUTTON_CLICK:
+            if (this.story_editor != null)
+                this.story_editor.HandleTaxHistoryButton(this.companies, event);
+            break;
+
         default: break;
         }
     }
@@ -529,7 +534,7 @@ function MainClass::ManageTowns()
         }
 
         // Charge the infrastructure tax before updating the GUI so the stat reflects it
-        ChargeTaxes(this.companies, towns_by_contributor);
+        ChargeTaxes(this.companies, towns_by_contributor, date);
 
         // Reset the monthly growth accumulator after the tax rebate has read it
         foreach (company in this.companies)
@@ -538,6 +543,7 @@ function MainClass::ManageTowns()
         foreach (company in this.companies) {
             company.MonthlyUpdateGUIGoals(towns_by_contributor.rawin(company.id)
                                           ? towns_by_contributor[company.id] : []);
+            this.story_editor.UpdateTaxHistoryPage(company);
         }
 
         this.current_month = month;

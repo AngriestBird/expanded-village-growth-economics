@@ -10,18 +10,18 @@ This script has two tax-related mechanics you can tune in Advanced Game Settings
 
 ## Taxes
 
-- Base infrastructure tax is charged on rail and road pieces.
-  - Formula: `tax_rate * goal_scale_factor * (rail + road) * (1 + big_town_bonus * contributed_towns)`.
+- Base infrastructure tax is charged on rail and road pieces, plus dock stations.
+  - Formula: `(tax_rate * (rail + road) + tax_dock_rate * docks) *`
+    `goal_scale_factor / 100 * (1 + big_town_bonus * contributed_towns)`.
+  - A station with one or more docks is charged once.
 - The bill is multiplied by the average of all contributed towns' local authority ratings.
   - With `tax_rating_discount = 30`, an excellent town rating gives ~30% off.
   - At low or missing ratings, no discount is applied.
 - Population growth can also rebate part of this month's bill through `tax_growth_rebate`.
 
-The script writes all of this to Goal stats as:
-
-- Infrastructure taxes paid
-- Infrastructure tax last month
-- Infrastructure tax rebate last month
+The Goal list shows total, rail/road, and dock taxes paid, plus each amount for
+last month and the rebate. Its Tax history entry opens a company StoryBook page
+with a 36-month history, a relative text bar chart, and Older/Newer buttons.
 
 ## Invest in an area
 
@@ -34,6 +34,6 @@ You get tax impact through play:
 
 ## Taxes-paid trend
 
-OpenTTD's GameScript goal target types do not expose custom graph widgets.
-There is no native taxes-paid graph in this script right now.
-Use the monthly values in Goal stats for trend tracking, or export your own notes in separate tools if you need charts.
+OpenTTD's GameScript API has no custom graph widget. The Tax history StoryBook
+page provides a 12-month text bar chart and lets players browse up to 36 months
+with its Older and Newer buttons.

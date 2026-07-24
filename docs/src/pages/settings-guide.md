@@ -33,6 +33,7 @@ Use the randomization type to control local variety.
 - Taxes apply to owned rail/road infrastructure and dock stations. Set each
   rate separately.
 - Growth rebate can convert last month population gain into a partial refund.
+- The Tax history Goal opens a 36-month breakdown with Older/Newer controls.
 - Subsidies can be enabled to spawn useful passenger or cargo routes toward contributed towns.
 
 ## Expert values

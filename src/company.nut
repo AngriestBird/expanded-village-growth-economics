@@ -9,6 +9,11 @@ enum Statistics
     TAX_PAID,
     TAX_PAID_LAST_MONTH,
     TAX_REBATE_LAST_MONTH,
+    TAX_RAIL_ROAD_PAID,
+    TAX_DOCK_PAID,
+    TAX_RAIL_ROAD_LAST_MONTH,
+    TAX_DOCK_LAST_MONTH,
+    TAX_HISTORY,
     END
 }
 
@@ -19,14 +24,27 @@ class Company
     tax_paid = null;        // cumulative infrastructure tax paid
     tax_last_month = null;  // infrastructure tax charged in the most recent month
     tax_rebate_last_month = null; // infrastructure tax rebate in the most recent month
+    tax_rail_road_paid = null;
+    tax_dock_paid = null;
+    tax_rail_road_last_month = null;
+    tax_dock_last_month = null;
+    tax_history = null;
     points_this_month = null; // population gained by contributed towns this month
     statistics = null;      // contains texts for statistics in goal gui
     global_goal = null;     // global goal showing achieved points in the goal gui
     sp_welcome = null;      // story page welcome
+    sp_tax_history = null;
+    tax_history_offset = null;
+    tax_history_previous_button = null;
+    tax_history_next_button = null;
 
     constructor(id, load_data)
     {
         this.id = id;
+        this.sp_tax_history = null;
+        this.tax_history_offset = 0;
+        this.tax_history_previous_button = -1;
+        this.tax_history_next_button = -1;
 
         if (!load_data)
         {
@@ -34,6 +52,11 @@ class Company
             this.tax_paid = 0;
             this.tax_last_month = 0;
             this.tax_rebate_last_month = 0;
+            this.tax_rail_road_paid = 0;
+            this.tax_dock_paid = 0;
+            this.tax_rail_road_last_month = 0;
+            this.tax_dock_last_month = 0;
+            this.tax_history = [];
             this.points_this_month = 0;
             this.InitGUIGoals();
         }
@@ -44,6 +67,11 @@ class Company
             this.tax_paid = company_data.rawin("tax_paid") ? company_data.tax_paid : 0;
             this.tax_last_month = company_data.rawin("tax_last_month") ? company_data.tax_last_month : 0;
             this.tax_rebate_last_month = company_data.rawin("tax_rebate_last_month") ? company_data.tax_rebate_last_month : 0;
+            this.tax_rail_road_paid = company_data.rawin("tax_rail_road_paid") ? company_data.tax_rail_road_paid : 0;
+            this.tax_dock_paid = company_data.rawin("tax_dock_paid") ? company_data.tax_dock_paid : 0;
+            this.tax_rail_road_last_month = company_data.rawin("tax_rail_road_last_month") ? company_data.tax_rail_road_last_month : 0;
+            this.tax_dock_last_month = company_data.rawin("tax_dock_last_month") ? company_data.tax_dock_last_month : 0;
+            this.tax_history = company_data.rawin("tax_history") ? company_data.tax_history : [];
             this.points_this_month = company_data.rawin("points_this_month") ? company_data.points_this_month : 0;
             this.global_goal = company_data.global_goal;
             this.statistics = company_data.statistics;
@@ -61,6 +89,11 @@ function Company::SavingCompanyData()
     company_data.tax_paid <- this.tax_paid;
     company_data.tax_last_month <- this.tax_last_month;
     company_data.tax_rebate_last_month <- this.tax_rebate_last_month;
+    company_data.tax_rail_road_paid <- this.tax_rail_road_paid;
+    company_data.tax_dock_paid <- this.tax_dock_paid;
+    company_data.tax_rail_road_last_month <- this.tax_rail_road_last_month;
+    company_data.tax_dock_last_month <- this.tax_dock_last_month;
+    company_data.tax_history <- this.tax_history;
     company_data.points_this_month <- this.points_this_month;
     company_data.global_goal <- this.global_goal;
     company_data.statistics <- this.statistics;
@@ -107,6 +140,21 @@ function Company::InitGUIGoals()
     this.statistics[Statistics.TAX_REBATE_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_REBATE), GSGoal.GT_NONE, 0);
     GSGoal.SetProgress(this.statistics[Statistics.TAX_REBATE_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rebate_last_month));
 
+    this.statistics[Statistics.TAX_RAIL_ROAD_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_RAIL_ROAD_PAID), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_RAIL_ROAD_PAID], GSText(GSText.STR_CURRENCY, this.tax_rail_road_paid));
+
+    this.statistics[Statistics.TAX_DOCK_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_DOCK_PAID), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_DOCK_PAID], GSText(GSText.STR_CURRENCY, this.tax_dock_paid));
+
+    this.statistics[Statistics.TAX_RAIL_ROAD_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_RAIL_ROAD_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_RAIL_ROAD_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rail_road_last_month));
+
+    this.statistics[Statistics.TAX_DOCK_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_DOCK_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_DOCK_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_dock_last_month));
+
+    this.statistics[Statistics.TAX_HISTORY] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_HISTORY), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_HISTORY], GSText(GSText.STR_STATISTICS_TAX_HISTORY_OPEN));
+
     // Reset to previous settings
     GSGameSettings.SetValue("construction.command_pause_level", pause_level);
 
@@ -126,9 +174,26 @@ function Company::AddPoints(points)
     this.points_this_month += gain;
 }
 
-function Company::AddTaxPaid(amount)
+function Company::AddTaxPaid(rail_road, docks)
 {
-    this.tax_paid += amount > 0 ? amount : 0;
+    this.tax_rail_road_paid += rail_road > 0 ? rail_road : 0;
+    this.tax_dock_paid += docks > 0 ? docks : 0;
+    this.tax_paid += rail_road + docks;
+}
+
+function Company::RecordTaxHistory(year, month, rail_road, docks, rebate)
+{
+    this.tax_history.append({
+        year = year,
+        month = month,
+        rail_road = rail_road,
+        docks = docks,
+        rebate = rebate,
+        total = rail_road + docks
+    });
+
+    if (this.tax_history.len() > 36)
+        this.tax_history.remove(0);
 }
 
 function Company::MonthlyUpdateGUIGoals(towns)
@@ -218,6 +283,28 @@ function Company::MonthlyUpdateGUIGoals(towns)
     if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_REBATE_LAST_MONTH]))
         this.statistics[Statistics.TAX_REBATE_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_REBATE), GSGoal.GT_NONE, 0);
     GSGoal.SetProgress(this.statistics[Statistics.TAX_REBATE_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rebate_last_month));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_RAIL_ROAD_PAID]))
+        this.statistics[Statistics.TAX_RAIL_ROAD_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_RAIL_ROAD_PAID), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_RAIL_ROAD_PAID], GSText(GSText.STR_CURRENCY, this.tax_rail_road_paid));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_DOCK_PAID]))
+        this.statistics[Statistics.TAX_DOCK_PAID] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_DOCK_PAID), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_DOCK_PAID], GSText(GSText.STR_CURRENCY, this.tax_dock_paid));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_RAIL_ROAD_LAST_MONTH]))
+        this.statistics[Statistics.TAX_RAIL_ROAD_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_RAIL_ROAD_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_RAIL_ROAD_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_rail_road_last_month));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_DOCK_LAST_MONTH]))
+        this.statistics[Statistics.TAX_DOCK_LAST_MONTH] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_DOCK_LAST_MONTH), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_DOCK_LAST_MONTH], GSText(GSText.STR_CURRENCY, this.tax_dock_last_month));
+
+    if (!GSGoal.IsValidGoal(this.statistics[Statistics.TAX_HISTORY]))
+        this.statistics[Statistics.TAX_HISTORY] = GSGoal.New(this.id, GSText(GSText.STR_STATISTICS_TAX_HISTORY), GSGoal.GT_NONE, 0);
+    GSGoal.SetProgress(this.statistics[Statistics.TAX_HISTORY], GSText(GSText.STR_STATISTICS_TAX_HISTORY_OPEN));
+    if (this.sp_tax_history != null && GSStoryPage.IsValidStoryPage(this.sp_tax_history))
+        GSGoal.SetDestination(this.statistics[Statistics.TAX_HISTORY], GSGoal.GT_STORY_PAGE, this.sp_tax_history);
 }
 
 function GetColorText(company_id)

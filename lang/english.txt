@@ -53,7 +53,14 @@ STR_SB_WELCOME_LIMIT_GROWTH         :{SILVER}{CARGO_LIST}{BLACK} from that town 
 STR_SB_WELCOME_LIMIT_GROWTH_DELAY   :The growth stops after {SILVER}{NUM} months{BLACK} of not fulfilling this requirement.
 STR_SB_WELCOME_STATISTICS           :Company providing the majority of cargo to a town becomes its {ORANGE}Contributor{BLACK}. Every new population above largest population of that town is counted towards {ORANGE}growth points{BLACK} of that company. See the growth points and statistics in the {ORANGE}Goal list{BLACK}.
 STR_SB_WELCOME_ETERNAL_LOVE         :{SILVER}Eternal Love{BLACK} changes {ORANGE}local authority rating{BLACK} of each town once per month to at least {SILVER}{STRING}{BLACK}.
-STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail, road, and dock{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates.
+STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail, road, and dock{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates. Open {ORANGE}Tax history{BLACK} in the Story Book for a breakdown.
+STR_SB_TAX_HISTORY_TITLE            :Tax history
+STR_SB_TAX_HISTORY_EMPTY            :No infrastructure tax has been charged yet.
+STR_SB_TAX_HISTORY_SUMMARY          :Most recent {NUM} months. Bars compare total tax within this page.
+STR_SB_TAX_HISTORY_ROW              :{NUM}/{NUM}: rail/road {STRING}, docks {STRING}, rebate {STRING}, total {STRING}
+STR_SB_TAX_HISTORY_BAR              :{NUM}/{NUM}: {RAW_STRING}
+STR_SB_TAX_HISTORY_OLDER            :Older
+STR_SB_TAX_HISTORY_NEWER            :Newer
 STR_SB_WELCOME_END                  :Have fun!
 
 ##### CUSTOM STORY BOOK #####
@@ -70,9 +77,15 @@ STR_STATISTICS_GROWTH_TOWN      :{BLACK}Fastest growing town in days {SILVER}{TO
 STR_STATISTICS_AVERAGE_CATEGORY :{BLACK}Average town category{ORANGE}
 STR_STATISTICS_NUM_TOWNS        :{BLACK}Number of contributed towns{ORANGE}
 STR_STATISTICS_NOT_GROWING      :{BLACK}Number of not growing towns{ORANGE}
-STR_STATISTICS_TAX_PAID         :{BLACK}Infrastructure taxes paid{ORANGE}
-STR_STATISTICS_TAX_LAST_MONTH   :{BLACK}Infrastructure tax last month{ORANGE}
-STR_STATISTICS_TAX_REBATE       :{BLACK}Infrastructure tax rebate last month{ORANGE}
+STR_STATISTICS_TAX_PAID                 :{BLACK}Total infrastructure taxes paid{ORANGE}
+STR_STATISTICS_TAX_LAST_MONTH           :{BLACK}Total infrastructure tax last month{ORANGE}
+STR_STATISTICS_TAX_REBATE               :{BLACK}Infrastructure tax rebate last month{ORANGE}
+STR_STATISTICS_TAX_RAIL_ROAD_PAID       :{BLACK}Rail/road infrastructure taxes paid{ORANGE}
+STR_STATISTICS_TAX_DOCK_PAID            :{BLACK}Dock taxes paid{ORANGE}
+STR_STATISTICS_TAX_RAIL_ROAD_LAST_MONTH :{BLACK}Rail/road infrastructure tax last month{ORANGE}
+STR_STATISTICS_TAX_DOCK_LAST_MONTH      :{BLACK}Dock tax last month{ORANGE}
+STR_STATISTICS_TAX_HISTORY              :{BLACK}Tax history{ORANGE}
+STR_STATISTICS_TAX_HISTORY_OPEN         :{SILVER}Open Story Book{ORANGE}
 
 ##### TOWNBOX #####
 STR_TOWNBOX_CONTRIBUTOR         :Largest population {SILVER}{NUM}{BLACK}{} * {SILVER}{COMPANY}{BLACK}

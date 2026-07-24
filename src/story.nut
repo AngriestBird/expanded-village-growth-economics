@@ -84,6 +84,108 @@ function StoryEditor::WelcomePage(sp_welcome)
     GSStoryPage.NewElement(sp_welcome, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WELCOME_END));
 }
 
+function GetTaxHistoryBar(total, maximum)
+{
+    if (total <= 0 || maximum <= 0)
+        return "-";
+
+    local length = (total.tofloat() * 20 / maximum).tointeger();
+    if (length < 1)
+        length = 1;
+
+    local bar = "";
+    for (local i = 0; i < length; ++i)
+        bar += "#";
+    return bar;
+}
+
+function StoryEditor::CreateTaxHistoryPage(company)
+{
+    company.sp_tax_history = this.NewStoryPage(company.id, GSText(GSText.STR_SB_TAX_HISTORY_TITLE));
+    if (GSStoryPage.IsValidStoryPage(company.sp_tax_history)
+            && company.statistics != null && GSGoal.IsValidGoal(company.statistics[Statistics.TAX_HISTORY]))
+        GSGoal.SetDestination(company.statistics[Statistics.TAX_HISTORY], GSGoal.GT_STORY_PAGE, company.sp_tax_history);
+    this.UpdateTaxHistoryPage(company);
+}
+
+function StoryEditor::UpdateTaxHistoryPage(company)
+{
+    if (company.sp_tax_history == null || !GSStoryPage.IsValidStoryPage(company.sp_tax_history))
+        return;
+
+    local elements = GSStoryPageElementList(company.sp_tax_history);
+    foreach (element, _ in elements)
+        GSStoryPage.RemoveElement(element);
+
+    company.tax_history_previous_button = -1;
+    company.tax_history_next_button = -1;
+
+    local history = company.tax_history;
+    if (history.len() == 0) {
+        GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_HISTORY_EMPTY));
+        return;
+    }
+
+    local end = history.len() - company.tax_history_offset;
+    if (end < 1) {
+        company.tax_history_offset = 0;
+        end = history.len();
+    }
+    local start = end > 12 ? end - 12 : 0;
+    local maximum = 0;
+    for (local i = start; i < end; ++i) {
+        if (history[i].total > maximum)
+            maximum = history[i].total;
+    }
+
+    GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
+                           GSText(GSText.STR_SB_TAX_HISTORY_SUMMARY, end - start));
+    for (local i = end - 1; i >= start; --i) {
+        local entry = history[i];
+        GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
+                               GSText(GSText.STR_SB_TAX_HISTORY_ROW, entry.year, entry.month + 1,
+                                      GSText(GSText.STR_CURRENCY, entry.rail_road),
+                                      GSText(GSText.STR_CURRENCY, entry.docks),
+                                      GSText(GSText.STR_CURRENCY, entry.rebate),
+                                      GSText(GSText.STR_CURRENCY, entry.total)));
+        GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
+                               GSText(GSText.STR_SB_TAX_HISTORY_BAR, entry.year, entry.month + 1,
+                                      GetTaxHistoryBar(entry.total, maximum)));
+    }
+
+    if (start > 0) {
+        company.tax_history_previous_button = GSStoryPage.NewElement(
+            company.sp_tax_history, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_LEFT),
+            GSText(GSText.STR_SB_TAX_HISTORY_OLDER));
+    }
+    if (company.tax_history_offset > 0) {
+        company.tax_history_next_button = GSStoryPage.NewElement(
+            company.sp_tax_history, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_RIGHT),
+            GSText(GSText.STR_SB_TAX_HISTORY_NEWER));
+    }
+}
+
+function StoryEditor::HandleTaxHistoryButton(companies, event)
+{
+    event = GSEventStoryPageButtonClick.Convert(event);
+    foreach (company in companies) {
+        if (company.id != event.GetCompanyID() || company.sp_tax_history != event.GetStoryPageID())
+            continue;
+
+        if (event.GetElementID() == company.tax_history_previous_button)
+            company.tax_history_offset += 12;
+        else if (event.GetElementID() == company.tax_history_next_button)
+            company.tax_history_offset -= 12;
+        else
+            return;
+
+        this.UpdateTaxHistoryPage(company);
+        return;
+    }
+}
+
 /* Create a page showing informations about cargo categories. */
 function StoryEditor::CargoInfoPage(sp_cargo)
 {
@@ -198,6 +300,7 @@ function StoryEditor::CreateStoryBook(companies, num_towns, init_error)
             // Create welcome page
             company.sp_welcome = this.NewStoryPage(company.id, GSText(GSText.STR_SB_WELCOME_TITLE, SELF_MAJORVERSION, SELF_MINORVERSION));
             this.WelcomePage(company.sp_welcome);
+            this.CreateTaxHistoryPage(company);
             GSStoryPage.Show(company.sp_welcome);
         }
     }
@@ -234,6 +337,7 @@ function StoryEditor::CreateNewCompanyStoryBook(company)
     // Create welcome page
     company.sp_welcome = this.NewStoryPage(company.id, GSText(GSText.STR_SB_WELCOME_TITLE, SELF_MAJORVERSION, SELF_MINORVERSION));
     this.WelcomePage(company.sp_welcome);
+    this.CreateTaxHistoryPage(company);
     GSStoryPage.Show(company.sp_welcome);
 }
 

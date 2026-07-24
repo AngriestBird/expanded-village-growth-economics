@@ -24,12 +24,14 @@ function GetTownTaxMultiplier(town_id, company_id, rating_discount)
     return multiplier;
 }
 
-function ChargeTaxes(companies, towns_by_contributor)
+function ChargeTaxes(companies, towns_by_contributor, date)
 {
     // Clear the previous month's figure first so companies not charged this month show 0
     foreach (company in companies) {
         company.tax_last_month = 0;
         company.tax_rebate_last_month = 0;
+        company.tax_rail_road_last_month = 0;
+        company.tax_dock_last_month = 0;
     }
 
     if (!GSController.GetSetting("tax_enable"))
@@ -58,8 +60,10 @@ function ChargeTaxes(companies, towns_by_contributor)
             local dummy = GSCompanyMode(company.id);
             docks = GSStationList(GSStation.STATION_DOCK).Count();
         }
-        if (infra <= 0 && docks <= 0)
+        if (infra <= 0 && docks <= 0) {
+            company.RecordTaxHistory(GSDate.GetYear(date), GSDate.GetMonth(date), 0, 0, 0);
             continue;
+        }
 
         // Bonus for each large town the company actively serves (monitored, above the raw-food threshold)
         local num_big_towns = 0;
@@ -81,22 +85,36 @@ function ChargeTaxes(companies, towns_by_contributor)
                 rating_multiplier = town_rating_total / rated_towns;
         }
 
-        local infrastructure_tax = tax_rate * infra + dock_tax_rate * docks;
+        local rail_road_base = tax_rate * infra;
+        local dock_base = dock_tax_rate * docks;
+        local infrastructure_tax = rail_road_base + dock_base;
         local gross_tax = (infrastructure_tax * difficulty * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
         local rebate = (rebate_rate * difficulty * company.points_this_month).tointeger();
         if (rebate > gross_tax)
             rebate = gross_tax;
+
+        local rail_road_gross = gross_tax > 0 ? (gross_tax * rail_road_base.tofloat() / infrastructure_tax).tointeger() : 0;
+        local dock_gross = gross_tax - rail_road_gross;
+        local rail_road_rebate = rebate > 0 ? (rebate * rail_road_gross.tofloat() / gross_tax).tointeger() : 0;
+        local dock_rebate = rebate - rail_road_rebate;
+        local rail_road_tax = rail_road_gross - rail_road_rebate;
+        local dock_tax = dock_gross - dock_rebate;
+        local tax = rail_road_tax + dock_tax;
+
         company.tax_rebate_last_month = rebate;
-        local tax = gross_tax - rebate;
+        company.tax_rail_road_last_month = rail_road_tax;
+        company.tax_dock_last_month = dock_tax;
+        company.tax_last_month = tax;
+        company.RecordTaxHistory(GSDate.GetYear(date), GSDate.GetMonth(date), rail_road_tax, dock_tax, rebate);
         if (tax <= 0)
             continue;
 
         GSCompany.ChangeBankBalance(company.id, -tax, GSCompany.EXPENSES_PROPERTY, tile);
-        company.AddTaxPaid(tax);
-        company.tax_last_month = tax;
+        company.AddTaxPaid(rail_road_tax, dock_tax);
 
-        Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (pieces: "
-                 + infra + ", docks: " + docks + ", big towns: " + num_big_towns + ", rating: x"
+        Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (rail/road: "
+                 + rail_road_tax + ", docks: " + dock_tax + ", pieces: " + infra + ", dock stations: "
+                 + docks + ", big towns: " + num_big_towns + ", rating: x"
                  + rating_multiplier + ", rebate: " + rebate + ")", Log.LVL_DEBUG);
     }
 }

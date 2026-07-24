@@ -127,16 +127,13 @@ function StoryEditor::UpdateTaxHistoryPage(company)
                            GSText(GSText.STR_SB_TAX_HISTORY_SUMMARY, end - start));
     for (local i = end - 1; i >= start; --i) {
         local entry = history[i];
-        local bar = "-";
-        if (entry.total > 0 && maximum > 0) {
-            local length = (entry.total.tofloat() * 20 / maximum).tointeger();
-            if (length < 1)
-                length = 1;
+        local position = 0;
+        if (entry.total > 0 && maximum > 0)
+            position = (entry.total.tofloat() * 20 / maximum + 0.5).tointeger();
 
-            bar = "";
-            for (local j = 0; j < length; ++j)
-                bar += "#";
-        }
+        local line = "";
+        for (local j = 0; j <= 20; ++j)
+            line += j == position ? "#" : ".";
 
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
                                GSText(GSText.STR_SB_TAX_HISTORY_ROW, entry.year, entry.month + 1,
@@ -145,7 +142,7 @@ function StoryEditor::UpdateTaxHistoryPage(company)
                                       GSText(GSText.STR_CURRENCY, entry.rebate),
                                       GSText(GSText.STR_CURRENCY, entry.total)));
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_BAR, entry.year, entry.month + 1, bar));
+                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month + 1, line));
     }
 
     if (start > 0) {
@@ -276,9 +273,15 @@ function StoryEditor::CustomPage(sp_custom)
  */
 function StoryEditor::CreateStoryBook(companies, num_towns, init_error)
 {
-    // Remove any eventual previous existent storypage
-    local sb_list = GSStoryPageList(0);
-    foreach (page, _ in sb_list) GSStoryPage.Remove(page);
+    // Remove any eventual previous existent storypage, for every company and global
+    for (local c = GSCompany.COMPANY_FIRST; c <= GSCompany.COMPANY_LAST; c++) {
+        if (GSCompany.ResolveCompanyID(c) == GSCompany.COMPANY_INVALID)
+            continue;
+        local sb_list = GSStoryPageList(c);
+        foreach (page, _ in sb_list) GSStoryPage.Remove(page);
+    }
+    local sb_global = GSStoryPageList(GSCompany.COMPANY_INVALID);
+    foreach (page, _ in sb_global) GSStoryPage.Remove(page);
 
     if (!init_error) {
         // Create basic cargo informations page

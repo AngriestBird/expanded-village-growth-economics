@@ -1,12 +1,12 @@
-require("src/version.nut");
-require("src/cargo.nut");
-require("src/industry.nut");
-require("src/town.nut");
-require("src/company.nut");
-require("src/subsidies.nut")
-require("src/taxes.nut");
-require("src/story.nut");
-require("src/strings.nut");
+require("version.nut");
+require("cargo.nut");
+require("industry.nut");
+require("town.nut");
+require("company.nut");
+require("subsidies.nut");
+require("taxes.nut");
+require("story.nut");
+require("strings.nut");
 
 // Import SuperLib for GameScript
 import("util.superlib", "SuperLib", 40);
@@ -276,7 +276,8 @@ function MainClass::Save()
         {
             save_table.town_data_table[town.id] <- town.SavingTownData();
         }
-        Log.Info("Opcodes per saved town = " + ((start_opcodes - GSController.GetOpsTillSuspend()) / this.towns.len()), Log.LVL_DEBUG);
+        if (this.towns.len() > 0)
+            Log.Info("Opcodes per saved town = " + ((start_opcodes - GSController.GetOpsTillSuspend()) / this.towns.len()), Log.LVL_DEBUG);
         // Also store a savegame version flag
         save_table.save_version <- this.current_save_version;
     }
@@ -305,7 +306,8 @@ function MainClass::Load(version, saved_data)
         }
     }
     else {
-        Log.Info("Save data format doesn't match with current version (saved " + saved_data.save_version + " vs current " + this.current_save_version + "). Resetting.", Log.LVL_INFO);
+        local saved_version = saved_data.rawin("save_version") ? saved_data.save_version : "none";
+        Log.Info("Save data format doesn't match with current version (saved " + saved_version + " vs current " + this.current_save_version + "). Resetting.", Log.LVL_INFO);
     }
 }
 

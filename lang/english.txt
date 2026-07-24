@@ -56,9 +56,9 @@ STR_SB_WELCOME_ETERNAL_LOVE         :{SILVER}Eternal Love{BLACK} changes {ORANGE
 STR_SB_WELCOME_TAX                  :{SILVER}Infrastructure tax{BLACK}: charged by your total {ORANGE}rail, road, and dock{BLACK} holdings, plus one bonus per contributed town above {SILVER}500{BLACK}. Good local ratings reduce the tax, and growth can trigger rebates. Open {ORANGE}Tax history{BLACK} in the Story Book for a breakdown.
 STR_SB_TAX_HISTORY_TITLE            :Tax history
 STR_SB_TAX_HISTORY_EMPTY            :No infrastructure tax has been charged yet.
-STR_SB_TAX_HISTORY_SUMMARY          :Most recent {NUM} months. Bars compare total tax within this page.
+STR_SB_TAX_HISTORY_SUMMARY          :Most recent {NUM} months. Each # marks the month's total tax, scaled to this page's highest month.
 STR_SB_TAX_HISTORY_ROW              :{NUM}/{NUM}: rail/road {STRING}, docks {STRING}, rebate {STRING}, total {STRING}
-STR_SB_TAX_HISTORY_BAR              :{NUM}/{NUM}: {RAW_STRING}
+STR_SB_TAX_HISTORY_LINE             :{NUM}/{NUM}: {RAW_STRING}
 STR_SB_TAX_HISTORY_OLDER            :Older
 STR_SB_TAX_HISTORY_NEWER            :Newer
 STR_SB_WELCOME_END                  :Have fun!

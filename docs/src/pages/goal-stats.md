@@ -17,7 +17,7 @@ Each time a town exceeds its historical maximum population, the contributor for 
 
 ## Average town categories
 
-The average of categories successfully contributed for your monitored towns.
+The average number of required categories across your monitored towns.
 
 - Higher values mean you are supporting more complex towns.
 - Low values often mean mostly basic passenger/mail supply.

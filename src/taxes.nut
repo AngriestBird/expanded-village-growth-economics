@@ -47,6 +47,8 @@ function ChargeTaxes(companies, towns_by_contributor, date)
     local big_town_bonus = GSController.GetSetting("tax_big_town_bonus") / 100.0;
     local rating_discount = GSController.GetSetting("tax_rating_discount") / 100.0;
     local rebate_rate = GSController.GetSetting("tax_growth_rebate");
+    local year = GSDate.GetYear(date);
+    local month = GSDate.GetMonth(date);
 
     foreach (company in companies) {
         if (GSCompany.ResolveCompanyID(company.id) == GSCompany.COMPANY_INVALID)
@@ -61,7 +63,7 @@ function ChargeTaxes(companies, towns_by_contributor, date)
             docks = GSStationList(GSStation.STATION_DOCK).Count();
         }
         if (infra <= 0 && docks <= 0) {
-            company.RecordTaxHistory(GSDate.GetYear(date), GSDate.GetMonth(date), 0, 0, 0);
+            company.RecordTaxHistory(year, month, 0, 0, 0);
             continue;
         }
 
@@ -86,8 +88,7 @@ function ChargeTaxes(companies, towns_by_contributor, date)
         }
 
         local rail_road_base = tax_rate * infra;
-        local dock_base = dock_tax_rate * docks;
-        local infrastructure_tax = rail_road_base + dock_base;
+        local infrastructure_tax = rail_road_base + dock_tax_rate * docks;
         local gross_tax = (infrastructure_tax * difficulty * (1.0 + big_town_bonus * num_big_towns) * rating_multiplier).tointeger();
         local rebate = (rebate_rate * difficulty * company.points_this_month).tointeger();
         if (rebate > gross_tax)
@@ -105,12 +106,14 @@ function ChargeTaxes(companies, towns_by_contributor, date)
         company.tax_rail_road_last_month = rail_road_tax;
         company.tax_dock_last_month = dock_tax;
         company.tax_last_month = tax;
-        company.RecordTaxHistory(GSDate.GetYear(date), GSDate.GetMonth(date), rail_road_tax, dock_tax, rebate);
+        company.RecordTaxHistory(year, month, rail_road_tax, dock_tax, rebate);
         if (tax <= 0)
             continue;
 
-        GSCompany.ChangeBankBalance(company.id, -tax, GSCompany.EXPENSES_PROPERTY, tile);
-        company.AddTaxPaid(rail_road_tax, dock_tax);
+        GSCompany.ChangeBankBalance(company.id, -tax, GSCompany.EXPENSES_OTHER, tile);
+        company.tax_rail_road_paid += rail_road_tax;
+        company.tax_dock_paid += dock_tax;
+        company.tax_paid += tax;
 
         Log.Info(GSCompany.GetName(company.id) + " paid " + tax + " infrastructure tax (rail/road: "
                  + rail_road_tax + ", docks: " + dock_tax + ", pieces: " + infra + ", dock stations: "

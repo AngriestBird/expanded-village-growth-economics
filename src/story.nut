@@ -84,21 +84,6 @@ function StoryEditor::WelcomePage(sp_welcome)
     GSStoryPage.NewElement(sp_welcome, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WELCOME_END));
 }
 
-function GetTaxHistoryBar(total, maximum)
-{
-    if (total <= 0 || maximum <= 0)
-        return "-";
-
-    local length = (total.tofloat() * 20 / maximum).tointeger();
-    if (length < 1)
-        length = 1;
-
-    local bar = "";
-    for (local i = 0; i < length; ++i)
-        bar += "#";
-    return bar;
-}
-
 function StoryEditor::CreateTaxHistoryPage(company)
 {
     company.sp_tax_history = this.NewStoryPage(company.id, GSText(GSText.STR_SB_TAX_HISTORY_TITLE));
@@ -142,6 +127,17 @@ function StoryEditor::UpdateTaxHistoryPage(company)
                            GSText(GSText.STR_SB_TAX_HISTORY_SUMMARY, end - start));
     for (local i = end - 1; i >= start; --i) {
         local entry = history[i];
+        local bar = "-";
+        if (entry.total > 0 && maximum > 0) {
+            local length = (entry.total.tofloat() * 20 / maximum).tointeger();
+            if (length < 1)
+                length = 1;
+
+            bar = "";
+            for (local j = 0; j < length; ++j)
+                bar += "#";
+        }
+
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
                                GSText(GSText.STR_SB_TAX_HISTORY_ROW, entry.year, entry.month + 1,
                                       GSText(GSText.STR_CURRENCY, entry.rail_road),
@@ -149,8 +145,7 @@ function StoryEditor::UpdateTaxHistoryPage(company)
                                       GSText(GSText.STR_CURRENCY, entry.rebate),
                                       GSText(GSText.STR_CURRENCY, entry.total)));
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_BAR, entry.year, entry.month + 1,
-                                      GetTaxHistoryBar(entry.total, maximum)));
+                               GSText(GSText.STR_SB_TAX_HISTORY_BAR, entry.year, entry.month + 1, bar));
     }
 
     if (start > 0) {

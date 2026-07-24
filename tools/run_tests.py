@@ -2,10 +2,12 @@
 """Syntax-check every .nut file and run the Squirrel unit tests in tests/.
 
 Needs a standalone Squirrel interpreter. Set SQ to point at one, otherwise `sq`
-from PATH is used (Debian/Ubuntu: apt-get install squirrel3). Note that `sq`
-exits 0 even when a script raises, so test success is decided by the sentinel
-the test script prints on its way out. Compilation failures do exit non-zero.
+from PATH is used. tools/install_squirrel.sh builds the pinned CI version. Note
+that `sq` exits 0 even when a script raises, so test success is decided by the
+sentinel the test script prints on its way out. Compilation failures do exit
+non-zero.
 """
+
 import os
 import shutil
 import subprocess
@@ -32,7 +34,7 @@ def find_interpreter():
 
 def compile_check(sq, repo):
     """Compile each script without running it, to catch syntax errors early."""
-    sources = sorted(repo.glob("*.nut")) + sorted(repo.glob("src/*.nut"))
+    sources = sorted(repo.glob("*.nut")) + sorted((repo / "src").rglob("*.nut"))
     failed = []
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "out.cnut"
@@ -59,7 +61,7 @@ def main():
         print(
             "No Squirrel interpreter found (looked for: "
             + ", ".join(SQ_NAMES)
-            + "). Install squirrel3 or set SQ=/path/to/sq."
+            + "). Build it with tools/install_squirrel.sh or set SQ=/path/to/sq."
         )
         return 1
 

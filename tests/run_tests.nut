@@ -1,14 +1,54 @@
-/* Unit tests for the pure helpers in src/.
+/* Unit and save/load integration tests for src/.
  *
- * Run with tools/run_tests.py. Only files that are safe to load outside OpenTTD
- * are pulled in here: they must define functions and globals at file scope and
- * nothing else. Anything reaching for a GS API or `this` at load time belongs
- * in the game, not in a test.
+ * Run with tools/run_tests.py. GS API stubs keep the runtime wiring executable
+ * under the standalone Squirrel interpreter.
  */
 
+require <- function(path) {};
+import <- function(library, name, version) {};
+
+class GSController
+{
+    static function GetSetting(name) { return 0; }
+    static function GetOpsTillSuspend() { return 100000; }
+}
+
+class GSTown
+{
+    static function GetPopulation(id) { throw "saved town entered fresh initialization"; }
+}
+
+class GSIndustryType
+{
+    static function GetAcceptedCargo(id)
+    {
+        local cargo_by_industry = { _5 = 10, _7 = 11, _9 = 12, _256 = 13, _510 = 14 };
+        local cargo_list = {};
+        local key = "_" + id;
+        if (cargo_by_industry.rawin(key))
+            cargo_list[cargo_by_industry[key]] <- 0;
+        return cargo_list;
+    }
+}
+
+SuperLib <- {
+    Log = {
+        LVL_INFO = 0,
+        LVL_DEBUG = 0,
+        function Info(message, level) {}
+    },
+    Helper = {}
+};
+
+dofile("src/version.nut", true);
 dofile("src/industry.nut", true);
 dofile("src/cargo.nut", true);
 dofile("src/taxes.nut", true);
+dofile("src/main.nut", true);
+Randomization <- { INDUSTRY_DESC = 2, INDUSTRY_ASC = 3 };
+dofile("src/town.nut", true);
+
+function GoalTown::DebugCargoTable(cargo_table) {}
 
 tests_run <- 0;
 tests_failed <- 0;
@@ -72,6 +112,25 @@ function LegacyIndustryHash(industry_cat)
     return hash;
 }
 
+function SavedTown(max_population, cargo_hash)
+{
+    return {
+        sign_id = -1,
+        contributor = -1,
+        max_population = max_population,
+        is_monitored = false,
+        allowGrowth = true,
+        last_delivery = null,
+        town_goals_cat = [0, 0, 0],
+        town_supplied_cat = [0, 0, 0],
+        town_stockpiled_cat = [0, 0, 0],
+        tgr_array = array(8, 0),
+        limit_transported = 0,
+        limit_delay = 0,
+        cargo_hash = cargo_hash
+    };
+}
+
 
 print("GetIndustryHash / GetIndustryTable\n");
 
@@ -95,6 +154,50 @@ Check("legacy format could not hold ids above 255",
 // Savegames from 1.2.0 store the old integer and must keep loading.
 local legacy = [[5], [7], [3, 9]];
 CheckTable("legacy integer hash still decodes", GetIndustryTable(LegacyIndustryHash(legacy)), legacy);
+
+
+print("MainClass save/load and GoalTown reconstruction\n");
+
+local saved_data = {
+    save_version = SELF_MAJORVERSION,
+    use_town_sign = false,
+    randomization = Randomization.INDUSTRY_ASC,
+    display_cargo = true,
+    cargo_6_category = false,
+    category_min_pop = [0, 1000, 4000],
+    company_data_table = {},
+    town_data_table = {}
+};
+saved_data.town_data_table[3] <- SavedTown(300, LegacyIndustryHash([[5], [7, 9]]));
+saved_data.town_data_table[900] <- SavedTown(90000, GetIndustryHash([[256], [510]]));
+
+local controller = MainClass();
+controller.Load(0, saved_data);
+Check("load keeps sparse town id 3", ::TownDataTable.rawin(3));
+Check("load keeps sparse town id 900", ::TownDataTable.rawin(900));
+
+local legacy_town = GoalTown(3, true, 0, null, 0);
+local sparse_town = GoalTown(900, true, 0, null, 0);
+CheckEqual("sparse town restores saved population", sparse_town.max_population, 90000);
+CheckTable("constructor decodes legacy industry hash", legacy_town.town_cargo_cat,
+           [[0, 2], [10], [11, 12]]);
+CheckTable("constructor decodes array industry hash", sparse_town.town_cargo_cat,
+           [[0, 2], [13], [14]]);
+
+controller.towns = [legacy_town, sparse_town];
+controller.gs_init_done = true;
+local resaved_data = controller.Save();
+CheckEqual("save keeps both sparse town entries", resaved_data.town_data_table.len(), 2);
+Check("save indexes town id 3", resaved_data.town_data_table.rawin(3));
+Check("save indexes town id 900", resaved_data.town_data_table.rawin(900));
+CheckEqual("save keeps legacy hash type", typeof resaved_data.town_data_table[3].cargo_hash, "integer");
+CheckEqual("save keeps array hash type", typeof resaved_data.town_data_table[900].cargo_hash, "array");
+
+local reloaded_controller = MainClass();
+reloaded_controller.Load(0, resaved_data);
+local reloaded_town = GoalTown(900, true, 0, null, 0);
+CheckTable("resaved sparse town reconstructs", reloaded_town.town_cargo_cat,
+           [[0, 2], [13], [14]]);
 
 
 print("GetCargoHash / GetCargoTable\n");

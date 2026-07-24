@@ -1,4 +1,5 @@
 .vscode
+tools/__pycache__/
 *.tar
 slnx.sqlite
 .suo

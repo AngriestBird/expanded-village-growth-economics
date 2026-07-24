@@ -122,7 +122,15 @@ copytree("lang", tmp_path / "lang")
 with tarfile.open(tar_name, "w:") as tar_handle:
     for root, _dirs, file_list in os.walk(tmp_path):
         for file in file_list:
-            tar_handle.add(os.path.join(root, file))
+            path = Path(root) / file
+            tar_handle.add(path, arcname=path.as_posix())
+
+# OpenTTD only registers the script if info.nut sits at the package root.
+with tarfile.open(tar_name) as tar_handle:
+    if tmp_dir + "/info.nut" not in tar_handle.getnames():
+        print("Packaging error: " + tmp_dir + "/info.nut missing, OpenTTD can't load this tar!")
+        rmtree(tmp_path)
+        raise SystemExit(1)
 
 if args.install:
     install_dir = get_openttd_game_dir(args.game_dir)

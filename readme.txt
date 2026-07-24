@@ -3,7 +3,7 @@
                 *       A GameScript for OpenTTD        *
                 *****************************************
 
-Version: 1.1.0
+Version: 1.2.0
 
 Useful URLs:
 - forum topic: https://www.tt-forums.net/viewtopic.php?f=65&t=87052
@@ -32,7 +32,8 @@ The script only defines requirements for towns who are exchanging
 passengers (meaning that a delivery of passengers coming from a town
 is detected). Unless a town exchange passengers, it is not monitored
 and you will not see any cargo requirement. The check is done
-monthly. When a town stops exchanging passengers for six months, it
+monthly. When a town stops exchanging passengers for longer than the
+"Monitoring" timeout setting (365 days by default, 0 = never), it
 gets out from the list of monitored towns.
 
 If passenger delivery is detected, the script defines some cargo
@@ -110,7 +111,7 @@ The script gives this information:
   indication for category 1.
 - There are five possible modes of showing the townboxes:
     - Automatic
-    - Cargo deliveries
+    - Category deliveries
     - Cargo list
     - Combined
     - Full cargo list
@@ -155,7 +156,7 @@ percentage of passengers and/or mails is not fulfilled.
 
 Finally, note that towns data (goals, supplies, stockpiles, growth
 rates...) are saved, so that you can safely reload the game without
-losses. This release supports up to 1400 towns to be saved.
+losses. This release supports up to 2000 towns to be saved.
 
 Have fun !
 
@@ -292,8 +293,8 @@ they can safely be changed while the game is running:
   requirements are not met at all for a town, but this still is under
   active monitoring (because exchanging passengers), it is better not
   disabling completely town growth but setting it to an extremely low
-  rate. The default is 880 (which means that a new house is created
-  only each 880 days). It can be increased until 880.
+  rate. The default is 550 (which means that a new house is created
+  only each 550 days). It can be increased until 880.
 - "allow_0_days_growth": the town growth rate can go to zero days.
 
 

@@ -5,6 +5,7 @@
 ## Repo map
 
 - `main.nut`: loader that boots the script from `src/main.nut`
+- `info.nut`: script registration metadata (`desc`, supported versions, deps); must stay at the repo root or OpenTTD won't load the script
 - `src/cargo.nut`: cargo handling and category mapping
 - `src/industry.nut`: industry discovery and utility
 - `src/town.nut`: town growth core logic
@@ -13,7 +14,6 @@
 - `src/taxes.nut`: infrastructure tax feature
 - `src/story.nut`: StoryBook pages and intro text
 - `src/strings.nut`: localized string IDs and settings labels
-- `src/info.nut`: metadata for NewGRF metadata (`desc`, supported versions, deps)
 - `src/version.nut`: version and save compatibility numbers
 - `lang/`: translation files
 - `tools/check_lang.py`: translation validator

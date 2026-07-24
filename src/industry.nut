@@ -480,7 +480,7 @@ function GetIndustryHash(industry_cat)
         local new_cat = 0x01;
         foreach (ind_idx, ind in cat)
         {
-            local industry = (ind << 1 & 0xff) | new_cat; // | industry id 8 bit | new category flag 1 bit |
+            local industry = ((ind & 0xff) << 1) | new_cat; // | industry id 8 bit | new category flag 1 bit |
             hash = hash | (industry << index);
             index += 9;
             new_cat = 0x00;

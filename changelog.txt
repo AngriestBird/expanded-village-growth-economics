@@ -4,6 +4,12 @@ Version 1.2.0 (2026-07-24)
 - added: Docks are now properly taxed like every other asset
 - added: Taxes story book for more detailed information with respects to taxes
 - added: additional difficulty tuners for the new sytems
+- changed: Tax history page plots a line graph instead of bars
+- fixed: packaging layout broke script loading since 1.1.0 (info.nut is back at the package root)
+- fixed: crash when loading a save made before initialization finished
+- fixed: industry randomization corrupted industry IDs above 127 in savegames
+- fixed: crash on save when the map has no towns
+- fixed: story book pages duplicated for other companies after each load
 - tax information is now public for these publicly traded companies. Can't hide from the IRS (or well your shareholders)!
 
 Version 1.1.0 (2026-07-18)

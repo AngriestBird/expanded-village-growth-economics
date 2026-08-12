@@ -614,19 +614,9 @@ function ProspectRawIndustry()
     GSGameSettings.SetValue("construction.command_pause_level", pause_level);
 }
 
-function IsProcessingIndustry(industry)
-{
-    return GSIndustryType.IsProcessingIndustry(GSIndustry.GetIndustryType(industry))
-}
-
 function IsRawIndustry(industry)
 {
     return GSIndustryType.IsRawIndustry(GSIndustry.GetIndustryType(industry))
-}
-
-function CanProspectIndustry(industry)
-{
-    return GSIndustryType.CanProspectIndustry(GSIndustry.GetIndustryType(industry))
 }
 
 function GetRawIndustryTypeRatio()

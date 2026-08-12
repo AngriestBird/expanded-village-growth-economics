@@ -48,7 +48,6 @@ class MainClass extends GSController
     companies = null;
     towns = null;
     current_date = null;
-    current_week = null;
     current_month = null;
     current_year = null;
     gs_init_done = null;
@@ -62,7 +61,6 @@ class MainClass extends GSController
         this.companies = [];
         this.towns = [];
         this.current_date = 0;
-        this.current_week = 0;
         this.current_month = 0;
         this.current_year = 0;
         this.gs_init_done = false;
@@ -169,7 +167,7 @@ function MainClass::Init()
     }
 
     // Set current date
-    this.current_date = this.current_week = GSDate.GetCurrentDate();
+    this.current_date = GSDate.GetCurrentDate();
     this.current_month = GSDate.GetMonth(this.current_date);
     this.current_year = GSDate.GetYear(this.current_date);
 

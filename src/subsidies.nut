@@ -182,14 +182,14 @@ function CreateSubsidies(towns, companies)
     // Create subsidies
     foreach (company, subs in subsidies) {
         if (subs.town_subsidy != null) {
-            local success = GSSubsidy.Create(
+            GSSubsidy.Create(
                 Helper.GetPAXCargo(),
                 GSSubsidy.SPT_TOWN, subs.town_subsidy.town_1,
                 GSSubsidy.SPT_TOWN, subs.town_subsidy.town_2);
         }
 
         if (subs.cargo_subsidy != null) {
-            local success = GSSubsidy.Create(
+            GSSubsidy.Create(
                 subs.cargo_subsidy.cargo_id,
                 GSSubsidy.SPT_INDUSTRY, subs.cargo_subsidy.providing_industry_id,
                 GSSubsidy.SPT_INDUSTRY, subs.cargo_subsidy.accepting_industry_id);

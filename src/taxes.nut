@@ -55,6 +55,22 @@ function CalculateGrowthFunding(net_tax, town_count, boost_per_1000)
     return (net_tax.tofloat() / town_count / 1000.0 * boost_per_1000).tointeger();
 }
 
+/* Apply a tax-funded boost to a town growth rate. The boost shaves days off
+ * the rate, which never drops below 1 day unless 0 day growth is allowed,
+ * in which case it floors at 0. Kept free of GS API calls so tests/ can
+ * exercise the arithmetic without a running game.
+ */
+function ApplyGrowthFunding(base_rate, funding, allow_0_days_growth)
+{
+    local rate = base_rate - funding;
+    if (rate < 0)
+        rate = 0;
+    if (rate < 1 && !allow_0_days_growth)
+        rate = 1;
+
+    return rate;
+}
+
 /* GSController.GetSetting hands back -1 for a setting the running config does
  * not know, which happens for a rate added after the savegame was made. A
  * negative rate would pay the company instead of charging it.

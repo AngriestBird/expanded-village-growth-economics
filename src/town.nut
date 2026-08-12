@@ -266,10 +266,9 @@ function GoalTown::MonthlyManageTown(settings)
         new_town_growth_rate = 1;
 
     // Tax paid by this month's contributor funds faster growth for the town
-    if (settings.tax_funding.rawin(this.contributor))
-        new_town_growth_rate -= settings.tax_funding[this.contributor];
-    if (new_town_growth_rate < 1 && !allow_0_days_growth)
-        new_town_growth_rate = 1;
+    new_town_growth_rate = ApplyGrowthFunding(new_town_growth_rate,
+        settings.tax_funding.rawin(this.contributor) ? settings.tax_funding[this.contributor] : 0,
+        allow_0_days_growth);
 
     // Defining the new town growth rate, calculated as the moving average of the TGR array, update only if town growth requirements are fulfilled
     local sum_array = 0.0;

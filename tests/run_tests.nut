@@ -257,8 +257,22 @@ CheckEqual("no tax funds nothing", CalculateGrowthFunding(0, 3, 10), 0);
 CheckEqual("no towns funds nothing", CalculateGrowthFunding(1000, 0, 10), 0);
 CheckEqual("zero boost funds nothing", CalculateGrowthFunding(1000, 2, 0), 0);
 CheckEqual("tax splits evenly between towns", CalculateGrowthFunding(2000, 2, 10), 10);
+CheckEqual("uneven split rounds each share down", CalculateGrowthFunding(2000, 3, 10), 6);
 CheckEqual("funding rounds down", CalculateGrowthFunding(999, 1, 10), 9);
 CheckEqual("one town gets the whole share", CalculateGrowthFunding(1500, 1, 10), 15);
+CheckEqual("tiny tax buys no growth", CalculateGrowthFunding(99, 1, 10), 0);
+CheckEqual("negative tax funds nothing", CalculateGrowthFunding(-100, 2, 10), 0);
+
+
+print("ApplyGrowthFunding\n");
+
+CheckEqual("no funding leaves the rate unchanged", ApplyGrowthFunding(100, 0, false), 100);
+CheckEqual("funding shaves days off the rate", ApplyGrowthFunding(100, 40, false), 60);
+CheckEqual("funding exactly the rate floors at one day", ApplyGrowthFunding(40, 40, false), 1);
+CheckEqual("funding past the rate floors at one day", ApplyGrowthFunding(5, 40, false), 1);
+CheckEqual("funding past the rate floors at zero days when allowed", ApplyGrowthFunding(5, 40, true), 0);
+CheckEqual("funding can reach zero days when allowed", ApplyGrowthFunding(1, 1, true), 0);
+CheckEqual("zero rate stays at zero with daily growth", ApplyGrowthFunding(0, 0, true), 0);
 
 
 print("SortCategoriesMinPopDemand\n");

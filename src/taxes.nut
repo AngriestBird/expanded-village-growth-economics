@@ -43,6 +43,18 @@ function CalculateTaxBill(network_base, station_base, difficulty, big_town_bonus
     return bill;
 }
 
+/* Split a company's net tax between its contributed towns and convert each
+ * share into town growth days. Kept free of GS API calls so tests/ can
+ * exercise the arithmetic without a running game.
+ */
+function CalculateGrowthFunding(net_tax, town_count, boost_per_1000)
+{
+    if (net_tax <= 0 || town_count <= 0 || boost_per_1000 <= 0)
+        return 0;
+
+    return (net_tax.tofloat() / town_count / 1000.0 * boost_per_1000).tointeger();
+}
+
 /* GSController.GetSetting hands back -1 for a setting the running config does
  * not know, which happens for a rate added after the savegame was made. A
  * negative rate would pay the company instead of charging it.

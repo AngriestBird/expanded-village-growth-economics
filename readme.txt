@@ -260,6 +260,11 @@ and has no solvency check, so companies can go into debt.
   when this is set (for example 30 for a 30% maximum discount at top rating).
 - "Taxes: Rebate per population your towns gained last month": turns town growth
   into a tax rebate for the same month.
+- "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
+  company pays each month is split equally between the towns it contributes
+  to, and every share is converted into faster growth for that town (days
+  taken off its town growth rate). The company still pays the full bill;
+  this only changes what the money buys.
 The bill is split into two buckets: network (rail, road, canals) and stations
 (docks, airports). Each company's Goal statistics show the total plus both
 buckets, along with last month's breakdown and rebate. The Tax history Goal

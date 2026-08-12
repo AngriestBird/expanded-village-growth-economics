@@ -251,6 +251,16 @@ CheckEqual("fully rebated split leaves no negative network bucket", capped_split
 CheckEqual("fully rebated split leaves no negative station bucket", capped_split.stations, 0);
 
 
+print("CalculateGrowthFunding\n");
+
+CheckEqual("no tax funds nothing", CalculateGrowthFunding(0, 3, 10), 0);
+CheckEqual("no towns funds nothing", CalculateGrowthFunding(1000, 0, 10), 0);
+CheckEqual("zero boost funds nothing", CalculateGrowthFunding(1000, 2, 0), 0);
+CheckEqual("tax splits evenly between towns", CalculateGrowthFunding(2000, 2, 10), 10);
+CheckEqual("funding rounds down", CalculateGrowthFunding(999, 1, 10), 9);
+CheckEqual("one town gets the whole share", CalculateGrowthFunding(1500, 1, 10), 15);
+
+
 print("SortCategoriesMinPopDemand\n");
 
 ::CargoCatNum <- 3;

@@ -313,6 +313,15 @@ class MainClass extends GSInfo
             custom_value = 0,
             flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
+        AddSetting({
+            name = "tax_growth_boost",
+            description = "Taxes: Days of town growth per 1000 tax per contributed town",
+            easy_value = 0,
+            medium_value = 0,
+            hard_value = 0,
+            custom_value = 0,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
+
         for (local i = 1; i <= 6; i++) {
             AddSetting({
                 name = "category_" + i + "_min_pop",

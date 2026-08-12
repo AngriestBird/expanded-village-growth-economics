@@ -6,10 +6,6 @@ class StoryEditor
     limiter_delay = null;
     tax_enable = null;
 
-    sp_cargo = null;
-    sp_custom = null;
-    sp_warning = null;
-
     constructor() {
         this.supply_impacting_part = GSController.GetSetting("supply_impacting_part");
         this.eternal_love = GSController.GetSetting("eternal_love");
@@ -28,26 +24,26 @@ function StoryEditor::CheckParameters(companies)
     local limiter_delay = GSController.GetSetting("limiter_delay");
     local tax_enable = GSController.GetSetting("tax_enable");
 
-    if (this.supply_impacting_part != supply_impacting_part
-            || this.eternal_love != eternal_love
-            || this.limit_min_transport != limit_min_transport
-            || this.limiter_delay != limiter_delay
-            || this.tax_enable != tax_enable) {
+    if (this.supply_impacting_part == supply_impacting_part
+            && this.eternal_love == eternal_love
+            && this.limit_min_transport == limit_min_transport
+            && this.limiter_delay == limiter_delay
+            && this.tax_enable == tax_enable)
+        return;
 
-        foreach (company in companies) {
-            local sp_welcome_elements = GSStoryPageElementList(company.sp_welcome);
-            foreach (element, _ in sp_welcome_elements) {
-                GSStoryPage.RemoveElement(element);
-            }
+    this.supply_impacting_part = supply_impacting_part;
+    this.eternal_love = eternal_love;
+    this.limit_min_transport = limit_min_transport;
+    this.limiter_delay = limiter_delay;
+    this.tax_enable = tax_enable;
 
-            this.supply_impacting_part = supply_impacting_part;
-            this.eternal_love = eternal_love;
-            this.limit_min_transport = limit_min_transport;
-            this.limiter_delay = limiter_delay;
-            this.tax_enable = tax_enable;
-
-            this.WelcomePage(company.sp_welcome);
+    foreach (company in companies) {
+        local sp_welcome_elements = GSStoryPageElementList(company.sp_welcome);
+        foreach (element, _ in sp_welcome_elements) {
+            GSStoryPage.RemoveElement(element);
         }
+
+        this.WelcomePage(company.sp_welcome);
     }
 }
 
@@ -285,13 +281,13 @@ function StoryEditor::CreateStoryBook(companies, num_towns, init_error)
 
     if (!init_error) {
         // Create basic cargo informations page
-        this.sp_cargo = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_TITLE_1));
-        this.CargoInfoPage(this.sp_cargo);
+        local sp_cargo = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_TITLE_1));
+        this.CargoInfoPage(sp_cargo);
 
         // Create custom page
         if (GSText.STR_SB_CUSTOM_END - GSText.STR_SB_CUSTOM_TITLE > 1) {
-            this.sp_custom = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_CUSTOM_TITLE));
-            this.CustomPage(this.sp_custom);
+            local sp_custom = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_CUSTOM_TITLE));
+            this.CustomPage(sp_custom);
         }
 
         foreach (company in companies) {
@@ -303,30 +299,29 @@ function StoryEditor::CreateStoryBook(companies, num_towns, init_error)
         }
     }
 
+    local warning_text = null;
     switch (init_error) {
         // Issue a warning if there are more towns on the map than the GS can save
         case InitError.TOWN_NUMBER:
-            this.sp_warning = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_WARNING_TITLE));
-            GSStoryPage.NewElement(this.sp_warning, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WARNING_1, num_towns, SELF_MAX_TOWNS));
-            GSStoryPage.Show(this.sp_warning);
+            warning_text = GSText(GSText.STR_SB_WARNING_1, num_towns, SELF_MAX_TOWNS);
             break;
         // Issue a warning that the cargo list initialization has failed
         case InitError.CARGO_LIST:
-            this.sp_warning = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_WARNING_TITLE));
-            GSStoryPage.NewElement(this.sp_warning, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WARNING_2));
-            GSStoryPage.Show(this.sp_warning);
+            warning_text = GSText(GSText.STR_SB_WARNING_2);
             break;
         // Issue a warning that the cargo list initialization has failed
         case InitError.INDUSTRY_LIST:
-            this.sp_warning = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_WARNING_TITLE));
-            GSStoryPage.NewElement(this.sp_warning, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WARNING_3));
-            GSStoryPage.Show(this.sp_warning);
+            warning_text = GSText(GSText.STR_SB_WARNING_3);
             break;
         case InitError.TOWN_GROWTH_RATE:
-            this.sp_warning = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_WARNING_TITLE));
-            GSStoryPage.NewElement(this.sp_warning, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_WARNING_4));
-            GSStoryPage.Show(this.sp_warning);
+            warning_text = GSText(GSText.STR_SB_WARNING_4);
             break;
+    }
+
+    if (warning_text != null) {
+        local sp_warning = this.NewStoryPage(GSCompany.COMPANY_INVALID, GSText(GSText.STR_SB_WARNING_TITLE));
+        GSStoryPage.NewElement(sp_warning, GSStoryPage.SPET_TEXT, 0, warning_text);
+        GSStoryPage.Show(sp_warning);
     }
 }
 

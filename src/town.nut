@@ -146,11 +146,8 @@ function GoalTown::MonthlyManageTown(settings)
         return;
     }
 
-    local sum_goals = 0;
-    local goal_diff = 0;
     local goal_diff_percent = 0.0;
     local cur_pop = GSTown.GetPopulation(this.id);
-    local parsed_cat = 0;   // index of parsed category
     local new_town_growth_rate = null;
     // Difficulty and calculation factors, read once per month by the caller
     local d_factor = settings.d_factor;

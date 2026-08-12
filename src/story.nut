@@ -155,6 +155,78 @@ function StoryEditor::UpdateTaxHistoryPage(company)
     }
 }
 
+function StoryEditor::CreateTaxFundingPage(company)
+{
+    company.sp_tax_funding = this.NewStoryPage(company.id, GSText(GSText.STR_SB_TAX_FUNDING_TITLE));
+    if (GSStoryPage.IsValidStoryPage(company.sp_tax_funding)
+            && company.statistics != null && GSGoal.IsValidGoal(company.statistics[Statistics.TAX_FUNDING]))
+        GSGoal.SetDestination(company.statistics[Statistics.TAX_FUNDING], GSGoal.GT_STORY_PAGE, company.sp_tax_funding);
+    this.UpdateTaxFundingPage(company);
+}
+
+function StoryEditor::UpdateTaxFundingPage(company)
+{
+    if (company.sp_tax_funding == null || !GSStoryPage.IsValidStoryPage(company.sp_tax_funding))
+        return;
+
+    local elements = GSStoryPageElementList(company.sp_tax_funding);
+    foreach (element, _ in elements)
+        GSStoryPage.RemoveElement(element);
+
+    local history = company.tax_history;
+    if (history.len() == 0) {
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_FUNDING_EMPTY));
+        return;
+    }
+
+    // The most recent 12 months with actual town funding
+    local start = history.len() > 12 ? history.len() - 12 : 0;
+    local shown = 0;
+    local maximum = 0;
+    for (local i = history.len() - 1; i >= start; --i) {
+        if (history[i].rawin("town_funding") && history[i].town_funding.len() > 0) {
+            ++shown;
+            if (history[i].total > maximum)
+                maximum = history[i].total;
+        }
+    }
+
+    if (shown == 0) {
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_FUNDING_EMPTY));
+        return;
+    }
+
+    for (local i = history.len() - 1; i >= start; --i) {
+        local entry = history[i];
+        if (!entry.rawin("town_funding") || entry.town_funding.len() == 0)
+            continue;
+
+        local position = 0;
+        if (entry.total > 0 && maximum > 0)
+            position = (entry.total.tofloat() * 20 / maximum + 0.5).tointeger();
+
+        local line = "";
+        for (local j = 0; j <= 20; ++j)
+            line += j == position ? "#" : ".";
+
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                               GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month + 1,
+                                      GSText(GSText.STR_CURRENCY, entry.total),
+                                      entry.town_funding.len()));
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month + 1, line));
+
+        foreach (row in entry.town_funding) {
+            local percent = entry.total > 0
+                            ? (row.portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
+            GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                                   GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
+                                          percent, GSText(GSText.STR_CURRENCY, row.portion),
+                                          row.days));
+        }
+    }
+}
+
 function StoryEditor::HandleTaxHistoryButton(companies, event)
 {
     event = GSEventStoryPageButtonClick.Convert(event);
@@ -295,6 +367,7 @@ function StoryEditor::CreateStoryBook(companies, num_towns, init_error)
             company.sp_welcome = this.NewStoryPage(company.id, GSText(GSText.STR_SB_WELCOME_TITLE, SELF_MAJORVERSION, SELF_MINORVERSION));
             this.WelcomePage(company.sp_welcome);
             this.CreateTaxHistoryPage(company);
+            this.CreateTaxFundingPage(company);
             GSStoryPage.Show(company.sp_welcome);
         }
     }
@@ -331,6 +404,7 @@ function StoryEditor::CreateNewCompanyStoryBook(company)
     company.sp_welcome = this.NewStoryPage(company.id, GSText(GSText.STR_SB_WELCOME_TITLE, SELF_MAJORVERSION, SELF_MINORVERSION));
     this.WelcomePage(company.sp_welcome);
     this.CreateTaxHistoryPage(company);
+    this.CreateTaxFundingPage(company);
     GSStoryPage.Show(company.sp_welcome);
 }
 

@@ -55,13 +55,40 @@ function CalculateGrowthFunding(net_tax, town_count, boost_per_1000)
     return (net_tax.tofloat() / town_count / 1000.0 * boost_per_1000).tointeger();
 }
 
+/* Split a company's net tax between its actively monitored towns. Returns the
+ * portion of the tax each town receives and the growth days that portion buys.
+ * Kept free of GS API calls so tests/ can exercise the arithmetic without a
+ * running game.
+ */
+function CalculateTownFunding(total_tax, towns, boost_per_1000)
+{
+    local town_count = 0;
+    foreach (town in towns) {
+        if (town.is_monitored)
+            ++town_count;
+    }
+
+    if (total_tax <= 0 || town_count <= 0)
+        return { portion = 0, days = 0 };
+
+    local portion = (total_tax.tofloat() / town_count).tointeger();
+    local days = CalculateGrowthFunding(total_tax, town_count, boost_per_1000);
+    return { portion = portion, days = days };
+}
+
 /* Apply a tax-funded boost to a town growth rate. The boost shaves days off
- * the rate, which never drops below 1 day unless 0 day growth is allowed,
- * in which case it floors at 0. Kept free of GS API calls so tests/ can
- * exercise the arithmetic without a running game.
+ * the rate but can at most halve it, so taxes accelerate growth instead of
+ * buying it outright. The rate never drops below 1 day unless 0 day growth
+ * is allowed, in which case it floors at 0. Kept free of GS API calls so
+ * tests/ can exercise the arithmetic without a running game.
  */
 function ApplyGrowthFunding(base_rate, funding, allow_0_days_growth)
 {
+    if (funding < 0)
+        funding = 0;
+    if (funding > base_rate / 2)
+        funding = base_rate / 2;
+
     local rate = base_rate - funding;
     if (rate < 0)
         rate = 0;

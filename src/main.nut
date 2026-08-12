@@ -529,16 +529,21 @@ function MainClass::ManageTowns()
         // can fund town growth this month
         ChargeTaxes(this.companies, towns_by_contributor, date);
 
-        // Split each company's net tax between its contributed towns; each
-        // share buys growth days for that town this month
+        // Split each company's net tax between its actively monitored towns;
+        // each share buys growth days for that town this month, and the
+        // breakdown is recorded for the tax funding story page
         local tax_funding = {};
         local growth_boost = GetTaxRateSetting("tax_growth_boost");
+        local year = GSDate.GetYear(date);
+        local month = GSDate.GetMonth(date);
         foreach (company in this.companies) {
-            local town_count = towns_by_contributor.rawin(company.id)
-                               ? towns_by_contributor[company.id].len() : 0;
-            local funding = CalculateGrowthFunding(company.tax_last_month, town_count, growth_boost);
-            if (funding > 0)
-                tax_funding[company.id] <- funding;
+            local contributed = towns_by_contributor.rawin(company.id)
+                                ? towns_by_contributor[company.id] : [];
+            local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
+            if (funding.days > 0)
+                tax_funding[company.id] <- funding.days;
+            if (funding.portion > 0)
+                company.RecordTaxFunding(year, month, contributed, funding.portion, funding.days);
         }
         monthly_settings.tax_funding <- tax_funding;
 
@@ -568,6 +573,7 @@ function MainClass::ManageTowns()
             company.MonthlyUpdateGUIGoals(gui_towns_by_contributor.rawin(company.id)
                                           ? gui_towns_by_contributor[company.id] : []);
             this.story_editor.UpdateTaxHistoryPage(company);
+            this.story_editor.UpdateTaxFundingPage(company);
         }
 
         this.current_month = month;

@@ -1,6 +1,11 @@
 Expanded Village Growth + Economics Changelog
 
 Unreleased
+- added: taxes can now fund town growth. A company's monthly tax is split
+  between its actively served towns and each share reduces that town's
+  growth rate by up to half (new "Taxes: Days of town growth per 1000 tax
+  per contributed town" setting, off by default). A "Tax funding by town"
+  Story Book page breaks down where each month's tax went
 - added: airports and canals are now taxed, so air and water networks no longer
   dodge the infrastructure tax. Two new rate settings, tax buckets are now
   "network" (rail, road, canals) and "stations" (docks, airports)

@@ -251,6 +251,60 @@ CheckEqual("fully rebated split leaves no negative network bucket", capped_split
 CheckEqual("fully rebated split leaves no negative station bucket", capped_split.stations, 0);
 
 
+print("CalculateGrowthFunding\n");
+
+CheckEqual("no tax funds nothing", CalculateGrowthFunding(0, 3, 10), 0);
+CheckEqual("no towns funds nothing", CalculateGrowthFunding(1000, 0, 10), 0);
+CheckEqual("zero boost funds nothing", CalculateGrowthFunding(1000, 2, 0), 0);
+CheckEqual("tax splits evenly between towns", CalculateGrowthFunding(2000, 2, 10), 10);
+CheckEqual("uneven split rounds each share down", CalculateGrowthFunding(2000, 3, 10), 6);
+CheckEqual("funding rounds down", CalculateGrowthFunding(999, 1, 10), 9);
+CheckEqual("one town gets the whole share", CalculateGrowthFunding(1500, 1, 10), 15);
+CheckEqual("tiny tax buys no growth", CalculateGrowthFunding(99, 1, 10), 0);
+CheckEqual("negative tax funds nothing", CalculateGrowthFunding(-100, 2, 10), 0);
+
+
+print("CalculateTownFunding\n");
+
+local mixed_towns = [{ is_monitored = true }, { is_monitored = true }, { is_monitored = false }];
+
+local no_tax = CalculateTownFunding(0, mixed_towns, 10);
+CheckEqual("no tax funds no towns", no_tax.portion, 0);
+CheckEqual("no tax buys no growth days", no_tax.days, 0);
+
+local even = CalculateTownFunding(2000, mixed_towns, 10);
+CheckEqual("tax splits evenly between monitored towns", even.portion, 1000);
+CheckEqual("each portion buys its growth days", even.days, 10);
+
+local odd = CalculateTownFunding(999, mixed_towns, 10);
+CheckEqual("portions round down", odd.portion, 499);
+CheckEqual("odd portions round growth days down", odd.days, 4);
+
+local no_boost = CalculateTownFunding(2000, mixed_towns, 0);
+CheckEqual("zero boost still splits the tax", no_boost.portion, 1000);
+CheckEqual("zero boost buys no growth days", no_boost.days, 0);
+
+local tiny = CalculateTownFunding(2, [{ is_monitored = true }], 10);
+CheckEqual("tiny tax splits but buys no growth", tiny.portion, 2);
+CheckEqual("tiny tax buys no growth days", tiny.days, 0);
+
+local unmonitored = CalculateTownFunding(2000, [{ is_monitored = false }], 10);
+CheckEqual("unmonitored towns do not dilute the split", unmonitored.portion, 0);
+CheckEqual("unmonitored towns get no growth days", unmonitored.days, 0);
+
+
+print("ApplyGrowthFunding\n");
+
+CheckEqual("no funding leaves the rate unchanged", ApplyGrowthFunding(100, 0, false), 100);
+CheckEqual("funding shaves days off the rate", ApplyGrowthFunding(100, 40, false), 60);
+CheckEqual("funding is capped at half the rate", ApplyGrowthFunding(40, 40, false), 20);
+CheckEqual("half the rate is the maximum boost", ApplyGrowthFunding(100, 1000, false), 50);
+CheckEqual("odd rates cap to half rounded down", ApplyGrowthFunding(5, 40, false), 3);
+CheckEqual("single day rates cannot be boosted", ApplyGrowthFunding(1, 10, true), 1);
+CheckEqual("negative funding never slows growth", ApplyGrowthFunding(10, -5, false), 10);
+CheckEqual("zero rate stays at zero with daily growth", ApplyGrowthFunding(0, 0, true), 0);
+
+
 print("SortCategoriesMinPopDemand\n");
 
 ::CargoCatNum <- 3;

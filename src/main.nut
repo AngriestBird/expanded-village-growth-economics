@@ -516,8 +516,39 @@ function MainClass::ManageTowns()
         };
         local limiter_delay = GSController.GetSetting("limiter_delay");
 
-        // Bucket towns by contributor so each company's GUI update is a single pass, not towns x companies
+        // Bucket towns by last month's contributor so the tax bill and its
+        // growth funding are known before this month's growth rates are applied
         local towns_by_contributor = {};
+        foreach (town in this.towns) {
+            if (!towns_by_contributor.rawin(town.contributor))
+                towns_by_contributor[town.contributor] <- [];
+            towns_by_contributor[town.contributor].append(town);
+        }
+
+        // Charge the infrastructure tax before the town update so the tax paid
+        // can fund town growth this month
+        ChargeTaxes(this.companies, towns_by_contributor, date);
+
+        // Split each company's net tax between its actively monitored towns;
+        // each share buys growth days for that town this month, and the
+        // breakdown is recorded for the tax funding story page
+        local tax_funding = {};
+        local growth_boost = GetTaxRateSetting("tax_growth_boost");
+        local year = GSDate.GetYear(date);
+        local month = GSDate.GetMonth(date);
+        foreach (company in this.companies) {
+            local contributed = towns_by_contributor.rawin(company.id)
+                                ? towns_by_contributor[company.id] : [];
+            local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
+            if (funding.days > 0)
+                tax_funding[company.id] <- funding.days;
+            if (funding.portion > 0)
+                company.RecordTaxFunding(year, month, contributed, funding.portion, funding.days);
+        }
+        monthly_settings.tax_funding <- tax_funding;
+
+        // Update each town, bucketing by the fresh contributor for the GUI pass
+        local gui_towns_by_contributor = {};
         foreach (town in this.towns) {
             town.ManageTownLimiting(threshold_setting, min_transport, limiter_delay);
             town.MonthlyManageTown(monthly_settings);
@@ -529,22 +560,20 @@ function MainClass::ManageTowns()
                 town.EternalLove(eternal_love_rating);
             }
 
-            if (!towns_by_contributor.rawin(town.contributor))
-                towns_by_contributor[town.contributor] <- [];
-            towns_by_contributor[town.contributor].append(town);
+            if (!gui_towns_by_contributor.rawin(town.contributor))
+                gui_towns_by_contributor[town.contributor] <- [];
+            gui_towns_by_contributor[town.contributor].append(town);
         }
-
-        // Charge the infrastructure tax before updating the GUI so the stat reflects it
-        ChargeTaxes(this.companies, towns_by_contributor, date);
 
         // Reset the monthly growth accumulator after the tax rebate has read it
         foreach (company in this.companies)
             company.points_this_month = 0;
 
         foreach (company in this.companies) {
-            company.MonthlyUpdateGUIGoals(towns_by_contributor.rawin(company.id)
-                                          ? towns_by_contributor[company.id] : []);
+            company.MonthlyUpdateGUIGoals(gui_towns_by_contributor.rawin(company.id)
+                                          ? gui_towns_by_contributor[company.id] : []);
             this.story_editor.UpdateTaxHistoryPage(company);
+            this.story_editor.UpdateTaxFundingPage(company);
         }
 
         this.current_month = month;

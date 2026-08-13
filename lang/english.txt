@@ -61,6 +61,10 @@ STR_SB_TAX_HISTORY_ROW              :{NUM}/{NUM}: network {STRING}, stations {ST
 STR_SB_TAX_HISTORY_LINE             :{NUM}/{NUM}: {RAW_STRING}
 STR_SB_TAX_HISTORY_OLDER            :Older
 STR_SB_TAX_HISTORY_NEWER            :Newer
+STR_SB_TAX_FUNDING_TITLE            :Tax funding by town
+STR_SB_TAX_FUNDING_EMPTY            :No town growth has been funded by taxes yet.
+STR_SB_TAX_FUNDING_MONTH            :{NUM}/{NUM}: {STRING} tax, split between {NUM} towns
+STR_SB_TAX_FUNDING_TOWN             :  {TOWN}: {NUM}% ({STRING}, {NUM} growth days)
 STR_SB_WELCOME_END                  :Have fun!
 
 ##### CUSTOM STORY BOOK #####
@@ -86,6 +90,8 @@ STR_STATISTICS_TAX_RAIL_ROAD_LAST_MONTH :{BLACK}Network tax last month{ORANGE}
 STR_STATISTICS_TAX_DOCK_LAST_MONTH      :{BLACK}Station tax last month{ORANGE}
 STR_STATISTICS_TAX_HISTORY              :{BLACK}Tax history{ORANGE}
 STR_STATISTICS_TAX_HISTORY_OPEN         :{SILVER}Open Story Book{ORANGE}
+STR_STATISTICS_TAX_FUNDING              :{BLACK}Tax funding by town{ORANGE}
+STR_STATISTICS_TAX_FUNDING_OPEN         :{SILVER}Open Story Book{ORANGE}
 
 ##### TOWNBOX #####
 STR_TOWNBOX_CONTRIBUTOR         :Largest population {SILVER}{NUM}{BLACK}{} * {SILVER}{COMPANY}{BLACK}

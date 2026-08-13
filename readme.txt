@@ -260,11 +260,20 @@ and has no solvency check, so companies can go into debt.
   when this is set (for example 30 for a 30% maximum discount at top rating).
 - "Taxes: Rebate per population your towns gained last month": turns town growth
   into a tax rebate for the same month.
+- "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
+  company pays each month is split equally between the towns it actively
+  contributes to, and every share is converted into faster growth for that
+  town (days taken off its town growth rate). A share can at most halve the
+  town's growth rate, so taxes accelerate growth instead of buying it
+  outright. The company still pays the full bill; this only changes what
+  the money buys.
 The bill is split into two buckets: network (rail, road, canals) and stations
 (docks, airports). Each company's Goal statistics show the total plus both
 buckets, along with last month's breakdown and rebate. The Tax history Goal
 opens a Story Book page with up to 36 months of history. Use the Older and
-Newer buttons to browse it.
+Newer buttons to browse it. The Tax funding Goal opens a Story Book page that
+breaks down, town by town, what percentage of each month's tax funded that
+town's growth.
 
 Category settings:
 These settings change the cargo category values and can only be changed

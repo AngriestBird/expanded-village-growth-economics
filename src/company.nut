@@ -14,6 +14,7 @@ enum Statistics
     TAX_RAIL_ROAD_LAST_MONTH,
     TAX_DOCK_LAST_MONTH,
     TAX_HISTORY,
+    TAX_FUNDING,
     END
 }
 
@@ -34,6 +35,7 @@ class Company
     global_goal = null;     // global goal showing achieved points in the goal gui
     sp_welcome = null;      // story page welcome
     sp_tax_history = null;
+    sp_tax_funding = null;
     tax_history_offset = 0;
     tax_history_previous_button = -1;
     tax_history_next_button = -1;
@@ -143,6 +145,8 @@ function Company::InitGUIGoals()
                             GSText(GSText.STR_CURRENCY, this.tax_dock_last_month));
     this.UpdateTaxStatistic(Statistics.TAX_HISTORY, GSText.STR_STATISTICS_TAX_HISTORY,
                             GSText(GSText.STR_STATISTICS_TAX_HISTORY_OPEN));
+    this.UpdateTaxStatistic(Statistics.TAX_FUNDING, GSText.STR_STATISTICS_TAX_FUNDING,
+                            GSText(GSText.STR_STATISTICS_TAX_FUNDING_OPEN));
 
     // Reset to previous settings
     GSGameSettings.SetValue("construction.command_pause_level", pause_level);
@@ -183,6 +187,26 @@ function Company::RecordTaxHistory(year, month, rail_road, docks, rebate)
 
     if (this.tax_history.len() > 36)
         this.tax_history.remove(0);
+}
+
+function Company::RecordTaxFunding(year, month, towns, portion, days)
+{
+    if (this.tax_history.len() == 0)
+        return;
+
+    // ChargeTaxes only appends a history entry for companies that were
+    // processed this month, so a mismatched tail means this call is stale
+    local entry = this.tax_history[this.tax_history.len() - 1];
+    if (entry.year != year || entry.month != month)
+        return;
+
+    local rows = [];
+    foreach (town in towns) {
+        if (!town.is_monitored)
+            continue;
+        rows.append({ town_id = town.id, portion = portion, days = days });
+    }
+    entry.town_funding <- rows;
 }
 
 function Company::MonthlyUpdateGUIGoals(towns)
@@ -281,6 +305,10 @@ function Company::MonthlyUpdateGUIGoals(towns)
                             GSText(GSText.STR_STATISTICS_TAX_HISTORY_OPEN));
     if (this.sp_tax_history != null && GSStoryPage.IsValidStoryPage(this.sp_tax_history))
         GSGoal.SetDestination(this.statistics[Statistics.TAX_HISTORY], GSGoal.GT_STORY_PAGE, this.sp_tax_history);
+    this.UpdateTaxStatistic(Statistics.TAX_FUNDING, GSText.STR_STATISTICS_TAX_FUNDING,
+                            GSText(GSText.STR_STATISTICS_TAX_FUNDING_OPEN));
+    if (this.sp_tax_funding != null && GSStoryPage.IsValidStoryPage(this.sp_tax_funding))
+        GSGoal.SetDestination(this.statistics[Statistics.TAX_FUNDING], GSGoal.GT_STORY_PAGE, this.sp_tax_funding);
 }
 
 function GetColorText(company_id)

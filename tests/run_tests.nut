@@ -199,6 +199,28 @@ local reloaded_town = GoalTown(900, true, 0, null, 0);
 CheckTable("resaved sparse town reconstructs", reloaded_town.town_cargo_cat,
            [[0, 2], [13], [14]]);
 
+// A quick save or autosave can land after a load but before Init has finished.
+resaved_data.company_data_table[4] <- { tax_paid = 123 };
+local early_controller = MainClass();
+early_controller.Load(0, resaved_data);
+::TownDataTable = null;    // Init frees both tables part way through
+::CompanyDataTable = null;
+local early_data = early_controller.Save();
+Check("save before init keeps the save version", early_data.rawin("save_version"));
+CheckEqual("save before init keeps the settings", early_data.randomization, Randomization.INDUSTRY_ASC);
+CheckEqual("save before init keeps both towns", early_data.town_data_table.len(), 2);
+CheckEqual("save before init keeps company data", early_data.company_data_table[4].tax_paid, 123);
+
+CheckEqual("a new game saved before init has no version to load",
+           MainClass().Save().rawin("save_version"), false);
+
+// Loaded last so later sections see the loaded settings and tables again.
+local early_reloaded = MainClass();
+early_reloaded.Load(0, early_data);
+Check("save before init loads again", early_reloaded.load_saved_data);
+Check("save before init reloads town id 900", ::TownDataTable.rawin(900));
+Check("save before init reloads company id 4", ::CompanyDataTable.rawin(4));
+
 
 print("GetCargoHash / GetCargoTable\n");
 

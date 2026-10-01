@@ -1,6 +1,6 @@
 Expanded Village Growth + Economics Changelog
 
-Unreleased
+Version 1.3.0 (unreleased)
 - added: taxes can now fund town growth. A company's monthly tax is split
   between its actively served towns and each share reduces that town's
   growth rate by up to half (new "Taxes: Days of town growth per 1000 tax

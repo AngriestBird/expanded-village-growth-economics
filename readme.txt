@@ -266,7 +266,7 @@ and has no solvency check, so companies can go into debt.
   town (days taken off its town growth rate). A share can at most halve the
   town's growth rate, so taxes accelerate growth instead of buying it
   outright. The company still pays the full bill; this only changes what
-  the money buys.
+  the money buys. Off by default (0).
 The bill is split into two buckets: network (rail, road, canals) and stations
 (docks, airports). Each company's Goal statistics show the total plus both
 buckets, along with last month's breakdown and rebate. The Tax history Goal

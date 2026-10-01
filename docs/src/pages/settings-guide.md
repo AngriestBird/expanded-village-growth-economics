@@ -30,10 +30,13 @@ Use the randomization type to control local variety.
 
 ## Taxes and subsidies
 
-- Taxes apply to owned rail/road infrastructure and dock stations. Set each
-  rate separately.
+- Taxes apply to owned rail, road, and canal infrastructure and to dock and
+  airport stations. Set each rate separately.
 - Growth rebate can convert last month population gain into a partial refund.
+- Tax-funded growth turns the tax you pay into faster growth for the towns you
+  serve. It is off until you raise its setting above 0.
 - The Tax history Goal opens a 36-month breakdown with Older/Newer controls.
+- The Tax funding Goal shows how each month's tax was split between towns.
 - Subsidies can be enabled to spawn useful passenger or cargo routes toward contributed towns.
 
 ## Expert values

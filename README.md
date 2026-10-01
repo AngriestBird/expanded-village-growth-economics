@@ -5,6 +5,7 @@
 EVGE replaces default OpenTTD growth with a cargo-based model.
 Towns start being managed once they export passengers, then they need the right mix of cargo to keep growing.
 This makes local industry and route planning matter much more than just population pumping.
+An optional infrastructure tax charges rail, road, canal, dock, and airport holdings, and can fund faster growth in the towns you serve.
 
 ## Documentation and player notes
 

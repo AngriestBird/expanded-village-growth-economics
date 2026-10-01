@@ -13,6 +13,8 @@ Unreleased
 - changed: town cargo requirements are stored per category instead of packed
   into one integer, which removes the 255 industry id ceiling. Savegames from
   1.2.0 still load
+- fixed: Story Book tax pages showed every month one too high, so December
+  appeared as month 13
 - fixed: towns with non-contiguous ids could lose their saved cargo
   requirements on load and get re-randomized
 

@@ -132,13 +132,13 @@ function StoryEditor::UpdateTaxHistoryPage(company)
             line += j == position ? "#" : ".";
 
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_ROW, entry.year, entry.month + 1,
+                               GSText(GSText.STR_SB_TAX_HISTORY_ROW, entry.year, entry.month,
                                       GSText(GSText.STR_CURRENCY, entry.rail_road),
                                       GSText(GSText.STR_CURRENCY, entry.docks),
                                       GSText(GSText.STR_CURRENCY, entry.rebate),
                                       GSText(GSText.STR_CURRENCY, entry.total)));
         GSStoryPage.NewElement(company.sp_tax_history, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month + 1, line));
+                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month, line));
     }
 
     if (start > 0) {
@@ -210,11 +210,11 @@ function StoryEditor::UpdateTaxFundingPage(company)
             line += j == position ? "#" : ".";
 
         GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month + 1,
+                               GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month,
                                       GSText(GSText.STR_CURRENCY, entry.total),
                                       entry.town_funding.len()));
         GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month + 1, line));
+                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month, line));
 
         foreach (row in entry.town_funding) {
             local percent = entry.total > 0

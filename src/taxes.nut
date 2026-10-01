@@ -57,6 +57,7 @@ function CalculateGrowthFunding(net_tax, town_count, boost_per_1000)
 
 /* Split a company's net tax between its actively monitored towns. Returns the
  * portion of the tax each town receives and the growth days that portion buys.
+ * Nothing is split while the boost is off, so no funding rows get recorded.
  * Kept free of GS API calls so tests/ can exercise the arithmetic without a
  * running game.
  */
@@ -68,7 +69,7 @@ function CalculateTownFunding(total_tax, towns, boost_per_1000)
             ++town_count;
     }
 
-    if (total_tax <= 0 || town_count <= 0)
+    if (total_tax <= 0 || town_count <= 0 || boost_per_1000 <= 0)
         return { portion = 0, days = 0 };
 
     local portion = (total_tax.tofloat() / town_count).tointeger();

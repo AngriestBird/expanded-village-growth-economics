@@ -61,7 +61,8 @@ class GoalTown
                 this.initialized = false;
         } else {
             this.sign_id = ::TownDataTable[this.id].sign_id;
-            this.contributor = ::TownDataTable[this.id].contributor;
+            // Older saves kept the contributor of towns that are no longer monitored
+            this.contributor = ::TownDataTable[this.id].is_monitored ? ::TownDataTable[this.id].contributor : -1;
             this.max_population = ::TownDataTable[this.id].max_population;
             this.is_monitored = ::TownDataTable[this.id].is_monitored;
             this.allowGrowth = ::TownDataTable[this.id].allowGrowth;
@@ -428,6 +429,7 @@ function GoalTown::CheckMonitoring(monitored, valid_companies, monitoring_timeou
         } else {
             GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NONE);
             this.is_monitored = false;
+            this.contributor = -1;
             this.town_stockpiled_cat = array(::CargoCatNum, 0);
             this.tgr_array = array(this.tgr_array_len, 0);
             this.tgr_average = null;

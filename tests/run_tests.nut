@@ -370,6 +370,89 @@ CheckEqual("negative funding never slows growth", ApplyGrowthFunding(10, -5, fal
 CheckEqual("zero rate stays at zero with daily growth", ApplyGrowthFunding(0, 0, true), 0);
 
 
+print("MonthlyCheckTown and the funding split\n");
+
+class GSDate
+{
+    static function GetCurrentDate() { return 1000; }
+}
+
+class GSCargoMonitor
+{
+    static function GetTownPickupAmount(company, cargo, town, keep_monitoring)
+    {
+        return ::stub_pickups.rawin(town) ? ::stub_pickups[town] : 0;
+    }
+    static function GetTownDeliveryAmount(company, cargo, town, keep_monitoring) { return 0; }
+}
+
+::CargoLimiter <- [0, 2];
+::CargoIDList <- ["PASS", null, "MAIL"];
+::stub_population <- {};
+::stub_pickups <- {};
+::stub_growth_rate <- {};
+
+// The shared stub throws on purpose, so it is swapped for this section only
+local throwing_get_population = GSTown.GetPopulation;
+GSTown.GetPopulation <- function(id) { return ::stub_population[id]; };
+GSTown.TOWN_GROWTH_NONE <- 0xFFFF;
+GSTown.TOWN_GROWTH_NORMAL <- 0x10000;
+GSTown.SetGrowthRate <- function(id, rate) { ::stub_growth_rate[id] <- rate; };
+GSTown.SetText <- function(id, text) {};
+GSTown.GetName <- function(id) { return "town " + id; };
+function GoalTown::TownBoxText(growth_enabled, text_mode) { return null; }
+
+function CheckedTown(id, population, monitored)
+{
+    ::TownDataTable[id] <- SavedTown(population, GetIndustryHash([[5]]));
+    ::stub_population[id] <- population;
+    local town = GoalTown(id, true, 0, null, 0);
+    town.is_monitored = monitored;
+    town.last_delivery = 0;
+    return town;
+}
+
+local check_settings = { landscape = 0, valid_companies = [0], monitoring_timeout = 365 };
+
+// One company contributed to all three towns last month
+local active_town = CheckedTown(20, 500, true);
+local timed_out_town = CheckedTown(21, 500, true);
+local small_town = CheckedTown(22, 80, true);
+::stub_pickups[20] <- 5;
+
+local managed = {};
+local managed_towns = [];
+foreach (town in [active_town, timed_out_town, small_town]) {
+    managed[town.id] <- town.MonthlyCheckTown(check_settings);
+    if (managed[town.id])
+        managed_towns.append(town);
+}
+
+Check("monitored town with pickups is growth-managed", managed[20]);
+Check("town whose monitoring times out is not growth-managed", !managed[21]);
+Check("timed out town is no longer monitored", !timed_out_town.is_monitored);
+CheckEqual("timed out town stops growing", ::stub_growth_rate[21], GSTown.TOWN_GROWTH_NONE);
+Check("town under 100 population is not growth-managed", !managed[22]);
+CheckEqual("town under 100 population grows normally", ::stub_growth_rate[22], GSTown.TOWN_GROWTH_NORMAL);
+
+local settled = CalculateTownFunding(2000, managed_towns, 10);
+CheckEqual("whole tax goes to the growth-managed town", settled.portion, 2000);
+CheckEqual("growth-managed town gets the whole boost", settled.days, 20);
+
+local resumed_town = CheckedTown(23, 500, false);
+::stub_pickups[23] <- 3;
+Check("unmonitored town with new pickups is growth-managed", resumed_town.MonthlyCheckTown(check_settings));
+Check("resumed town counts in the split", resumed_town.is_monitored);
+
+local starting_town = CheckedTown(24, 500, true);
+starting_town.initialized = false;
+::stub_pickups[24] <- 5;
+Check("town still initializing is not growth-managed", !starting_town.MonthlyCheckTown(check_settings));
+Check("town finishes initializing", starting_town.initialized);
+
+GSTown.GetPopulation <- throwing_get_population;
+
+
 print("SortCategoriesMinPopDemand\n");
 
 ::CargoCatNum <- 3;

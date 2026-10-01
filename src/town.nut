@@ -135,8 +135,11 @@ function GoalTown::SavingTownData()
     return town_data;
 }
 
-/* Main town management function. Called each month. */
-function GoalTown::MonthlyManageTown(settings)
+/* Settles the town's state for the month. Called each month, once, before
+ * MonthlyManageTown. Returns true if the town is growth-managed this month,
+ * false otherwise.
+ */
+function GoalTown::MonthlyCheckTown(settings)
 {
     // Finish initialization of the town
     if (!this.initialized)
@@ -144,27 +147,17 @@ function GoalTown::MonthlyManageTown(settings)
         GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NONE);
         GSTown.SetText(this.id, TownBoxText(false, 0));
         this.initialized = true;
-        return;
+        return false;
     }
 
-    local goal_diff_percent = 0.0;
-    local cur_pop = GSTown.GetPopulation(this.id);
-    local new_town_growth_rate = null;
-    // Difficulty and calculation factors, read once per month by the caller
-    local d_factor = settings.d_factor;
-    local g_factor = settings.g_factor;
-    local e_factor = settings.e_factor;
-    local sup_imp_part = settings.sup_imp_part;
-    local lowest_tgr = settings.lowest_tgr;
-    local allow_0_days_growth = settings.allow_0_days_growth;
     // Clearing the arrays
     this.town_supplied_cat = array(::CargoCatNum, 0);
     this.town_goals_cat = array(::CargoCatNum, 0);
 
     // Allow small towns to grow
-    if (cur_pop < 100) {
+    if (GSTown.GetPopulation(this.id) < 100) {
         GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NORMAL);
-        return;
+        return false;
     }
 
     // Check whether specific cargo goals have been enabled for tropical towns growing over 60
@@ -175,7 +168,24 @@ function GoalTown::MonthlyManageTown(settings)
     }
 
     // Checking whether we should enable or disable town monitoring
-    if (!this.CheckMonitoring(this.is_monitored, settings.valid_companies, settings.monitoring_timeout)) return;
+    return this.CheckMonitoring(this.is_monitored, settings.valid_companies, settings.monitoring_timeout);
+}
+
+/* Main town management function. Called each month for the towns that
+ * MonthlyCheckTown reported as growth-managed.
+ */
+function GoalTown::MonthlyManageTown(settings)
+{
+    local goal_diff_percent = 0.0;
+    local cur_pop = GSTown.GetPopulation(this.id);
+    local new_town_growth_rate = null;
+    // Difficulty and calculation factors, read once per month by the caller
+    local d_factor = settings.d_factor;
+    local g_factor = settings.g_factor;
+    local e_factor = settings.e_factor;
+    local sup_imp_part = settings.sup_imp_part;
+    local lowest_tgr = settings.lowest_tgr;
+    local allow_0_days_growth = settings.allow_0_days_growth;
 
     // Calculate supplied cargo
     local companies_supplied = {};

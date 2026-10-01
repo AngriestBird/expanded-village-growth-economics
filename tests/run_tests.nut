@@ -281,7 +281,7 @@ CheckEqual("portions round down", odd.portion, 499);
 CheckEqual("odd portions round growth days down", odd.days, 4);
 
 local no_boost = CalculateTownFunding(2000, mixed_towns, 0);
-CheckEqual("zero boost still splits the tax", no_boost.portion, 1000);
+CheckEqual("zero boost splits nothing, so nothing is recorded", no_boost.portion, 0);
 CheckEqual("zero boost buys no growth days", no_boost.days, 0);
 
 local tiny = CalculateTownFunding(2, [{ is_monitored = true }], 10);

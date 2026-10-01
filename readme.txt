@@ -273,7 +273,7 @@ buckets, along with last month's breakdown and rebate. The Tax history Goal
 opens a Story Book page with up to 36 months of history. Use the Older and
 Newer buttons to browse it. The Tax funding Goal opens a Story Book page that
 breaks down, town by town, what percentage of each month's tax funded that
-town's growth.
+town's growth. It stays empty while the "Days of town growth" setting is 0.
 
 Category settings:
 These settings change the cargo category values and can only be changed

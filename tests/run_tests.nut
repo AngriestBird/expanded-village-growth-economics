@@ -215,6 +215,49 @@ CheckTable("cargo mask round trip, high cargo ids",
            GetCargoTable(GetCargoHash([[], [], [40, 55]])), [[], [], [40, 55]]);
 
 
+print("Town contributor reset\n");
+
+GSTown.TOWN_GROWTH_NONE <- 0;
+GSTown.SetGrowthRate <- function(id, rate) {};
+GSTown.SetText <- function(id, text) {};
+GSTown.GetName <- function(id) { return "town " + id; };
+
+class GSDate
+{
+    static function GetCurrentDate() { return 100; }
+}
+
+class GSCargoMonitor
+{
+    static function GetTownPickupAmount(company, cargo, town, keep_monitoring) { return 0; }
+    static function GetTownDeliveryAmount(company, cargo, town, keep_monitoring) { return 0; }
+}
+
+function GoalTown::TownBoxText(growth_enabled, text_mode, redraw=false) { return null; }
+
+::CargoLimiter <- [0, 2];
+::CargoIDList <- ["PASS", null, "MAIL"];
+
+local stale_saved = SavedTown(500, GetIndustryHash([[5], [7]]));
+stale_saved.contributor = 2;
+::TownDataTable[21] <- stale_saved;
+CheckEqual("unmonitored saved town drops its stale contributor",
+           GoalTown(21, true, 0, null, 0).contributor, -1);
+
+local served_saved = SavedTown(500, GetIndustryHash([[5], [7]]));
+served_saved.contributor = 2;
+served_saved.is_monitored = true;
+served_saved.last_delivery = 10;
+::TownDataTable[22] <- served_saved;
+local served_town = GoalTown(22, true, 0, null, 0);
+CheckEqual("monitored saved town keeps its contributor", served_town.contributor, 2);
+
+// The date stub is 90 days past the last delivery, well over the 30 day timeout.
+Check("timed out town reports it is not monitored", !served_town.CheckMonitoring(true, [2], 30));
+CheckEqual("timed out town stops being monitored", served_town.is_monitored, false);
+CheckEqual("timed out town clears its contributor", served_town.contributor, -1);
+
+
 print("CalculateTaxBill\n");
 
 CheckEqual("no infrastructure charges nothing", CalculateTaxBill(0, 0, 1.0, 0.0, 0, 1.0, 0, 0).total, 0);

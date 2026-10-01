@@ -1,0 +1,33 @@
+name: Documentation or translation
+description: Report wrong or missing text in the manual, the website, the Story Book or a translation.
+labels: ["documentation", "status: needs triage"]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where is the text?
+      options:
+        - Manual (readme.txt or the website)
+        - In game (settings, Story Book, goals, town signs)
+        - A translation
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: If this is about a translation.
+      placeholder: "German"
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing?
+      description: Quote the current text if you can, and say what it should be.
+    validations:
+      required: true
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Helping out
+      options:
+        - label: I can provide or review the corrected text or translation.

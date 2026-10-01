@@ -1,0 +1,73 @@
+name: Bug report
+description: Something in the game script is broken, crashes or behaves wrongly.
+labels: ["bug", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! A savegame and the script log make most bugs quick to fix.
+        A maintainer will set the priority and severity labels when triaging.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start a new game with ...
+        2. Serve town ... with ...
+        3. After a month, ...
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: How bad is it?
+      description: Your best guess. It helps us pick the severity label.
+      options:
+        - Crashes the script, breaks saves or blocks play
+        - Breaks a feature or loses data
+        - Wrong or misleading numbers or text, but playable
+        - Cosmetic or wording only
+    validations:
+      required: true
+  - type: input
+    id: evge-version
+    attributes:
+      label: EVGE version
+      placeholder: "1.2.0"
+    validations:
+      required: true
+  - type: input
+    id: openttd-version
+    attributes:
+      label: OpenTTD version
+      placeholder: "14.1"
+    validations:
+      required: true
+  - type: textarea
+    id: industry-set
+    attributes:
+      label: Industry set, economy and other NewGRFs
+      description: For example FIRS 5 Steeltown, ECS, base set. Include the "Force economy" setting if you changed it.
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings you changed
+      description: Any EVGE settings that differ from the defaults (taxes, difficulty, randomization, ...).
+  - type: textarea
+    id: log
+    attributes:
+      label: Script log
+      description: Open the AI/Game Script debug window, select the game script and copy any errors or the last lines.
+      render: text
+  - type: textarea
+    id: savegame
+    attributes:
+      label: Savegame or screenshots
+      description: Drag a zipped savegame or screenshots here if you can.

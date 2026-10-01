@@ -69,6 +69,12 @@ Every issue gets one priority and one severity label, alongside a type label
   gameplay in real games; `minor` wrong or misleading output with small impact;
   `trivial` cosmetic, wording or housekeeping.
 
+Issue forms in `.github/ISSUE_TEMPLATE/` (bug report, feature request,
+industry set support, documentation or translation) add the type label and
+`status: needs triage`. When triaging, set the priority and severity labels and
+remove `status: needs triage`. The bug form's "How bad is it?" answers map to
+the four severity levels in order.
+
 Label names, colours and descriptions live in `.github/workflows/labels.yml`;
 edit that file and push to change them.
 

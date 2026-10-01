@@ -31,3 +31,5 @@ jobs:
           label "severity: major" 7b3fbf "Breaks a feature, loses data or skews gameplay in real games"
           label "severity: minor" b39ddb "Wrong or misleading output with small impact or a workaround"
           label "severity: trivial" e1d5f5 "Cosmetic, wording or housekeeping"
+
+          label "status: needs triage" fef2c0 "New issue waiting for priority and severity labels"

@@ -1,0 +1,36 @@
+name: Industry set support
+description: Ask for an industry NewGRF or economy to be supported, or its cargo categories fixed.
+labels: ["enhancement", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Unsupported sets still work through generated cargo categories. A dedicated mapping makes
+        the town requirements sensible for that set.
+  - type: input
+    id: grf-name
+    attributes:
+      label: NewGRF name and version
+      placeholder: "FIRS 5.2, economy Steeltown"
+    validations:
+      required: true
+  - type: input
+    id: grf-link
+    attributes:
+      label: Where to get it
+      description: BaNaNaS page, forum topic or repository.
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request
+      options:
+        - Add support for a new set or economy
+        - Fix the cargo categories of a supported set
+        - A supported set was updated and cargos changed
+    validations:
+      required: true
+  - type: textarea
+    id: cargos
+    attributes:
+      label: Cargos and suggested categories
+      description: List the cargo labels if you know them, and which ones towns should need at each stage.

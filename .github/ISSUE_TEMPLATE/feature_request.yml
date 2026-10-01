@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a new feature, setting or change to how the script plays.
+labels: ["enhancement", "status: needs triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: What are you trying to do in your games that the script makes hard or impossible?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Town growth and cargo requirements
+        - Industry sets and cargo categories
+        - Infrastructure tax
+        - Subsidies
+        - Story Book, goals and town signs
+        - Settings and difficulty
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered

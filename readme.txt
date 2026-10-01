@@ -261,9 +261,9 @@ and has no solvency check, so companies can go into debt.
 - "Taxes: Rebate per population your towns gained last month": turns town growth
   into a tax rebate for the same month.
 - "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
-  company pays each month is split equally between the towns it actively
-  contributes to, and every share is converted into faster growth for that
-  town (days taken off its town growth rate). A share can at most halve the
+  company pays each month is split equally between its contributed towns that
+  are still monitored and have at least 100 population. Each share gives that
+  town faster growth (days off its growth rate). A share can at most halve the
   town's growth rate, so taxes accelerate growth instead of buying it
   outright. The company still pays the full bill; this only changes what
   the money buys.

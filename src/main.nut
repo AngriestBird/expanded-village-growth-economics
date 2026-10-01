@@ -529,7 +529,22 @@ function MainClass::ManageTowns()
         // can fund town growth this month
         ChargeTaxes(this.companies, towns_by_contributor, date);
 
-        // Split each company's net tax between its actively monitored towns;
+        // Settle each town's state before the split so the split, the funding
+        // page and the growth boost all use the towns growth-managed this month
+        local managed_towns = {};
+        local managed_by_contributor = {};
+        foreach (town in this.towns) {
+            town.ManageTownLimiting(threshold_setting, min_transport, limiter_delay);
+            if (!town.MonthlyCheckTown(monthly_settings))
+                continue;
+
+            managed_towns[town.id] <- true;
+            if (!managed_by_contributor.rawin(town.contributor))
+                managed_by_contributor[town.contributor] <- [];
+            managed_by_contributor[town.contributor].append(town);
+        }
+
+        // Split each company's net tax between its growth-managed towns;
         // each share buys growth days for that town this month, and the
         // breakdown is recorded for the tax funding story page
         local tax_funding = {};
@@ -537,8 +552,8 @@ function MainClass::ManageTowns()
         local year = GSDate.GetYear(date);
         local month = GSDate.GetMonth(date);
         foreach (company in this.companies) {
-            local contributed = towns_by_contributor.rawin(company.id)
-                                ? towns_by_contributor[company.id] : [];
+            local contributed = managed_by_contributor.rawin(company.id)
+                                ? managed_by_contributor[company.id] : [];
             local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
             if (funding.days > 0)
                 tax_funding[company.id] <- funding.days;
@@ -550,8 +565,8 @@ function MainClass::ManageTowns()
         // Update each town, bucketing by the fresh contributor for the GUI pass
         local gui_towns_by_contributor = {};
         foreach (town in this.towns) {
-            town.ManageTownLimiting(threshold_setting, min_transport, limiter_delay);
-            town.MonthlyManageTown(monthly_settings);
+            if (managed_towns.rawin(town.id))
+                town.MonthlyManageTown(monthly_settings);
             if (this.actual_town_info_mode > 1) {
                 town.UpdateTownText(this.actual_town_info_mode);
             }

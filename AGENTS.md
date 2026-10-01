@@ -13,7 +13,7 @@
 - `src/subsidies.nut`: subsidy generation
 - `src/taxes.nut`: infrastructure tax feature
 - `src/story.nut`: StoryBook pages and intro text
-- `src/strings.nut`: localized string IDs and settings labels
+- `src/strings.nut`: town box and town sign text builders (settings labels live in `info.nut` and `lang/`)
 - `src/version.nut`: version and save compatibility numbers
 - `lang/`: translation files
 - `tools/check_lang.py`: translation validator
@@ -56,6 +56,23 @@ version with `bash tools/install_squirrel.sh /tmp/squirrel` and set
 which catches syntax slips such as using a reserved word like `base` for a
 local. Keep standalone tests behind GS API stubs so they remain safe outside
 OpenTTD.
+
+`install_squirrel.sh` downloads from `codeload.github.com`. In a sandbox where
+that host is blocked, build the same commit from a `git clone` instead.
+
+## Issue labels
+
+Every issue carries one `priority:` label and one `severity:` label. New issues
+start with `status: needs triage` until both are set.
+
+- `priority: P0`: drop everything and fix now
+- `priority: P1`: fix before the next release
+- `priority: P2`: schedule soon
+- `priority: P3`: polish, investigate or decide later
+- `severity: critical`: crashes, corrupts saves or blocks play in most games
+- `severity: major`: breaks a feature, loses data or skews gameplay in real games
+- `severity: minor`: wrong or misleading output with small impact or a workaround
+- `severity: trivial`: cosmetic, wording or housekeeping
 
 ## Version/release notes
 

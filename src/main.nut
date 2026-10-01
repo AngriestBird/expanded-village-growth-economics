@@ -52,6 +52,7 @@ class MainClass extends GSController
     current_year = null;
     gs_init_done = null;
     load_saved_data = null;
+    loaded_data = null;
     current_save_version = null;
     actual_town_info_mode = null;
     toy_lib = null;
@@ -206,6 +207,7 @@ function MainClass::Init()
 
     // Ending initialization
     this.gs_init_done = true;
+    this.loaded_data = null;
 
     return InitError.NONE;
 }
@@ -246,12 +248,15 @@ function MainClass::HandleEvents()
 function MainClass::Save()
 {
     Log.Info("Saving data...", Log.LVL_INFO);
-    local save_table = {};
 
     /* If the script isn't yet initialized, we can't retrieve data
      * from GoalTown instances. Thus, simply use the original
      * loaded table. Otherwise we build the table with town data.
      */
+    if (!this.gs_init_done && this.loaded_data != null)
+        return this.loaded_data;
+
+    local save_table = {};
     save_table.company_data_table <- {};
     save_table.town_data_table <- {};
     if (!this.gs_init_done) {
@@ -289,6 +294,7 @@ function MainClass::Load(version, saved_data)
     // Loading town data. Only load data if the savegame version matches.
     if ((saved_data.rawin("save_version") && saved_data.save_version == this.current_save_version)) {
         this.load_saved_data = true;
+        this.loaded_data = saved_data;
         ::SettingsTable.use_town_sign <- saved_data.use_town_sign;
         ::SettingsTable.randomization <- saved_data.randomization;
         ::SettingsTable.display_cargo <- saved_data.display_cargo;

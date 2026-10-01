@@ -211,14 +211,15 @@ CheckEqual("save before init keeps the settings", early_data.randomization, Rand
 CheckEqual("save before init keeps both towns", early_data.town_data_table.len(), 2);
 CheckEqual("save before init keeps company data", early_data.company_data_table[4].tax_paid, 123);
 
+CheckEqual("a new game saved before init has no version to load",
+           MainClass().Save().rawin("save_version"), false);
+
+// Loaded last so later sections see the loaded settings and tables again.
 local early_reloaded = MainClass();
 early_reloaded.Load(0, early_data);
 Check("save before init loads again", early_reloaded.load_saved_data);
 Check("save before init reloads town id 900", ::TownDataTable.rawin(900));
 Check("save before init reloads company id 4", ::CompanyDataTable.rawin(4));
-
-CheckEqual("a new game saved before init has no version to load",
-           MainClass().Save().rawin("save_version"), false);
 
 
 print("GetCargoHash / GetCargoTable\n");

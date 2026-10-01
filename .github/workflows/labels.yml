@@ -1,0 +1,33 @@
+name: Labels
+
+# Keeps the triage labels in sync. Edit the list below and push to apply;
+# existing labels are updated in place, nothing is deleted.
+on:
+  push:
+    paths:
+      - .github/workflows/labels.yml
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Create or update labels
+        run: |
+          label() { gh label create "$1" --color "$2" --description "$3" --force; }
+
+          label "priority: P0" b60205 "Critical: drop everything and fix now"
+          label "priority: P1" d93f0b "High: fix before the next release"
+          label "priority: P2" fbca04 "Medium: schedule soon"
+          label "priority: P3" 0e8a16 "Low: polish, investigate or decide later"
+
+          label "severity: critical" 4a0e78 "Crashes, corrupts saves or blocks play in most games"
+          label "severity: major" 7b3fbf "Breaks a feature, loses data or skews gameplay in real games"
+          label "severity: minor" b39ddb "Wrong or misleading output with small impact or a workaround"
+          label "severity: trivial" e1d5f5 "Cosmetic, wording or housekeeping"

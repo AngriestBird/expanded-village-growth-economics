@@ -57,6 +57,21 @@ which catches syntax slips such as using a reserved word like `base` for a
 local. Keep standalone tests behind GS API stubs so they remain safe outside
 OpenTTD.
 
+## Issue triage
+
+Every issue gets one priority and one severity label, alongside a type label
+(`bug`, `enhancement`, `documentation`, `question`).
+
+- Priority (when to fix): `priority: P0` drop everything, `P1` before the next
+  release, `P2` schedule soon, `P3` polish, investigate or decide later.
+- Severity (how bad it is): `severity: critical` crashes, corrupts saves or
+  blocks play in most games; `major` breaks a feature, loses data or skews
+  gameplay in real games; `minor` wrong or misleading output with small impact;
+  `trivial` cosmetic, wording or housekeeping.
+
+Label names, colours and descriptions live in `.github/workflows/labels.yml`;
+edit that file and push to change them.
+
 ## Version/release notes
 
 - Bump `src/version.nut` before release work; keep `readme.txt`/`changelog.txt` and packaged version references consistent with it.

@@ -39,6 +39,12 @@ class Company
     tax_history_offset = 0;
     tax_history_previous_button = -1;
     tax_history_next_button = -1;
+    tax_funding_offset = 0;
+    tax_funding_town_offset = 0;
+    tax_funding_previous_button = -1;
+    tax_funding_next_button = -1;
+    tax_funding_previous_towns_button = -1;
+    tax_funding_next_towns_button = -1;
 
     constructor(id, load_data)
     {

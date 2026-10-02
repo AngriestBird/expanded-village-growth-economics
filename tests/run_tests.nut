@@ -44,6 +44,9 @@ dofile("src/version.nut", true);
 dofile("src/industry.nut", true);
 dofile("src/cargo.nut", true);
 dofile("src/taxes.nut", true);
+dofile("src/company.nut", true);
+dofile("src/subsidies.nut", true);
+dofile("src/story.nut", true);
 dofile("src/main.nut", true);
 Randomization <- { INDUSTRY_DESC = 2, INDUSTRY_ASC = 3 };
 dofile("src/town.nut", true);
@@ -400,7 +403,7 @@ GSTown.TOWN_GROWTH_NORMAL <- 0x10000;
 GSTown.SetGrowthRate <- function(id, rate) { ::stub_growth_rate[id] <- rate; };
 GSTown.SetText <- function(id, text) {};
 GSTown.GetName <- function(id) { return "town " + id; };
-function GoalTown::TownBoxText(growth_enabled, text_mode) { return null; }
+function GoalTown::TownBoxText(growth_enabled, text_mode, redraw=false) { return null; }
 
 function CheckedTown(id, population, monitored)
 {
@@ -471,6 +474,8 @@ CheckEqual("labels follow the sort", ::CargoCatList[0] + ::CargoCatList[1] + ::C
 CheckEqual("permille follows the sort",
            ::CargoPermille[0] + "," + ::CargoPermille[1] + "," + ::CargoPermille[2], "60,10,40");
 
+
+dofile("tests/runtime_tests.nut", true);
 
 print("\n" + tests_run + " checks, " + tests_failed + " failed\n");
 if (tests_failed == 0)

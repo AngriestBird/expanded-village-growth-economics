@@ -116,11 +116,11 @@ STR_ECONOMY_FIRS1_ARCTIC        :FIRS 1 Arctic
 STR_ECONOMY_FIRS1_TROPIC        :FIRS 1 Tropic
 STR_ECONOMY_FIRS1_HOD           :FIRS 1 Hearth Of Darkness
 STR_ECONOMY_ECS                 :ECS
-STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 1 Temperate
-STR_ECONOMY_FIRS2_ARCTIC        :FIRS 1 Arctic
-STR_ECONOMY_FIRS2_TROPIC        :FIRS 1 Tropic
-STR_ECONOMY_FIRS2_IAHC          :FIRS 1 In A Hot Country
-STR_ECONOMY_FIRS2_HOD           :FIRS 1 Hearth Of Darkness
+STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 2 Temperate
+STR_ECONOMY_FIRS2_ARCTIC        :FIRS 2 Arctic
+STR_ECONOMY_FIRS2_TROPIC        :FIRS 2 Tropic
+STR_ECONOMY_FIRS2_IAHC          :FIRS 2 In A Hot Country
+STR_ECONOMY_FIRS2_HOD           :FIRS 2 Hearth Of Darkness
 STR_ECONOMY_YETI                :YETI
 STR_ECONOMY_FIRS3_TEMPERATE     :FIRS 3 温带
 STR_ECONOMY_FIRS3_ARCTIC        :FIRS 3 寒带
@@ -146,7 +146,7 @@ STR_ECONOMY_AXIS_TROPICAL       :AXIS 热带天堂
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :IOTC 加勒比海工业
 STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
-STR_ECOMONY_WRBI                :Wannaroo Basic Industries
+STR_ECONOMY_WRBI                :Wannaroo Basic Industries
 STR_ECONOMY_ITI2                :ITI 改进城镇工业
 STR_ECONOMY_REAL                :Real Industries
 STR_ECONOMY_MINIMALIST          :Minimalist Industries

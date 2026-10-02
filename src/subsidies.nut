@@ -26,7 +26,7 @@ function SortTowns(towns, companies)
     foreach (index, town in towns) {
         if (!town.is_monitored)
             sorted_towns.not_monitored.append(town.id);
-        else if (town.contributor != -1)
+        else if (sorted_towns.contributed.rawin(town.contributor))
             sorted_towns.contributed[town.contributor].append(index);
     }
 

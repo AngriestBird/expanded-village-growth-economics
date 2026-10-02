@@ -173,65 +173,100 @@ function StoryEditor::UpdateTaxFundingPage(company)
     foreach (element, _ in elements)
         GSStoryPage.RemoveElement(element);
 
-    local history = company.tax_history;
-    if (history.len() == 0) {
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_FUNDING_EMPTY));
-        return;
-    }
+    company.tax_funding_previous_button = -1;
+    company.tax_funding_next_button = -1;
+    company.tax_funding_previous_towns_button = -1;
+    company.tax_funding_next_towns_button = -1;
 
-    // The most recent 12 months with actual town funding
-    local start = history.len() > 12 ? history.len() - 12 : 0;
-    local shown = 0;
+    local funded = [];
     local maximum = 0;
-    for (local i = history.len() - 1; i >= start; --i) {
-        if (history[i].rawin("town_funding") && history[i].town_funding.len() > 0) {
-            ++shown;
-            if (history[i].total > maximum)
-                maximum = history[i].total;
-        }
-    }
-
-    if (shown == 0) {
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_FUNDING_EMPTY));
-        return;
-    }
-
-    for (local i = history.len() - 1; i >= start; --i) {
-        local entry = history[i];
+    foreach (entry in company.tax_history) {
         if (!entry.rawin("town_funding") || entry.town_funding.len() == 0)
             continue;
-
-        local position = 0;
-        if (entry.total > 0 && maximum > 0)
-            position = (entry.total.tofloat() * 20 / maximum + 0.5).tointeger();
-
-        local line = "";
-        for (local j = 0; j <= 20; ++j)
-            line += j == position ? "#" : ".";
-
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month,
-                                      GSText(GSText.STR_CURRENCY, entry.total),
-                                      entry.town_funding.len()));
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month, line));
-
-        foreach (row in entry.town_funding) {
-            local percent = entry.total > 0
-                            ? (row.portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
-            GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                                   GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
-                                          percent, GSText(GSText.STR_CURRENCY, row.portion),
-                                          row.days));
-        }
+        funded.append(entry);
+        if (entry.total > maximum)
+            maximum = entry.total;
     }
+    if (funded.len() == 0) {
+        company.tax_funding_offset = 0;
+        company.tax_funding_town_offset = 0;
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, GSText(GSText.STR_SB_TAX_FUNDING_EMPTY));
+        return;
+    }
+
+    if (company.tax_funding_offset < 0 || company.tax_funding_offset >= funded.len())
+        company.tax_funding_offset = 0;
+    local entry = funded[funded.len() - 1 - company.tax_funding_offset];
+    if (company.tax_funding_town_offset < 0 || company.tax_funding_town_offset >= entry.town_funding.len())
+        company.tax_funding_town_offset = 0;
+    local start = company.tax_funding_town_offset;
+    local end = start + 20;
+    if (end > entry.town_funding.len())
+        end = entry.town_funding.len();
+
+    local position = maximum > 0 ? (entry.total.tofloat() * 20 / maximum + 0.5).tointeger() : 0;
+    local line = "";
+    for (local j = 0; j <= 20; ++j)
+        line += j == position ? "#" : ".";
+
+    GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                           GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month,
+                                  GSText(GSText.STR_CURRENCY, entry.total), entry.town_funding.len()));
+    GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                           GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month, line));
+    for (local i = start; i < end; ++i) {
+        local row = entry.town_funding[i];
+        local percent = entry.total > 0
+                        ? (row.portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                               GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
+                                      percent, GSText(GSText.STR_CURRENCY, row.portion), row.days));
+    }
+
+    if (company.tax_funding_offset + 1 < funded.len())
+        company.tax_funding_previous_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_LEFT),
+            GSText(GSText.STR_SB_TAX_HISTORY_OLDER));
+    if (company.tax_funding_offset > 0)
+        company.tax_funding_next_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_RIGHT),
+            GSText(GSText.STR_SB_TAX_HISTORY_NEWER));
+    if (start > 0)
+        company.tax_funding_previous_towns_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_LEFT),
+            GSText(GSText.STR_SB_TAX_FUNDING_PREVIOUS_TOWNS));
+    if (end < entry.town_funding.len())
+        company.tax_funding_next_towns_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
+            GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_RIGHT),
+            GSText(GSText.STR_SB_TAX_FUNDING_MORE_TOWNS));
 }
 
-function StoryEditor::HandleTaxHistoryButton(companies, event)
+function StoryEditor::HandleTaxButton(companies, event)
 {
     event = GSEventStoryPageButtonClick.Convert(event);
     foreach (company in companies) {
-        if (company.id != event.GetCompanyID() || company.sp_tax_history != event.GetStoryPageID())
+        if (company.id != event.GetCompanyID())
+            continue;
+
+        if (company.sp_tax_funding == event.GetStoryPageID()) {
+            local element = event.GetElementID();
+            if (element == company.tax_funding_previous_towns_button)
+                company.tax_funding_town_offset -= 20;
+            else if (element == company.tax_funding_next_towns_button)
+                company.tax_funding_town_offset += 20;
+            else {
+                if (element == company.tax_funding_previous_button)
+                    ++company.tax_funding_offset;
+                else if (element == company.tax_funding_next_button)
+                    --company.tax_funding_offset;
+                else
+                    return;
+                company.tax_funding_town_offset = 0;
+            }
+            this.UpdateTaxFundingPage(company);
+            return;
+        }
+        if (company.sp_tax_history != event.GetStoryPageID())
             continue;
 
         if (event.GetElementID() == company.tax_history_previous_button)

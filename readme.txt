@@ -34,7 +34,8 @@ is detected). Unless a town exchange passengers, it is not monitored
 and you will not see any cargo requirement. The check is done
 monthly. When a town stops exchanging passengers for longer than the
 "Monitoring" timeout setting (365 days by default, 0 = never), it
-gets out from the list of monitored towns.
+gets out from the list of monitored towns. Towns under 100 population grow
+normally, but still run the monitoring check and have no Contributor.
 
 If passenger delivery is detected, the script defines some cargo
 requirements for the ongoing month. Cargo requirements are not defined
@@ -275,7 +276,10 @@ buckets, along with last month's breakdown and rebate. The Tax history Goal
 opens a Story Book page with up to 36 months of history. Use the Older and
 Newer buttons to browse it. The Tax funding Goal opens a Story Book page that
 breaks down, town by town, what percentage of each month's tax funded that
-town's growth. It stays empty while the "Days of town growth" setting is 0.
+town's growth. It shows one funded month and up to 20 towns at a time. Use
+Older/Newer for months and Previous towns/More towns for the remaining rows.
+All funded rows in the 36-month history remain available. No new funding is
+recorded while the "Days of town growth" setting is 0.
 
 Category settings:
 These settings change the cargo category values and can only be changed

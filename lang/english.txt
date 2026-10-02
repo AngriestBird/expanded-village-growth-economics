@@ -65,6 +65,8 @@ STR_SB_TAX_FUNDING_TITLE            :Tax funding by town
 STR_SB_TAX_FUNDING_EMPTY            :No town growth has been funded by taxes yet.
 STR_SB_TAX_FUNDING_MONTH            :{NUM}/{NUM}: {STRING} tax, split between {NUM} towns
 STR_SB_TAX_FUNDING_TOWN             :  {TOWN}: {NUM}% ({STRING}, {NUM} growth days)
+STR_SB_TAX_FUNDING_PREVIOUS_TOWNS   :Previous towns
+STR_SB_TAX_FUNDING_MORE_TOWNS       :More towns
 STR_SB_WELCOME_END                  :Have fun!
 
 ##### CUSTOM STORY BOOK #####
@@ -140,11 +142,11 @@ STR_ECONOMY_FIRS1_ARCTIC        :FIRS 1 Arctic
 STR_ECONOMY_FIRS1_TROPIC        :FIRS 1 Tropic
 STR_ECONOMY_FIRS1_HOD           :FIRS 1 Hearth Of Darkness
 STR_ECONOMY_ECS                 :ECS
-STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 1 Temperate
-STR_ECONOMY_FIRS2_ARCTIC        :FIRS 1 Arctic
-STR_ECONOMY_FIRS2_TROPIC        :FIRS 1 Tropic
-STR_ECONOMY_FIRS2_IAHC          :FIRS 1 In A Hot Country
-STR_ECONOMY_FIRS2_HOD           :FIRS 1 Hearth Of Darkness
+STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 2 Temperate
+STR_ECONOMY_FIRS2_ARCTIC        :FIRS 2 Arctic
+STR_ECONOMY_FIRS2_TROPIC        :FIRS 2 Tropic
+STR_ECONOMY_FIRS2_IAHC          :FIRS 2 In A Hot Country
+STR_ECONOMY_FIRS2_HOD           :FIRS 2 Hearth Of Darkness
 STR_ECONOMY_YETI                :YETI
 STR_ECONOMY_FIRS3_TEMPERATE     :FIRS 3 Temperate
 STR_ECONOMY_FIRS3_ARCTIC        :FIRS 3 Arctic
@@ -172,7 +174,7 @@ STR_ECONOMY_AXIS_EXTREME        :AXIS Extreme Classic
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :Industries of the Caribbean
 STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
-STR_ECOMONY_WRBI                :Wannaroo Basic Industries
+STR_ECONOMY_WRBI                :Wannaroo Basic Industries
 STR_ECONOMY_ITI2                :Improved Town Industries
 STR_ECONOMY_REAL                :Real Industries
 STR_ECONOMY_MINIMALIST          :Minimalist Industries

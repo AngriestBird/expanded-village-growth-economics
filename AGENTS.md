@@ -57,8 +57,9 @@ which catches syntax slips such as using a reserved word like `base` for a
 local. Keep standalone tests behind GS API stubs so they remain safe outside
 OpenTTD.
 
-`install_squirrel.sh` downloads from `codeload.github.com`. In a sandbox where
-that host is blocked, build the same commit from a `git clone` instead.
+`install_squirrel.sh` clones the pinned commit from GitHub, so it does not
+need access to `codeload.github.com`. Build sources remain under the install
+directory for inspection.
 
 ## Issue labels
 

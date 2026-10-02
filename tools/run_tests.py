@@ -34,7 +34,11 @@ def find_interpreter():
 
 def compile_check(sq, repo):
     """Compile each script without running it, to catch syntax errors early."""
-    sources = sorted(repo.glob("*.nut")) + sorted((repo / "src").rglob("*.nut"))
+    sources = (
+        sorted(repo.glob("*.nut"))
+        + sorted((repo / "src").rglob("*.nut"))
+        + sorted((repo / "tests").rglob("*.nut"))
+    )
     failed = []
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "out.cnut"

@@ -184,7 +184,9 @@ function ChargeTaxes(companies, towns_by_contributor, date)
         local tile = GSCompany.GetCompanyHQ(company.id);
         if (towns_by_contributor.rawin(company.id)) {
             foreach (town in towns_by_contributor[company.id]) {
-                if (town.is_monitored && GSTown.GetPopulation(town.id) > 500)
+                if (!town.is_monitored)
+                    continue;
+                if (GSTown.GetPopulation(town.id) > 500)
                     ++num_big_towns;
                 town_rating_total += GetTownTaxMultiplier(town.id, company.id, rating_discount);
                 ++rated_towns;

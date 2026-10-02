@@ -86,11 +86,11 @@ STR_ECONOMY_FIRS1_ARCTIC        :FIRS 1 Subártico
 STR_ECONOMY_FIRS1_TROPIC        :FIRS 1 Tropical
 STR_ECONOMY_FIRS1_HOD           :FIRS 1 Corazón da escuridade
 STR_ECONOMY_ECS                 :ECS
-STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 1 Temperado
-STR_ECONOMY_FIRS2_ARCTIC        :FIRS 1 Subártico
-STR_ECONOMY_FIRS2_TROPIC        :FIRS 1 Tropical
-STR_ECONOMY_FIRS2_IAHC          :FIRS 1 Nunha terra cálida
-STR_ECONOMY_FIRS2_HOD           :FIRS 1 Corazón da escuridade
+STR_ECONOMY_FIRS2_TEMPERATE     :FIRS 2 Temperado
+STR_ECONOMY_FIRS2_ARCTIC        :FIRS 2 Subártico
+STR_ECONOMY_FIRS2_TROPIC        :FIRS 2 Tropical
+STR_ECONOMY_FIRS2_IAHC          :FIRS 2 Nunha terra cálida
+STR_ECONOMY_FIRS2_HOD           :FIRS 2 Corazón da escuridade
 STR_ECONOMY_YETI                :YETI
 STR_ECONOMY_FIRS3_TEMPERATE     :FIRS 3 Temperado
 STR_ECONOMY_FIRS3_ARCTIC        :FIRS 3 Subártico
@@ -109,7 +109,7 @@ STR_ECONOMY_XIS_LOT             :XIS The Lot
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :Industries of the Caribbean
 STR_ECONOMY_LUMBERJACK          :Lumberjack Industries
-STR_ECOMONY_WRBI                :Wannaroo Basic Industries
+STR_ECONOMY_WRBI                :Wannaroo Basic Industries
 STR_ECONOMY_ITI2                :Improved Town Industries
 
 ##### ETERNAL LOVE #####

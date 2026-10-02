@@ -237,7 +237,7 @@ function MainClass::HandleEvents()
 
         case GSEvent.ET_STORYPAGE_BUTTON_CLICK:
             if (this.story_editor != null)
-                this.story_editor.HandleTaxHistoryButton(this.companies, event);
+                this.story_editor.HandleTaxButton(this.companies, event);
             break;
 
         default: break;
@@ -522,21 +522,7 @@ function MainClass::ManageTowns()
         };
         local limiter_delay = GSController.GetSetting("limiter_delay");
 
-        // Bucket towns by last month's contributor so the tax bill and its
-        // growth funding are known before this month's growth rates are applied
-        local towns_by_contributor = {};
-        foreach (town in this.towns) {
-            if (!towns_by_contributor.rawin(town.contributor))
-                towns_by_contributor[town.contributor] <- [];
-            towns_by_contributor[town.contributor].append(town);
-        }
-
-        // Charge the infrastructure tax before the town update so the tax paid
-        // can fund town growth this month
-        ChargeTaxes(this.companies, towns_by_contributor, date);
-
-        // Settle each town's state before the split so the split, the funding
-        // page and the growth boost all use the towns growth-managed this month
+        // Settle monitoring before charging tax and splitting growth funding.
         local managed_towns = {};
         local managed_by_contributor = {};
         foreach (town in this.towns) {
@@ -549,6 +535,8 @@ function MainClass::ManageTowns()
                 managed_by_contributor[town.contributor] <- [];
             managed_by_contributor[town.contributor].append(town);
         }
+
+        ChargeTaxes(this.companies, managed_by_contributor, date);
 
         // Split each company's net tax between its growth-managed towns;
         // each share buys growth days for that town this month, and the

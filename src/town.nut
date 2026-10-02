@@ -154,8 +154,10 @@ function GoalTown::MonthlyCheckTown(settings)
     this.town_supplied_cat = array(::CargoCatNum, 0);
     this.town_goals_cat = array(::CargoCatNum, 0);
 
-    // Allow small towns to grow
+    // Small towns grow normally but must still refresh or time out monitoring.
     if (GSTown.GetPopulation(this.id) < 100) {
+        this.CheckMonitoring(this.is_monitored, settings.valid_companies, settings.monitoring_timeout);
+        this.contributor = -1;
         GSTown.SetGrowthRate(this.id, GSTown.TOWN_GROWTH_NORMAL);
         return false;
     }

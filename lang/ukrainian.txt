@@ -147,7 +147,7 @@ STR_ECONOMY_AXIS_TROPICAL       :AXIS Тропічний рай
 STR_ECONOMY_OTIS                :OTIS
 STR_ECONOMY_IOTC                :Індустрії Карибських островів
 STR_ECONOMY_LUMBERJACK          :Лісорубні індустрії
-STR_ECOMONY_WRBI                :Ваннару базові індустрії
+STR_ECONOMY_WRBI                :Ваннару базові індустрії
 STR_ECONOMY_ITI2                :Покращені міські індустрії 2
 STR_ECONOMY_REAL                :Реальні індустрії
 STR_ECONOMY_MINIMALIST          :Мінімалістичні індустрії

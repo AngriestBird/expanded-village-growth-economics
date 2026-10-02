@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "bunx astro dev",
+    "start": "astro dev",
     "generate-readme": "bun run scripts/generate-readme.mjs",
-    "build": "bunx astro build"
+    "build": "astro build"
   },
   "dependencies": {
     "astro": "^5.11.0"

@@ -14,6 +14,9 @@ Version 1.3.0 (unreleased)
   dodge the infrastructure tax. Two new rate settings, tax buckets are now
   "network" (rail, road, canals) and "stations" (docks, airports)
 - added: unit tests and a compile check for every script, run in CI
+- changed: tax funding rows are saved as packed arrays with a tax schema
+  version, which roughly halves the save data the Tax funding page needs on
+  large maps. Saves written by earlier 1.3.0 builds still load
 - changed: the rating discount weighs each contributed town by population
   instead of counting every town equally, so small well-rated villages no
   longer dilute the rating of a large town

@@ -236,11 +236,41 @@ CheckEqual("funding records portion", company.tax_history[0].town_funding[0].por
 CheckEqual("funding records days", company.tax_history[0].town_funding[0].days, 4);
 company.RecordTaxFunding(2040, 1, []);
 CheckEqual("stale funding leaves current entry intact", company.tax_history[0].town_funding.len(), 1);
+company.RecordTaxHistory(2040, 3, 500, 100, 0);
+company.RecordTaxFunding(2040, 3, [{ town_id = 30, portion = 400, days = 4, applied = 2 },
+                                   { town_id = 31, portion = 200, days = 2, applied = 2 }]);
 local saved_company = company.SavingCompanyData();
 ::CompanyDataTable[0] <- saved_company;
 local restored = Company(0, true);
-foreach (key, value in saved_company)
-    CheckEqual("company round trip " + key, restored[key], value);
+foreach (key, value in saved_company) {
+    if (key != "tax_history" && key != "tax_schema")
+        CheckEqual("company round trip " + key, restored[key], value);
+}
+CheckEqual("save records the tax schema", saved_company.tax_schema, TAX_SCHEMA_VERSION);
+Check("save packs funding rows into arrays", !saved_company.tax_history[0].rawin("town_funding"));
+CheckEqual("packed towns keep their order", saved_company.tax_history[1].funding.towns[1], 31);
+CheckEqual("packed portions keep their values", saved_company.tax_history[1].funding.portions[0], 400);
+Check("rows without applied days save no applied array", !saved_company.tax_history[0].funding.rawin("applied"));
+CheckEqual("rows with applied days save them", saved_company.tax_history[1].funding.applied[0], 2);
+CheckEqual("round trip keeps every history entry", restored.tax_history.len(), 2);
+CheckEqual("round trip keeps the month", restored.tax_history[1].month, 3);
+CheckEqual("round trip keeps the total", restored.tax_history[1].total, 600);
+CheckEqual("round trip rebuilds funding rows", restored.tax_history[1].town_funding.len(), 2);
+CheckEqual("round trip keeps the row town", restored.tax_history[1].town_funding[1].town_id, 31);
+CheckEqual("round trip keeps the row portion", restored.tax_history[1].town_funding[1].portion, 200);
+CheckEqual("round trip keeps the row days", restored.tax_history[1].town_funding[0].days, 4);
+CheckEqual("round trip keeps the row applied days", restored.tax_history[1].town_funding[0].applied, 2);
+Check("round trip leaves older rows without applied days", !restored.tax_history[0].town_funding[0].rawin("applied"));
+local twice = restored.SavingCompanyData();
+CheckEqual("saving a loaded company packs the same rows", twice.tax_history[1].funding.towns.len(), 2);
+::CompanyDataTable[0] <- { points = 0, global_goal = null, statistics = array(Statistics.END, -1),
+    tax_history = [{ year = 2039, month = 12, rail_road = 10, docks = 0, rebate = 0, total = 10,
+                     town_funding = [{ town_id = 40, portion = 10, days = 1 }] },
+                   { year = 2040, month = 1, rail_road = 20, docks = 0, rebate = 0, total = 20 }] };
+local legacy_rows = Company(0, true);
+CheckEqual("schema 1 rows load as they are", legacy_rows.tax_history[0].town_funding[0].town_id, 40);
+Check("schema 1 entry without funding stays unfunded", !legacy_rows.tax_history[1].rawin("town_funding"));
+CheckEqual("schema 1 saves again in the packed shape", legacy_rows.SavingCompanyData().tax_history[0].funding.days[0], 1);
 ::CompanyDataTable[0] <- { points = 7, global_goal = 1, statistics = [2, 3] };
 local old_company = Company(0, true);
 CheckEqual("old statistics grow to current size", old_company.statistics.len(), Statistics.END);

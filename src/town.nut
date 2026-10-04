@@ -7,6 +7,7 @@ class GoalTown
     id = null;                  // Town id
     sign_id = null;             // Id for extra text under town name
     sign_growth_rate = null;    // Last growth rate rendered on the sign (transient, skips unchanged redraws)
+    funding_applied = null;     // Growth days the tax funding took off this month's sample (transient)
     contributor = null;         // company that contributed most to the growth of this town in the last month
     max_population = null;      // maximum achieved population of this town
     is_monitored = null;        // Whether the town is already under monitoring. True if town exchanges pax.
@@ -283,7 +284,9 @@ function GoalTown::MonthlyManageTown(settings)
     if (settings.tax_funding.rawin(this.contributor)
             && settings.tax_funding[this.contributor].rawin(this.id))
         funding = settings.tax_funding[this.contributor][this.id];
-    new_town_growth_rate = ApplyGrowthFunding(new_town_growth_rate, funding, allow_0_days_growth);
+    local funded_rate = ApplyGrowthFunding(new_town_growth_rate, funding, allow_0_days_growth);
+    this.funding_applied = new_town_growth_rate - funded_rate;
+    new_town_growth_rate = funded_rate;
 
     // Defining the new town growth rate, calculated as the moving average of the TGR array, update only if town growth requirements are fulfilled
     local sum_array = 0.0;

@@ -129,7 +129,7 @@ foreach (name in [
     "STR_STATISTICS_TAX_FUNDING", "STR_STATISTICS_TAX_FUNDING_OPEN", "STR_SB_TAX_HISTORY_EMPTY",
     "STR_SB_TAX_HISTORY_SUMMARY", "STR_SB_TAX_HISTORY_ROW", "STR_SB_TAX_HISTORY_LINE",
     "STR_SB_TAX_HISTORY_OLDER", "STR_SB_TAX_HISTORY_NEWER", "STR_SB_TAX_FUNDING_EMPTY",
-    "STR_SB_TAX_FUNDING_MONTH", "STR_SB_TAX_FUNDING_TOWN",
+    "STR_SB_TAX_FUNDING_MONTH", "STR_SB_TAX_FUNDING_TOWN", "STR_SB_TAX_FUNDING_TOWN_APPLIED",
     "STR_SB_TAX_FUNDING_PREVIOUS_TOWNS", "STR_SB_TAX_FUNDING_MORE_TOWNS"
 ]) GSText[name] <- name;
 
@@ -363,6 +363,7 @@ CheckEqual("monthly tax uses settled monitoring state", company.tax_last_month, 
 CheckEqual("monthly funding contains just managed town", company.tax_history[0].town_funding.len(), 1);
 CheckEqual("monthly funding matches taxed amount", company.tax_history[0].town_funding[0].portion, 1250);
 CheckEqual("monthly funding is applied before growth update", active.tgr_array[0], 88);
+CheckEqual("monthly funding records the days the town applied", company.tax_history[0].town_funding[0].applied, 12);
 CheckEqual("monthly pass clears previous growth points after tax", company.points_this_month, 0);
 CheckEqual("monthly pass updates month", monthly.current_month, 2);
 CheckEqual("monthly pass drops timed-out contributor", timeout.contributor, -1);
@@ -400,7 +401,16 @@ CheckEqual("population split gives the big town three quarters", rows[1].portion
 CheckEqual("population split gives the small town a quarter", rows[0].portion, 375);
 CheckEqual("big town sample carries its own days", second.tgr_array[0], 100 - 11);
 CheckEqual("small town sample carries its own days", active.tgr_array[2], 100 - 3);
+CheckEqual("applied days follow each town's own share", rows[1].applied, 11);
 delete ::stub_settings.tax_split_mode;
+::stub_date = 1091;
+::stub_month = 5;
+::stub_settings.tax_growth_boost = 1000;
+monthly.ManageTowns();
+rows = company.tax_history[3].town_funding;
+CheckEqual("a huge boost still asks for its full days", rows[0].days, 750);
+CheckEqual("the recorded applied days stop at half the rate", rows[0].applied, 50);
+CheckEqual("the town sample matches the applied days", active.tgr_array[3], 50);
 ::stub_settings.tax_growth_boost = 0;
 ::stub_month = 3;
 ::stub_date = 1030;
@@ -563,6 +573,14 @@ editor.UpdateTaxFundingPage(company);
 editor.HandleTaxButton([company], PageButton(0, 10, company.tax_funding_next_towns_button));
 CheckEqual("partial final page shows remaining row", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN).len(), 1);
 CheckEqual("partial final page keeps last town", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN)[0].values[0], 20);
+company.tax_history = [];
+company.RecordTaxHistory(2040, 1, 2000, 0, 0);
+company.RecordTaxFunding(2040, 1, [{ town_id = 1, portion = 2000, days = 20, applied = 9 }]);
+editor.UpdateTaxFundingPage(company);
+CheckEqual("rows with applied days use the longer line", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN_APPLIED).len(), 1);
+CheckEqual("longer line shows the days bought", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN_APPLIED)[0].values[3], 20);
+CheckEqual("longer line shows the days applied", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN_APPLIED)[0].values[4], 9);
+CheckEqual("older rows keep the shorter line", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN).len(), 0);
 company.sp_tax_history = 11;
 for (local i = 0; i < 24; ++i)
     company.RecordTaxHistory(2041, i, 1000, 0, 0);

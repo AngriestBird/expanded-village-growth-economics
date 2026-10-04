@@ -195,8 +195,9 @@ function Company::RecordTaxHistory(year, month, rail_road, docks, rebate)
         this.tax_history.remove(0);
 }
 
-/* Attach this month's funding rows ({ town_id, portion, days }, as returned by
- * SplitTaxFunding) to the history entry ChargeTaxes just recorded.
+/* Attach this month's funding rows ({ town_id, portion, days, applied }, the
+ * SplitTaxFunding rows plus the days each town took off its growth sample) to
+ * the history entry ChargeTaxes just recorded.
  */
 function Company::RecordTaxFunding(year, month, rows)
 {

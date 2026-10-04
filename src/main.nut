@@ -553,13 +553,14 @@ function MainClass::ManageTowns()
             if (!town.MonthlyCheckTown(monthly_settings))
                 continue;
 
-            managed_towns[town.id] <- true;
+            managed_towns[town.id] <- town;
             if (!managed_by_contributor.rawin(town.contributor))
                 managed_by_contributor[town.contributor] <- [];
             managed_by_contributor[town.contributor].append(town);
         }
 
         local tax_funding = {};
+        local funding_rows = {};
         if (settle_taxes) {
             ChargeTaxes(this.companies, managed_by_contributor, date);
 
@@ -568,8 +569,6 @@ function MainClass::ManageTowns()
             // breakdown is recorded for the tax funding story page
             local growth_boost = GetTaxRateSetting("tax_growth_boost");
             local split_mode = GetTaxRateSetting("tax_split_mode");
-            local year = GSDate.GetYear(date);
-            local month = GSDate.GetMonth(date);
             foreach (company in this.companies) {
                 local contributed = managed_by_contributor.rawin(company.id)
                                     ? managed_by_contributor[company.id] : [];
@@ -585,7 +584,7 @@ function MainClass::ManageTowns()
                 }
                 if (days_by_town.len() > 0)
                     tax_funding[company.id] <- days_by_town;
-                company.RecordTaxFunding(year, month, rows);
+                funding_rows[company.id] <- rows;
             }
         }
         monthly_settings.tax_funding <- tax_funding;
@@ -606,6 +605,19 @@ function MainClass::ManageTowns()
             if (!gui_towns_by_contributor.rawin(town.contributor))
                 gui_towns_by_contributor[town.contributor] <- [];
             gui_towns_by_contributor[town.contributor].append(town);
+        }
+
+        // Record the split now that each town has applied its share, so the
+        // funding page shows what the money bought and not only what it asked for
+        local year = GSDate.GetYear(date);
+        foreach (company in this.companies) {
+            if (!funding_rows.rawin(company.id))
+                continue;
+            foreach (row in funding_rows[company.id]) {
+                local town = managed_towns.rawin(row.town_id) ? managed_towns[row.town_id] : null;
+                row.applied <- town != null && town.funding_applied != null ? town.funding_applied : 0;
+            }
+            company.RecordTaxFunding(year, month, funding_rows[company.id]);
         }
 
         // Reset the monthly growth accumulator after the tax rebate has read it

@@ -284,7 +284,12 @@ buckets, along with last month's breakdown and rebate. The Tax history Goal
 opens a Story Book page with up to 36 months of history. Use the Older and
 Newer buttons to browse it. The Tax funding Goal opens a Story Book page that
 breaks down, town by town, what percentage of each month's tax funded that
-town's growth. It shows one funded month and up to 20 towns at a time. Use
+town's growth, the growth days that share bought and how many of them were
+applied. A share can take at most half the days off a town's growth rate, and
+the result is one sample in the town's 8-month moving average, so the applied
+figure can be lower than the days bought and the effect on the displayed
+growth rate builds up over several months. It shows one funded month and up
+to 20 towns at a time. Use
 Older/Newer for months and Previous towns/More towns for the remaining rows.
 All funded rows in the 36-month history remain available. No new funding is
 recorded while the "Days of town growth" setting is 0.

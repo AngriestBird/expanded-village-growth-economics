@@ -283,6 +283,22 @@ CheckEqual("timed out town stops being monitored", served_town.is_monitored, fal
 CheckEqual("timed out town clears its contributor", served_town.contributor, -1);
 
 
+print("CalculateRatingMultiplier\n");
+
+CheckEqual("no rated towns leaves the bill undiscounted", CalculateRatingMultiplier([]), 1.0);
+CheckEqual("one town sets the multiplier", CalculateRatingMultiplier([{ multiplier = 0.7, weight = 500 }]), 0.7);
+CheckEqual("equal towns average evenly",
+           CalculateRatingMultiplier([{ multiplier = 0.5, weight = 1000 }, { multiplier = 1.0, weight = 1000 }]), 0.75);
+local weighted = CalculateRatingMultiplier([{ multiplier = 0.5, weight = 9000 }, { multiplier = 1.0, weight = 1000 }]);
+Check("big towns dominate the average", weighted > 0.54 && weighted < 0.56);
+local diluted = CalculateRatingMultiplier([{ multiplier = 1.0, weight = 9000 },
+                                           { multiplier = 0.5, weight = 100 }, { multiplier = 0.5, weight = 100 },
+                                           { multiplier = 0.5, weight = 100 }, { multiplier = 0.5, weight = 100 }]);
+Check("villages cannot hide a poorly rated city", diluted > 0.97);
+CheckEqual("empty towns still count once",
+           CalculateRatingMultiplier([{ multiplier = 0.5, weight = 0 }, { multiplier = 1.0, weight = 0 }]), 0.75);
+
+
 print("CalculateTaxBill\n");
 
 CheckEqual("no infrastructure charges nothing", CalculateTaxBill(0, 0, 1.0, 0.0, 0, 1.0, 0, 0).total, 0);

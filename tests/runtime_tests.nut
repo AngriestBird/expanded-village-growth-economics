@@ -311,6 +311,11 @@ CheckEqual("disabled tax creates no history entry", company.tax_history.len(), 2
 ::stub_settings.tax_airport_rate = -1;
 CheckEqual("unknown tax setting cannot pay company", GetTaxRateSetting("tax_airport_rate"), 0);
 ::stub_settings.tax_airport_rate = 40;
+::stub_population[62] <- 6000;
+::stub_ratings[62] <- 1000;
+company = TestCompany(0);
+ChargeTaxes([company], { [0] = [{ id = 60, is_monitored = true }, { id = 62, is_monitored = true }] }, 1000);
+CheckEqual("rating discount weighs towns by population", company.tax_last_month, 1411);
 
 print("ManageTowns monthly wiring\n");
 ::CargoCatNum = 3;

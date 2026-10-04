@@ -23,7 +23,8 @@ Version 1.3.0 (unreleased)
   their growth points, tax funding and rating weight
 - fixed: multiplayer servers charged a second month of tax on every start or
   load. The pass that finishes initialization no longer taxes, records
-  history or resets the growth rebate
+  history or resets the growth rebate, unless it lands in a new month, which
+  is taxed as usual
 - fixed: towns with non-contiguous ids could lose their saved cargo
   requirements on load and get re-randomized
 - fixed: saving a loaded game before the script finished initializing dropped

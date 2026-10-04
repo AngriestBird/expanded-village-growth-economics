@@ -502,8 +502,10 @@ function MainClass::ManageTowns()
 
         // The forced pass that finishes initialization in multiplayer only
         // settles town state. The month was already taxed when it began, so
-        // charging it again would bill every start or load twice.
-        local settle_taxes = !this.finish_init_pass;
+        // charging it again would bill every start or load twice. If the
+        // forced pass lands in a new month (loaded on the last day of a
+        // month) that month was never taxed, so it is a real month change.
+        local settle_taxes = diff_month != 0;
         this.finish_init_pass = false;
 
         local eternal_love = GSController.GetSetting("eternal_love");

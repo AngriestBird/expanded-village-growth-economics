@@ -406,6 +406,33 @@ CheckEqual("next month after forced pass charges tax once", company.tax_history.
 ::stub_date = 1030;
 ::stub_settings.tax_growth_boost = 0;
 
+print("Forced initialization pass landing in a new month\n");
+::stub_month = 4;
+::stub_date = 1031;
+local forced_new = MainClass();
+::SettingsTable.use_town_sign <- false;
+::SettingsTable.randomization <- Randomization.INDUSTRY_ASC;
+forced_new.current_date = 1030;
+forced_new.current_month = 3;
+forced_new.current_year = 2040;
+forced_new.story_editor = StoryEditor();
+company = TestCompany(0);
+company.points_this_month = 10;
+forced_new.companies = [company];
+local forced_new_town = CheckedTown(76, 600, true);
+forced_new_town.contributor = 0;
+::stub_pickups[76] <- 5;
+::stub_ratings[76] <- 0;
+forced_new.towns = [forced_new_town];
+forced_new.finish_init_pass = true;
+forced_new.ManageTowns();
+CheckEqual("forced pass in a new month records one tax entry", company.tax_history.len(), 1);
+CheckEqual("forced pass in a new month resets growth points", company.points_this_month, 0);
+Check("forced pass in a new month clears its flag", !forced_new.finish_init_pass);
+CheckEqual("forced pass in a new month advances the month", forced_new.current_month, 4);
+::stub_month = 3;
+::stub_date = 1030;
+
 print("Company removal clears contributors\n");
 local removal = MainClass();
 ::SettingsTable.use_town_sign <- false;

@@ -43,38 +43,68 @@ function CalculateTaxBill(network_base, station_base, difficulty, big_town_bonus
     return bill;
 }
 
-/* Split a company's net tax between its contributed towns and convert each
- * share into town growth days. Kept free of GS API calls so tests/ can
- * exercise the arithmetic without a running game.
- */
-function CalculateGrowthFunding(net_tax, town_count, boost_per_1000)
+enum TaxSplit
 {
-    if (net_tax <= 0 || town_count <= 0 || boost_per_1000 <= 0)
-        return 0;
-
-    return (net_tax.tofloat() / town_count / 1000.0 * boost_per_1000).tointeger();
+    EQUAL,       // every funded town gets the same share
+    POPULATION,  // shares follow population, so big towns get more
+    UNDERDOG     // shares follow inverse population, so small towns get more
 }
 
-/* Split a company's net tax between its actively monitored towns. Returns the
- * portion of the tax each town receives and the growth days that portion buys.
- * Nothing is split while the boost is off, so no funding rows get recorded.
- * Kept free of GS API calls so tests/ can exercise the arithmetic without a
- * running game.
+/* Split a company's net tax between the towns it funds. Each entry names a
+ * town, its population and whether the growth limiter has stopped it. Stopped
+ * towns get nothing and their share moves to the others, so no funding is
+ * spent on a town that cannot grow. mode picks the weights (see TaxSplit).
+ * Portions are whole currency units that add up to the tax; the odd units go
+ * to the heaviest town. Each portion buys growth days at boost_per_1000 per
+ * 1000 of tax. Returns rows of { town_id, portion, days }. Kept free of GS
+ * API calls so tests/ can exercise the arithmetic without a running game.
  */
-function CalculateTownFunding(total_tax, towns, boost_per_1000)
+function SplitTaxFunding(total_tax, towns, boost_per_1000, mode)
 {
-    local town_count = 0;
+    local rows = [];
+    if (total_tax <= 0 || boost_per_1000 <= 0)
+        return rows;
+
+    local weights = [];
+    local total_weight = 0.0;
+    local heaviest = -1;
     foreach (town in towns) {
-        if (town.is_monitored)
-            ++town_count;
+        if (town.stopped)
+            continue;
+        local population = town.population > 0 ? town.population : 1;
+        local weight = 1.0;
+        if (mode == TaxSplit.POPULATION)
+            weight = population.tofloat();
+        else if (mode == TaxSplit.UNDERDOG)
+            weight = 1.0 / population;
+        weights.append({ town_id = town.id, weight = weight });
+        total_weight += weight;
+        if (heaviest < 0 || weight > weights[heaviest].weight)
+            heaviest = weights.len() - 1;
     }
+    if (weights.len() == 0)
+        return rows;
 
-    if (total_tax <= 0 || town_count <= 0 || boost_per_1000 <= 0)
-        return { portion = 0, days = 0 };
+    local assigned = 0;
+    foreach (entry in weights) {
+        local portion = (total_tax * entry.weight / total_weight).tointeger();
+        assigned += portion;
+        rows.append({ town_id = entry.town_id, portion = portion, days = 0 });
+    }
+    rows[heaviest].portion += total_tax - assigned;
+    foreach (row in rows)
+        row.days = (row.portion / 1000.0 * boost_per_1000).tointeger();
 
-    local portion = (total_tax.tofloat() / town_count).tointeger();
-    local days = CalculateGrowthFunding(total_tax, town_count, boost_per_1000);
-    return { portion = portion, days = days };
+    return rows;
+}
+
+/* Describe the growth-managed towns for SplitTaxFunding. */
+function TownFundingEntries(towns)
+{
+    local entries = [];
+    foreach (town in towns)
+        entries.append({ id = town.id, population = GSTown.GetPopulation(town.id), stopped = !town.allowGrowth });
+    return entries;
 }
 
 /* Apply a tax-funded boost to a town growth rate. The boost shaves days off

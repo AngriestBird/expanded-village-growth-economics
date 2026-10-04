@@ -317,6 +317,18 @@ function MainClass::Load(version, saved_data)
     }
 }
 
+/* A company that went bankrupt or merged keeps no claim on its towns. Until
+ * the next monthly update rewrites contributors, a new company reusing the
+ * slot would otherwise inherit their growth points, funding and tax weight.
+ */
+function MainClass::ClearContributor(company_id)
+{
+    foreach (town in this.towns) {
+        if (town.contributor == company_id)
+            town.contributor = -1;
+    }
+}
+
 function MainClass::UpdateCompanyList()
 {
     for(local c = GSCompany.COMPANY_FIRST; c <= GSCompany.COMPANY_LAST; c++)
@@ -338,6 +350,7 @@ function MainClass::UpdateCompanyList()
             if(existing != null) {
                 existing.RemoveGUIGoals();
                 this.companies.remove(existing_idx);
+                this.ClearContributor(c);
             }
 
             continue;

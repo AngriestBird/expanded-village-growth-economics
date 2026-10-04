@@ -44,6 +44,8 @@ class GSDate
 class GSCompany
 {
     static COMPANY_INVALID = -1;
+    static COMPANY_FIRST = 0;
+    static COMPANY_LAST = 14;
     static EXPENSES_OTHER = 0;
     static function ResolveCompanyID(id) {
         return ::stub_valid_companies.rawin(id) ? id : -1;
@@ -95,6 +97,7 @@ class GSGameSettings
 class GSGame
 {
     static function IsPaused() { return false; }
+    static function IsMultiplayer() { return false; }
 }
 
 class GSGoal
@@ -402,6 +405,26 @@ CheckEqual("next month after forced pass charges tax once", company.tax_history.
 ::stub_month = 3;
 ::stub_date = 1030;
 ::stub_settings.tax_growth_boost = 0;
+
+print("Company removal clears contributors\n");
+local removal = MainClass();
+::SettingsTable.use_town_sign <- false;
+::SettingsTable.randomization <- Randomization.INDUSTRY_ASC;
+local gone_company = TestCompany(5);
+local kept_company = TestCompany(0);
+removal.companies = [gone_company, kept_company];
+local gone_town = CheckedTown(74, 600, true);
+gone_town.contributor = 5;
+local kept_town = CheckedTown(75, 600, true);
+kept_town.contributor = 0;
+removal.towns = [gone_town, kept_town];
+removal.UpdateCompanyList();
+Check("removed company drops out of the company list", removal.companies.find(gone_company) == null);
+CheckEqual("removed company loses its town", gone_town.contributor, -1);
+CheckEqual("surviving company keeps its town", kept_town.contributor, 0);
+::stub_population[74] <- 700;
+removal.DailyManageTownPopulation();
+CheckEqual("growth in a dropped town earns nobody points", kept_company.points_this_month, 0);
 
 print("Tax funding Story Book command workload\n");
 company = TestCompany(0);

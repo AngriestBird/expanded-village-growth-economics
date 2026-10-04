@@ -22,7 +22,12 @@ enum Statistics
  * layout changes and teach LoadTaxHistory the old shape, so a tax-only change
  * never needs the global save version (which resets every town and company).
  *   1: tax_history entries carry town_funding as an array of row tables
+ *      ({ town_id, portion, days, applied }); also what saves without a
+ *      tax_schema field hold
  *   2: tax_history entries carry funding as parallel integer arrays
+ *      ({ towns, portions, days, applied }, applied only when recorded). The
+ *      in-memory history already has this shape, so Save hands it over as it
+ *      is and costs no per-row work under the save opcode budget
  */
 const TAX_SCHEMA_VERSION = 2;
 
@@ -106,7 +111,8 @@ function Company::SavingCompanyData()
     company_data.tax_rail_road_last_month <- this.tax_rail_road_last_month;
     company_data.tax_dock_last_month <- this.tax_dock_last_month;
     company_data.tax_schema <- TAX_SCHEMA_VERSION;
-    company_data.tax_history <- SaveTaxHistory(this.tax_history);
+    // By reference: the history is already packed, so Save walks nothing
+    company_data.tax_history <- this.tax_history;
     company_data.points_this_month <- this.points_this_month;
     company_data.global_goal <- this.global_goal;
     company_data.statistics <- this.statistics;
@@ -114,46 +120,46 @@ function Company::SavingCompanyData()
     return company_data;
 }
 
-/* Pack the funding rows for the save. A row table costs a key string per field
- * on top of each value, and there is one row per funded town per month, so the
- * rows dominate the tax data. Parallel integer arrays keep one key per month
- * instead. The applied array is only written when the rows carry it.
+/* Pack funding rows into parallel integer arrays. A row table costs a key
+ * string per field on top of each value, and there is one row per funded town
+ * per month, so rows would dominate the tax data and the save. Parallel arrays
+ * keep one key per month. The applied array is written when any row carries
+ * it, with 0 for rows that lack it.
  */
-function SaveTaxHistory(history)
+function PackTaxFunding(rows)
 {
-    local packed = [];
-    foreach (entry in history) {
-        local saved = {
-            year = entry.year, month = entry.month, rail_road = entry.rail_road,
-            docks = entry.docks, rebate = entry.rebate, total = entry.total
-        };
-        if (entry.rawin("town_funding") && entry.town_funding.len() > 0) {
-            local funding = { towns = [], portions = [], days = [] };
-            local applied = entry.town_funding[0].rawin("applied") ? [] : null;
-            foreach (row in entry.town_funding) {
-                funding.towns.append(row.town_id);
-                funding.portions.append(row.portion);
-                funding.days.append(row.days);
-                if (applied != null)
-                    applied.append(row.rawin("applied") ? row.applied : 0);
-            }
-            if (applied != null)
-                funding.applied <- applied;
-            saved.funding <- funding;
-        }
-        packed.append(saved);
+    local funding = { towns = [], portions = [], days = [] };
+    local has_applied = false;
+    foreach (row in rows) {
+        funding.towns.append(row.town_id);
+        funding.portions.append(row.portion);
+        funding.days.append(row.days);
+        if (row.rawin("applied"))
+            has_applied = true;
     }
-    return packed;
+    if (has_applied) {
+        local applied = [];
+        foreach (row in rows)
+            applied.append(row.rawin("applied") ? row.applied : 0);
+        funding.applied <- applied;
+    }
+    return funding;
 }
 
-/* Rebuild the in-memory history from a company's save table. Schema 1 saves
- * (and development saves before the schema existed) hold the row tables as
- * they are used in memory; schema 2 holds the packed arrays.
+/* Rebuild the in-memory history from a company's save table. Schema 2 saves
+ * already hold the packed shape, so they are used as they are. Schema 1 saves
+ * (and development saves before the schema existed) hold row tables, which are
+ * converted once here; this runs in the Company constructor, not under the
+ * save opcode budget.
  */
 function LoadTaxHistory(company_data)
 {
     if (!company_data.rawin("tax_history"))
         return [];
+
+    local schema = company_data.rawin("tax_schema") ? company_data.tax_schema : 1;
+    if (schema >= 2)
+        return company_data.tax_history;
 
     local history = [];
     foreach (saved in company_data.tax_history) {
@@ -161,20 +167,10 @@ function LoadTaxHistory(company_data)
             year = saved.year, month = saved.month, rail_road = saved.rail_road,
             docks = saved.docks, rebate = saved.rebate, total = saved.total
         };
-        if (saved.rawin("funding")) {
-            local funding = saved.funding;
-            local rows = [];
-            for (local i = 0; i < funding.towns.len(); ++i) {
-                local row = { town_id = funding.towns[i], portion = funding.portions[i], days = funding.days[i] };
-                if (funding.rawin("applied"))
-                    row.applied <- funding.applied[i];
-                rows.append(row);
-            }
-            entry.town_funding <- rows;
-        }
-        else if (saved.rawin("town_funding")) {
-            entry.town_funding <- saved.town_funding;
-        }
+        if (saved.rawin("town_funding") && saved.town_funding.len() > 0)
+            entry.funding <- PackTaxFunding(saved.town_funding);
+        else if (saved.rawin("funding"))
+            entry.funding <- saved.funding;
         history.append(entry);
     }
     return history;
@@ -285,7 +281,8 @@ function Company::RecordTaxFunding(year, month, rows)
     if (entry.year != year || entry.month != month)
         return;
 
-    entry.town_funding <- rows;
+    if (rows.len() > 0)
+        entry.funding <- PackTaxFunding(rows);
 }
 
 function Company::MonthlyUpdateGUIGoals(towns)

@@ -570,6 +570,10 @@ function MainClass::ManageTowns()
             local growth_boost = GetTaxRateSetting("tax_growth_boost");
             local split_mode = GetTaxRateSetting("tax_split_mode");
             foreach (company in this.companies) {
+                // SplitTaxFunding would return nothing; skip the per-town GS calls too
+                if (company.tax_last_month <= 0 || growth_boost <= 0)
+                    continue;
+
                 local contributed = managed_by_contributor.rawin(company.id)
                                     ? managed_by_contributor[company.id] : [];
                 local rows = SplitTaxFunding(company.tax_last_month, TownFundingEntries(contributed),

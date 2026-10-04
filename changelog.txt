@@ -25,6 +25,9 @@ Version 1.3.0 (unreleased)
   1.2.0 still load
 - fixed: Story Book tax pages showed every month one too high, so December
   appeared as month 13
+- fixed: the Tax funding page showed the growth days a share asked for, which
+  the half-rate cap could cut without notice. Rows now also show the days the
+  town applied that month
 - fixed: a company that went bankrupt or merged kept its towns' contributor
   slot until the next month, so a new company reusing the id could inherit
   their growth points, tax funding and rating weight

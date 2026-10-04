@@ -218,9 +218,15 @@ function StoryEditor::UpdateTaxFundingPage(company)
         local row = entry.town_funding[i];
         local percent = entry.total > 0
                         ? (row.portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
-                                      percent, GSText(GSText.STR_CURRENCY, row.portion), row.days));
+        // Rows written before the applied days were tracked keep the shorter line
+        if (row.rawin("applied"))
+            GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                                   GSText(GSText.STR_SB_TAX_FUNDING_TOWN_APPLIED, row.town_id,
+                                          percent, GSText(GSText.STR_CURRENCY, row.portion), row.days, row.applied));
+        else
+            GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
+                                   GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
+                                          percent, GSText(GSText.STR_CURRENCY, row.portion), row.days));
     }
 
     if (company.tax_funding_offset + 1 < funded.len())

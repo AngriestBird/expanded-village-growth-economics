@@ -57,6 +57,7 @@ class MainClass extends GSController
     actual_town_info_mode = null;
     toy_lib = null;
     story_editor = null;
+    finish_init_pass = null;     // run one monthly pass without taxing to finish initialization
 
     constructor() {
         this.companies = [];
@@ -70,6 +71,7 @@ class MainClass extends GSController
         this.actual_town_info_mode = 0;
         this.toy_lib = null;
         this.story_editor = null;
+        this.finish_init_pass = false;
         ::TownDataTable <- {};
         ::CompanyDataTable <- {};
         ::SettingsTable <- {};
@@ -384,7 +386,7 @@ function MainClass::CreateTownList()
     // In single player, if it is not set, temporarily allow all non-construction actions during pause
     local pause_level = GSGameSettings.GetValue("construction.command_pause_level");
     if (GSGame.IsMultiplayer() && pause_level < 1)
-        this.current_month -= 1;
+        this.finish_init_pass = true;
     else if (pause_level < 1)
         GSGameSettings.SetValue("construction.command_pause_level", 1);
 
@@ -479,11 +481,17 @@ function MainClass::ManageTowns()
     // Run the monthly functions
     local month = GSDate.GetMonth(date);
     local diff_month = month - this.current_month;
-    if (diff_month == 0) {
+    if (diff_month == 0 && !this.finish_init_pass) {
         return;
     } else {
         local month_tick = GSController.GetTick();
         Log.Info("Starting Monthly Updates...", Log.LVL_INFO);
+
+        // The forced pass that finishes initialization in multiplayer only
+        // settles town state. The month was already taxed when it began, so
+        // charging it again would bill every start or load twice.
+        local settle_taxes = !this.finish_init_pass;
+        this.finish_init_pass = false;
 
         local eternal_love = GSController.GetSetting("eternal_love");
         local eternal_love_rating = 0;
@@ -536,23 +544,25 @@ function MainClass::ManageTowns()
             managed_by_contributor[town.contributor].append(town);
         }
 
-        ChargeTaxes(this.companies, managed_by_contributor, date);
-
-        // Split each company's net tax between its growth-managed towns;
-        // each share buys growth days for that town this month, and the
-        // breakdown is recorded for the tax funding story page
         local tax_funding = {};
-        local growth_boost = GetTaxRateSetting("tax_growth_boost");
-        local year = GSDate.GetYear(date);
-        local month = GSDate.GetMonth(date);
-        foreach (company in this.companies) {
-            local contributed = managed_by_contributor.rawin(company.id)
-                                ? managed_by_contributor[company.id] : [];
-            local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
-            if (funding.days > 0)
-                tax_funding[company.id] <- funding.days;
-            if (funding.portion > 0)
-                company.RecordTaxFunding(year, month, contributed, funding.portion, funding.days);
+        if (settle_taxes) {
+            ChargeTaxes(this.companies, managed_by_contributor, date);
+
+            // Split each company's net tax between its growth-managed towns;
+            // each share buys growth days for that town this month, and the
+            // breakdown is recorded for the tax funding story page
+            local growth_boost = GetTaxRateSetting("tax_growth_boost");
+            local year = GSDate.GetYear(date);
+            local month = GSDate.GetMonth(date);
+            foreach (company in this.companies) {
+                local contributed = managed_by_contributor.rawin(company.id)
+                                    ? managed_by_contributor[company.id] : [];
+                local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
+                if (funding.days > 0)
+                    tax_funding[company.id] <- funding.days;
+                if (funding.portion > 0)
+                    company.RecordTaxFunding(year, month, contributed, funding.portion, funding.days);
+            }
         }
         monthly_settings.tax_funding <- tax_funding;
 
@@ -575,8 +585,10 @@ function MainClass::ManageTowns()
         }
 
         // Reset the monthly growth accumulator after the tax rebate has read it
-        foreach (company in this.companies)
-            company.points_this_month = 0;
+        if (settle_taxes) {
+            foreach (company in this.companies)
+                company.points_this_month = 0;
+        }
 
         foreach (company in this.companies) {
             company.MonthlyUpdateGUIGoals(gui_towns_by_contributor.rawin(company.id)

@@ -195,7 +195,10 @@ function Company::RecordTaxHistory(year, month, rail_road, docks, rebate)
         this.tax_history.remove(0);
 }
 
-function Company::RecordTaxFunding(year, month, towns, portion, days)
+/* Attach this month's funding rows ({ town_id, portion, days }, as returned by
+ * SplitTaxFunding) to the history entry ChargeTaxes just recorded.
+ */
+function Company::RecordTaxFunding(year, month, rows)
 {
     if (this.tax_history.len() == 0)
         return;
@@ -206,12 +209,6 @@ function Company::RecordTaxFunding(year, month, towns, portion, days)
     if (entry.year != year || entry.month != month)
         return;
 
-    local rows = [];
-    foreach (town in towns) {
-        if (!town.is_monitored)
-            continue;
-        rows.append({ town_id = town.id, portion = portion, days = days });
-    }
     entry.town_funding <- rows;
 }
 

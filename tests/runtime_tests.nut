@@ -199,6 +199,14 @@ function PageButton(company, page, element)
     };
 }
 
+function FundingRows(count, portion, days)
+{
+    local rows = [];
+    for (local town = 0; town < count; ++town)
+        rows.append({ town_id = town, portion = portion, days = days });
+    return rows;
+}
+
 function TestCompany(id)
 {
     ::CompanyDataTable <- {};
@@ -221,12 +229,12 @@ company.tax_dock_paid = 400;
 company.tax_rail_road_last_month = 300;
 company.tax_dock_last_month = 100;
 company.RecordTaxHistory(2040, 2, 300, 100, 10);
-company.RecordTaxFunding(2040, 2, [{ id = 20, is_monitored = true }, { id = 21, is_monitored = false }], 400, 4);
-CheckEqual("funding records only monitored towns", company.tax_history[0].town_funding.len(), 1);
+company.RecordTaxFunding(2040, 2, [{ town_id = 20, portion = 400, days = 4 }]);
+CheckEqual("funding records the split rows", company.tax_history[0].town_funding.len(), 1);
 CheckEqual("funding records town id", company.tax_history[0].town_funding[0].town_id, 20);
 CheckEqual("funding records portion", company.tax_history[0].town_funding[0].portion, 400);
 CheckEqual("funding records days", company.tax_history[0].town_funding[0].days, 4);
-company.RecordTaxFunding(2040, 1, [], 100, 1);
+company.RecordTaxFunding(2040, 1, []);
 CheckEqual("stale funding leaves current entry intact", company.tax_history[0].town_funding.len(), 1);
 local saved_company = company.SavingCompanyData();
 ::CompanyDataTable[0] <- saved_company;
@@ -244,7 +252,7 @@ CheckEqual("history retains 36 entries", company.tax_history.len(), 36);
 CheckEqual("history removes oldest entries", company.tax_history[0].month, 4);
 CheckEqual("history keeps latest entry", company.tax_history[35].month, 39);
 local empty_company = TestCompany(1);
-empty_company.RecordTaxFunding(2040, 2, [], 10, 1);
+empty_company.RecordTaxFunding(2040, 2, [{ town_id = 1, portion = 10, days = 1 }]);
 CheckEqual("funding without tax history is ignored", empty_company.tax_history.len(), 0);
 
 print("Small-town monitoring and missing subsidy contributors\n");
@@ -374,6 +382,28 @@ monthly.ManageTowns();
 Check("boost off records no funding rows", !company.tax_history[1].rawin("town_funding"));
 CheckEqual("boost off stores unboosted sample", active.tgr_array[1], 100);
 CheckEqual("deliveries refresh contributor", active.contributor, 0);
+::stub_date = 1060;
+::stub_month = 4;
+::stub_settings.tax_growth_boost = 10;
+::stub_settings.tax_split_mode <- 1;
+local second = CheckedTown(76, 1800, true);
+second.contributor = 0;
+::stub_pickups[76] <- 5;
+::stub_ratings[76] <- 0;
+::stub_deliveries[76] <- 10;
+monthly.towns = [active, second];
+monthly.ManageTowns();
+local rows = company.tax_history[2].town_funding;
+CheckEqual("population split records both towns", rows.len(), 2);
+CheckEqual("two big towns raise the surcharge", company.tax_history[2].total, 1500);
+CheckEqual("population split gives the big town three quarters", rows[1].portion, 1125);
+CheckEqual("population split gives the small town a quarter", rows[0].portion, 375);
+CheckEqual("big town sample carries its own days", second.tgr_array[0], 100 - 11);
+CheckEqual("small town sample carries its own days", active.tgr_array[2], 100 - 3);
+delete ::stub_settings.tax_split_mode;
+::stub_settings.tax_growth_boost = 0;
+::stub_month = 3;
+::stub_date = 1030;
 
 print("Forced initialization pass\n");
 ::stub_settings.tax_growth_boost = 10;
@@ -436,10 +466,7 @@ company = TestCompany(0);
 company.sp_tax_funding = 10;
 for (local month = 1; month <= 12; ++month) {
     company.RecordTaxHistory(2040, month, 300000, 0, 0);
-    local towns = [];
-    for (local town = 0; town < 300; ++town)
-        towns.append({ id = town, is_monitored = true });
-    company.RecordTaxFunding(2040, month, towns, 1000, 10);
+    company.RecordTaxFunding(2040, month, FundingRows(300, 1000, 10));
 }
 local editor = StoryEditor();
 ::stub_story_commands = 0;
@@ -504,10 +531,7 @@ CheckEqual("old history without funding shows empty page", PageTexts(10, GSText.
 CheckEqual("empty funding page clears buttons", company.tax_funding_previous_button, -1);
 company.tax_history = [];
 company.RecordTaxHistory(2040, 1, 21000, 0, 0);
-local short_rows = [];
-for (local i = 0; i < 21; ++i)
-    short_rows.append({ id = i, is_monitored = true });
-company.RecordTaxFunding(2040, 1, short_rows, 1000, 10);
+company.RecordTaxFunding(2040, 1, FundingRows(21, 1000, 10));
 editor.UpdateTaxFundingPage(company);
 editor.HandleTaxButton([company], PageButton(0, 10, company.tax_funding_next_towns_button));
 CheckEqual("partial final page shows remaining row", PageTexts(10, GSText.STR_SB_TAX_FUNDING_TOWN).len(), 1);

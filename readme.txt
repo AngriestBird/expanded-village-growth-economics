@@ -266,12 +266,18 @@ and has no solvency check, so companies can go into debt.
   into a tax rebate for the same month. Only towns the company currently serves
   (still monitored) count.
 - "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
-  company pays each month is split equally between its contributed towns that
-  are still monitored and have at least 100 population. Each share gives that
+  company pays each month is split between its contributed towns that are
+  still monitored and have at least 100 population. Each share gives that
   town faster growth (days off its growth rate). A share can at most halve the
   town's growth rate, so taxes accelerate growth instead of buying it
   outright. The company still pays the full bill; this only changes what
-  the money buys. Off by default (0).
+  the money buys. Towns the growth limiter has stopped get nothing and their
+  share goes to the others. Off by default (0).
+- "Taxes: How tax funding is split between contributed towns": "Equal shares"
+  gives every funded town the same amount. "By population" gives bigger towns
+  more, so a city pulls ahead. "Smallest towns first" weights by inverse
+  population, so villages catch up. The Tax funding page shows each town's
+  share whichever mode is chosen.
 The bill is split into two buckets: network (rail, road, canals) and stations
 (docks, airports). Each company's Goal statistics show the total plus both
 buckets, along with last month's breakdown and rebate. The Tax history Goal

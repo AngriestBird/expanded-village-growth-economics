@@ -18,6 +18,14 @@ enum Statistics
     END
 }
 
+/* Layout of the tax data inside each company's save table. Bump it when the
+ * layout changes and teach LoadTaxHistory the old shape, so a tax-only change
+ * never needs the global save version (which resets every town and company).
+ *   1: tax_history entries carry town_funding as an array of row tables
+ *   2: tax_history entries carry funding as parallel integer arrays
+ */
+const TAX_SCHEMA_VERSION = 2;
+
 class Company
 {
     id = null;              // company id
@@ -75,7 +83,7 @@ class Company
             this.tax_dock_paid = company_data.rawin("tax_dock_paid") ? company_data.tax_dock_paid : 0;
             this.tax_rail_road_last_month = company_data.rawin("tax_rail_road_last_month") ? company_data.tax_rail_road_last_month : 0;
             this.tax_dock_last_month = company_data.rawin("tax_dock_last_month") ? company_data.tax_dock_last_month : 0;
-            this.tax_history = company_data.rawin("tax_history") ? company_data.tax_history : [];
+            this.tax_history = LoadTaxHistory(company_data);
             this.points_this_month = company_data.rawin("points_this_month") ? company_data.points_this_month : 0;
             this.global_goal = company_data.global_goal;
             this.statistics = company_data.statistics;
@@ -97,12 +105,79 @@ function Company::SavingCompanyData()
     company_data.tax_dock_paid <- this.tax_dock_paid;
     company_data.tax_rail_road_last_month <- this.tax_rail_road_last_month;
     company_data.tax_dock_last_month <- this.tax_dock_last_month;
-    company_data.tax_history <- this.tax_history;
+    company_data.tax_schema <- TAX_SCHEMA_VERSION;
+    company_data.tax_history <- SaveTaxHistory(this.tax_history);
     company_data.points_this_month <- this.points_this_month;
     company_data.global_goal <- this.global_goal;
     company_data.statistics <- this.statistics;
 
     return company_data;
+}
+
+/* Pack the funding rows for the save. A row table costs a key string per field
+ * on top of each value, and there is one row per funded town per month, so the
+ * rows dominate the tax data. Parallel integer arrays keep one key per month
+ * instead. The applied array is only written when the rows carry it.
+ */
+function SaveTaxHistory(history)
+{
+    local packed = [];
+    foreach (entry in history) {
+        local saved = {
+            year = entry.year, month = entry.month, rail_road = entry.rail_road,
+            docks = entry.docks, rebate = entry.rebate, total = entry.total
+        };
+        if (entry.rawin("town_funding") && entry.town_funding.len() > 0) {
+            local funding = { towns = [], portions = [], days = [] };
+            local applied = entry.town_funding[0].rawin("applied") ? [] : null;
+            foreach (row in entry.town_funding) {
+                funding.towns.append(row.town_id);
+                funding.portions.append(row.portion);
+                funding.days.append(row.days);
+                if (applied != null)
+                    applied.append(row.rawin("applied") ? row.applied : 0);
+            }
+            if (applied != null)
+                funding.applied <- applied;
+            saved.funding <- funding;
+        }
+        packed.append(saved);
+    }
+    return packed;
+}
+
+/* Rebuild the in-memory history from a company's save table. Schema 1 saves
+ * (and development saves before the schema existed) hold the row tables as
+ * they are used in memory; schema 2 holds the packed arrays.
+ */
+function LoadTaxHistory(company_data)
+{
+    if (!company_data.rawin("tax_history"))
+        return [];
+
+    local history = [];
+    foreach (saved in company_data.tax_history) {
+        local entry = {
+            year = saved.year, month = saved.month, rail_road = saved.rail_road,
+            docks = saved.docks, rebate = saved.rebate, total = saved.total
+        };
+        if (saved.rawin("funding")) {
+            local funding = saved.funding;
+            local rows = [];
+            for (local i = 0; i < funding.towns.len(); ++i) {
+                local row = { town_id = funding.towns[i], portion = funding.portions[i], days = funding.days[i] };
+                if (funding.rawin("applied"))
+                    row.applied <- funding.applied[i];
+                rows.append(row);
+            }
+            entry.town_funding <- rows;
+        }
+        else if (saved.rawin("town_funding")) {
+            entry.town_funding <- saved.town_funding;
+        }
+        history.append(entry);
+    }
+    return history;
 }
 
 function Company::InitGUIGoals()

@@ -259,7 +259,9 @@ and has no solvency check, so companies can go into debt.
 - "Taxes: Max rating-based discount from contributed towns": rating determines
   a reduction to each month's tax, with excellent towns giving a large rebate
   when this is set (for example 30 for a 30% maximum discount at top rating).
-  Only towns the company currently serves (still monitored) count.
+  Only towns the company currently serves (still monitored) count, and each
+  town weighs in by its population, so a few well-rated villages cannot hide
+  a poorly rated city.
 - "Taxes: Rebate per population your towns gained last month": turns town growth
   into a tax rebate for the same month. Only towns the company currently serves
   (still monitored) count.

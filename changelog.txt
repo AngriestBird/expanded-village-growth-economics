@@ -10,6 +10,9 @@ Version 1.3.0 (unreleased)
   dodge the infrastructure tax. Two new rate settings, tax buckets are now
   "network" (rail, road, canals) and "stations" (docks, airports)
 - added: unit tests and a compile check for every script, run in CI
+- changed: the rating discount weighs each contributed town by population
+  instead of counting every town equally, so small well-rated villages no
+  longer dilute the rating of a large town
 - changed: a town that stops being monitored no longer keeps its contributor,
   so towns a company stopped serving do not count toward its rating discount
   or population rebate. Older savegames are cleaned up on load

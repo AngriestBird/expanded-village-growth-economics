@@ -500,12 +500,12 @@ function MainClass::ManageTowns()
         local month_tick = GSController.GetTick();
         Log.Info("Starting Monthly Updates...", Log.LVL_INFO);
 
-        // The forced pass that finishes initialization in multiplayer only
-        // settles town state. The month was already taxed when it began, so
-        // charging it again would bill every start or load twice. If the
-        // forced pass lands in a new month (loaded on the last day of a
-        // month) that month was never taxed, so it is a real month change.
-        local settle_taxes = diff_month != 0;
+        // The forced pass that finishes initialization in multiplayer is not
+        // a month change. The month was already taxed and its towns updated
+        // when it began, so doing either again would bill every start or
+        // load twice and score a partial month. If the forced pass lands in
+        // a new month (loaded on the last day of a month) it is a real one.
+        local month_changed = diff_month != 0;
         this.finish_init_pass = false;
 
         local eternal_love = GSController.GetSetting("eternal_love");
@@ -549,6 +549,13 @@ function MainClass::ManageTowns()
         local managed_towns = {};
         local managed_by_contributor = {};
         foreach (town in this.towns) {
+            // Mid-month, only finish towns that could not initialize while paused
+            if (!month_changed) {
+                if (!town.initialized)
+                    town.MonthlyCheckTown(monthly_settings);
+                continue;
+            }
+
             town.ManageTownLimiting(threshold_setting, min_transport, limiter_delay);
             if (!town.MonthlyCheckTown(monthly_settings))
                 continue;
@@ -561,7 +568,7 @@ function MainClass::ManageTowns()
 
         local tax_funding = {};
         local funding_rows = {};
-        if (settle_taxes) {
+        if (month_changed) {
             ChargeTaxes(this.companies, managed_by_contributor, date);
 
             // Split each company's net tax between its growth-managed towns;
@@ -623,7 +630,7 @@ function MainClass::ManageTowns()
         }
 
         // Reset the monthly growth accumulator after the tax rebate has read it
-        if (settle_taxes) {
+        if (month_changed) {
             foreach (company in this.companies)
                 company.points_this_month = 0;
         }

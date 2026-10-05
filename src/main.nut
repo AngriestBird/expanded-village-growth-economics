@@ -617,10 +617,8 @@ function MainClass::ManageTowns()
         foreach (company in this.companies) {
             if (!funding_rows.rawin(company.id))
                 continue;
-            foreach (row in funding_rows[company.id]) {
-                local town = managed_towns.rawin(row.town_id) ? managed_towns[row.town_id] : null;
-                row.applied <- town != null && town.funding_applied != null ? town.funding_applied : 0;
-            }
+            foreach (row in funding_rows[company.id])
+                row.applied <- managed_towns[row.town_id].funding_applied;
             company.RecordTaxFunding(year, month, funding_rows[company.id]);
         }
 

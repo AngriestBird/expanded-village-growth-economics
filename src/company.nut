@@ -169,8 +169,6 @@ function LoadTaxHistory(company_data)
         };
         if (saved.rawin("town_funding") && saved.town_funding.len() > 0)
             entry.funding <- PackTaxFunding(saved.town_funding);
-        else if (saved.rawin("funding"))
-            entry.funding <- saved.funding;
         history.append(entry);
     }
     return history;

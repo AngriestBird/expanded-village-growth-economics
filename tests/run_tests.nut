@@ -43,6 +43,8 @@ SuperLib <- {
 dofile("src/version.nut", true);
 dofile("src/industry.nut", true);
 dofile("src/cargo.nut", true);
+// Enums compile into the constant table, so a file compiled earlier needs a runtime alias
+TaxSplit <- { EQUAL = 0, POPULATION = 1, UNDERDOG = 2 };
 dofile("src/taxes.nut", true);
 dofile("src/company.nut", true);
 dofile("src/subsidies.nut", true);
@@ -335,46 +337,66 @@ CheckEqual("fully rebated split leaves no negative network bucket", capped_split
 CheckEqual("fully rebated split leaves no negative station bucket", capped_split.stations, 0);
 
 
-print("CalculateGrowthFunding\n");
+print("SplitTaxFunding\n");
 
-CheckEqual("no tax funds nothing", CalculateGrowthFunding(0, 3, 10), 0);
-CheckEqual("no towns funds nothing", CalculateGrowthFunding(1000, 0, 10), 0);
-CheckEqual("zero boost funds nothing", CalculateGrowthFunding(1000, 2, 0), 0);
-CheckEqual("tax splits evenly between towns", CalculateGrowthFunding(2000, 2, 10), 10);
-CheckEqual("uneven split rounds each share down", CalculateGrowthFunding(2000, 3, 10), 6);
-CheckEqual("funding rounds down", CalculateGrowthFunding(999, 1, 10), 9);
-CheckEqual("one town gets the whole share", CalculateGrowthFunding(1500, 1, 10), 15);
-CheckEqual("tiny tax buys no growth", CalculateGrowthFunding(99, 1, 10), 0);
-CheckEqual("negative tax funds nothing", CalculateGrowthFunding(-100, 2, 10), 0);
+function FundedTown(id, population, stopped = false)
+{
+    return { id = id, population = population, stopped = stopped };
+}
 
+function SumPortions(rows)
+{
+    local sum = 0;
+    foreach (row in rows)
+        sum += row.portion;
+    return sum;
+}
 
-print("CalculateTownFunding\n");
+local pair = [FundedTown(1, 3000), FundedTown(2, 1000)];
 
-local mixed_towns = [{ is_monitored = true }, { is_monitored = true }, { is_monitored = false }];
+CheckEqual("no tax funds no towns", SplitTaxFunding(0, pair, 10, TaxSplit.EQUAL).len(), 0);
+CheckEqual("negative tax funds no towns", SplitTaxFunding(-100, pair, 10, TaxSplit.EQUAL).len(), 0);
+CheckEqual("zero boost splits nothing, so nothing is recorded", SplitTaxFunding(2000, pair, 0, TaxSplit.EQUAL).len(), 0);
+CheckEqual("no towns funds nothing", SplitTaxFunding(2000, [], 10, TaxSplit.EQUAL).len(), 0);
 
-local no_tax = CalculateTownFunding(0, mixed_towns, 10);
-CheckEqual("no tax funds no towns", no_tax.portion, 0);
-CheckEqual("no tax buys no growth days", no_tax.days, 0);
+local even = SplitTaxFunding(2000, pair, 10, TaxSplit.EQUAL);
+CheckEqual("equal split gives every town the same portion", even[0].portion, 1000);
+CheckEqual("equal split keeps town ids", even[1].town_id, 2);
+CheckEqual("each portion buys its growth days", even[1].days, 10);
 
-local even = CalculateTownFunding(2000, mixed_towns, 10);
-CheckEqual("tax splits evenly between monitored towns", even.portion, 1000);
-CheckEqual("each portion buys its growth days", even.days, 10);
+local odd = SplitTaxFunding(1000, [FundedTown(1, 500), FundedTown(2, 500), FundedTown(3, 500)], 10, TaxSplit.EQUAL);
+CheckEqual("portions add up to the tax", SumPortions(odd), 1000);
+CheckEqual("odd units go to the first of equal towns", odd[0].portion, 334);
+CheckEqual("other towns round down", odd[1].portion, 333);
+CheckEqual("odd portions round growth days down", odd[1].days, 3);
 
-local odd = CalculateTownFunding(999, mixed_towns, 10);
-CheckEqual("portions round down", odd.portion, 499);
-CheckEqual("odd portions round growth days down", odd.days, 4);
+local by_population = SplitTaxFunding(2000, pair, 10, TaxSplit.POPULATION);
+CheckEqual("population split favours the big town", by_population[0].portion, 1500);
+CheckEqual("population split leaves the rest to the small town", by_population[1].portion, 500);
+CheckEqual("population split buys days from each portion", by_population[0].days, 15);
 
-local no_boost = CalculateTownFunding(2000, mixed_towns, 0);
-CheckEqual("zero boost splits nothing, so nothing is recorded", no_boost.portion, 0);
-CheckEqual("zero boost buys no growth days", no_boost.days, 0);
+local underdog = SplitTaxFunding(2000, pair, 10, TaxSplit.UNDERDOG);
+CheckEqual("underdog split favours the small town", underdog[1].portion, 1500);
+CheckEqual("underdog split leaves the rest to the big town", underdog[0].portion, 500);
 
-local tiny = CalculateTownFunding(2, [{ is_monitored = true }], 10);
-CheckEqual("tiny tax splits but buys no growth", tiny.portion, 2);
-CheckEqual("tiny tax buys no growth days", tiny.days, 0);
+local uneven = SplitTaxFunding(1000, [FundedTown(1, 700), FundedTown(2, 200), FundedTown(3, 100)], 10, TaxSplit.POPULATION);
+CheckEqual("weighted portions add up to the tax", SumPortions(uneven), 1000);
+CheckEqual("rounding remainder goes to the heaviest town", uneven[0].portion, 700);
 
-local unmonitored = CalculateTownFunding(2000, [{ is_monitored = false }], 10);
-CheckEqual("unmonitored towns do not dilute the split", unmonitored.portion, 0);
-CheckEqual("unmonitored towns get no growth days", unmonitored.days, 0);
+local stopped = SplitTaxFunding(2000, [FundedTown(1, 500), FundedTown(2, 500, true)], 10, TaxSplit.EQUAL);
+CheckEqual("stopped towns are left out of the split", stopped.len(), 1);
+CheckEqual("stopped town's share moves to the others", stopped[0].portion, 2000);
+CheckEqual("redistributed share buys more days", stopped[0].days, 20);
+CheckEqual("all towns stopped funds nothing", SplitTaxFunding(2000, [FundedTown(1, 500, true)], 10, TaxSplit.EQUAL).len(), 0);
+
+local empty_town = SplitTaxFunding(2000, [FundedTown(1, 0), FundedTown(2, 1000)], 10, TaxSplit.POPULATION);
+CheckEqual("a town without population still takes part", empty_town.len(), 2);
+CheckEqual("a town without population weighs one resident", empty_town[0].portion, 1);
+
+local tiny = SplitTaxFunding(2, [FundedTown(1, 500)], 10, TaxSplit.EQUAL);
+CheckEqual("tiny tax splits but buys no growth", tiny[0].portion, 2);
+CheckEqual("tiny tax buys no growth days", tiny[0].days, 0);
+CheckEqual("unknown mode splits equally", SplitTaxFunding(2000, pair, 10, 99)[0].portion, 1000);
 
 
 print("ApplyGrowthFunding\n");
@@ -454,9 +476,10 @@ CheckEqual("timed out town stops growing", ::stub_growth_rate[21], GSTown.TOWN_G
 Check("town under 100 population is not growth-managed", !managed[22]);
 CheckEqual("town under 100 population grows normally", ::stub_growth_rate[22], GSTown.TOWN_GROWTH_NORMAL);
 
-local settled = CalculateTownFunding(2000, managed_towns, 10);
-CheckEqual("whole tax goes to the growth-managed town", settled.portion, 2000);
-CheckEqual("growth-managed town gets the whole boost", settled.days, 20);
+local settled = SplitTaxFunding(2000, TownFundingEntries(managed_towns), 10, TaxSplit.EQUAL);
+CheckEqual("only the growth-managed town is funded", settled.len(), 1);
+CheckEqual("whole tax goes to the growth-managed town", settled[0].portion, 2000);
+CheckEqual("growth-managed town gets the whole boost", settled[0].days, 20);
 
 local resumed_town = CheckedTown(23, 500, false);
 ::stub_pickups[23] <- 3;

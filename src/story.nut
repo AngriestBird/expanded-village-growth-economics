@@ -181,7 +181,7 @@ function StoryEditor::UpdateTaxFundingPage(company)
     local funded = [];
     local maximum = 0;
     foreach (entry in company.tax_history) {
-        if (!entry.rawin("town_funding") || entry.town_funding.len() == 0)
+        if (!entry.rawin("funding") || entry.funding.towns.len() == 0)
             continue;
         funded.append(entry);
         if (entry.total > maximum)
@@ -197,12 +197,14 @@ function StoryEditor::UpdateTaxFundingPage(company)
     if (company.tax_funding_offset < 0 || company.tax_funding_offset >= funded.len())
         company.tax_funding_offset = 0;
     local entry = funded[funded.len() - 1 - company.tax_funding_offset];
-    if (company.tax_funding_town_offset < 0 || company.tax_funding_town_offset >= entry.town_funding.len())
+    local funding = entry.funding;
+    local count = funding.towns.len();
+    if (company.tax_funding_town_offset < 0 || company.tax_funding_town_offset >= count)
         company.tax_funding_town_offset = 0;
     local start = company.tax_funding_town_offset;
     local end = start + 20;
-    if (end > entry.town_funding.len())
-        end = entry.town_funding.len();
+    if (end > count)
+        end = count;
 
     local position = maximum > 0 ? (entry.total.tofloat() * 20 / maximum + 0.5).tointeger() : 0;
     local line = "";
@@ -211,16 +213,21 @@ function StoryEditor::UpdateTaxFundingPage(company)
 
     GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
                            GSText(GSText.STR_SB_TAX_FUNDING_MONTH, entry.year, entry.month,
-                                  GSText(GSText.STR_CURRENCY, entry.total), entry.town_funding.len()));
+                                  GSText(GSText.STR_CURRENCY, entry.total), count));
     GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
                            GSText(GSText.STR_SB_TAX_HISTORY_LINE, entry.year, entry.month, line));
+    local has_applied = funding.rawin("applied");
     for (local i = start; i < end; ++i) {
-        local row = entry.town_funding[i];
+        local portion = funding.portions[i];
         local percent = entry.total > 0
-                        ? (row.portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
-        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0,
-                               GSText(GSText.STR_SB_TAX_FUNDING_TOWN, row.town_id,
-                                      percent, GSText(GSText.STR_CURRENCY, row.portion), row.days));
+                        ? (portion.tofloat() * 100 / entry.total + 0.5).tointeger() : 0;
+        // Months recorded before the applied days were tracked keep the shorter line
+        local text = has_applied
+            ? GSText(GSText.STR_SB_TAX_FUNDING_TOWN_APPLIED, funding.towns[i], percent,
+                     GSText(GSText.STR_CURRENCY, portion), funding.days[i], funding.applied[i])
+            : GSText(GSText.STR_SB_TAX_FUNDING_TOWN, funding.towns[i], percent,
+                     GSText(GSText.STR_CURRENCY, portion), funding.days[i]);
+        GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_TEXT, 0, text);
     }
 
     if (company.tax_funding_offset + 1 < funded.len())
@@ -235,7 +242,7 @@ function StoryEditor::UpdateTaxFundingPage(company)
         company.tax_funding_previous_towns_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
             GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_LEFT),
             GSText(GSText.STR_SB_TAX_FUNDING_PREVIOUS_TOWNS));
-    if (end < entry.town_funding.len())
+    if (end < count)
         company.tax_funding_next_towns_button = GSStoryPage.NewElement(company.sp_tax_funding, GSStoryPage.SPET_BUTTON_PUSH,
             GSStoryPage.MakePushButtonReference(GSStoryPage.SPBC_ORANGE, GSStoryPage.SPBF_FLOAT_RIGHT),
             GSText(GSText.STR_SB_TAX_FUNDING_MORE_TOWNS));

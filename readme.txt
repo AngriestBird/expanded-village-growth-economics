@@ -266,19 +266,30 @@ and has no solvency check, so companies can go into debt.
   into a tax rebate for the same month. Only towns the company currently serves
   (still monitored) count.
 - "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
-  company pays each month is split equally between its contributed towns that
-  are still monitored and have at least 100 population. Each share gives that
+  company pays each month is split between its contributed towns that are
+  still monitored and have at least 100 population. Each share gives that
   town faster growth (days off its growth rate). A share can at most halve the
   town's growth rate, so taxes accelerate growth instead of buying it
   outright. The company still pays the full bill; this only changes what
-  the money buys. Off by default (0).
+  the money buys. Towns the growth limiter has stopped get nothing and their
+  share goes to the others. Off by default (0).
+- "Taxes: How tax funding is split between contributed towns": "Equal shares"
+  gives every funded town the same amount. "By population" gives bigger towns
+  more, so a city pulls ahead. "Smallest towns first" weights by inverse
+  population, so villages catch up. The Tax funding page shows each town's
+  share whichever mode is chosen.
 The bill is split into two buckets: network (rail, road, canals) and stations
 (docks, airports). Each company's Goal statistics show the total plus both
 buckets, along with last month's breakdown and rebate. The Tax history Goal
 opens a Story Book page with up to 36 months of history. Use the Older and
 Newer buttons to browse it. The Tax funding Goal opens a Story Book page that
 breaks down, town by town, what percentage of each month's tax funded that
-town's growth. It shows one funded month and up to 20 towns at a time. Use
+town's growth, the growth days that share bought and how many of them were
+applied. A share can take at most half the days off a town's growth rate, and
+the result is one sample in the town's 8-month moving average, so the applied
+figure can be lower than the days bought and the effect on the displayed
+growth rate builds up over several months. It shows one funded month and up
+to 20 towns at a time. Use
 Older/Newer for months and Previous towns/More towns for the remaining rows.
 All funded rows in the 36-month history remain available. No new funding is
 recorded while the "Days of town growth" setting is 0.

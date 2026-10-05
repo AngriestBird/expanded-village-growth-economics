@@ -65,6 +65,7 @@ STR_SB_TAX_FUNDING_TITLE            :Tax funding by town
 STR_SB_TAX_FUNDING_EMPTY            :No town growth has been funded by taxes yet.
 STR_SB_TAX_FUNDING_MONTH            :{NUM}/{NUM}: {STRING} tax, split between {NUM} towns
 STR_SB_TAX_FUNDING_TOWN             :  {TOWN}: {NUM}% ({STRING}, {NUM} growth days)
+STR_SB_TAX_FUNDING_TOWN_APPLIED     :  {TOWN}: {NUM}% ({STRING}, {NUM} growth days bought, {NUM} applied)
 STR_SB_TAX_FUNDING_PREVIOUS_TOWNS   :Previous towns
 STR_SB_TAX_FUNDING_MORE_TOWNS       :More towns
 STR_SB_WELCOME_END                  :Have fun!

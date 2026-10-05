@@ -553,13 +553,14 @@ function MainClass::ManageTowns()
             if (!town.MonthlyCheckTown(monthly_settings))
                 continue;
 
-            managed_towns[town.id] <- true;
+            managed_towns[town.id] <- town;
             if (!managed_by_contributor.rawin(town.contributor))
                 managed_by_contributor[town.contributor] <- [];
             managed_by_contributor[town.contributor].append(town);
         }
 
         local tax_funding = {};
+        local funding_rows = {};
         if (settle_taxes) {
             ChargeTaxes(this.companies, managed_by_contributor, date);
 
@@ -567,16 +568,27 @@ function MainClass::ManageTowns()
             // each share buys growth days for that town this month, and the
             // breakdown is recorded for the tax funding story page
             local growth_boost = GetTaxRateSetting("tax_growth_boost");
-            local year = GSDate.GetYear(date);
-            local month = GSDate.GetMonth(date);
+            local split_mode = GetTaxRateSetting("tax_split_mode");
             foreach (company in this.companies) {
+                // SplitTaxFunding would return nothing; skip the per-town GS calls too
+                if (company.tax_last_month <= 0 || growth_boost <= 0)
+                    continue;
+
                 local contributed = managed_by_contributor.rawin(company.id)
                                     ? managed_by_contributor[company.id] : [];
-                local funding = CalculateTownFunding(company.tax_last_month, contributed, growth_boost);
-                if (funding.days > 0)
-                    tax_funding[company.id] <- funding.days;
-                if (funding.portion > 0)
-                    company.RecordTaxFunding(year, month, contributed, funding.portion, funding.days);
+                local rows = SplitTaxFunding(company.tax_last_month, TownFundingEntries(contributed),
+                                             growth_boost, split_mode);
+                if (rows.len() == 0)
+                    continue;
+
+                local days_by_town = {};
+                foreach (row in rows) {
+                    if (row.days > 0)
+                        days_by_town[row.town_id] <- row.days;
+                }
+                if (days_by_town.len() > 0)
+                    tax_funding[company.id] <- days_by_town;
+                funding_rows[company.id] <- rows;
             }
         }
         monthly_settings.tax_funding <- tax_funding;
@@ -597,6 +609,19 @@ function MainClass::ManageTowns()
             if (!gui_towns_by_contributor.rawin(town.contributor))
                 gui_towns_by_contributor[town.contributor] <- [];
             gui_towns_by_contributor[town.contributor].append(town);
+        }
+
+        // Record the split now that each town has applied its share, so the
+        // funding page shows what the money bought and not only what it asked for
+        local year = GSDate.GetYear(date);
+        foreach (company in this.companies) {
+            if (!funding_rows.rawin(company.id))
+                continue;
+            foreach (row in funding_rows[company.id]) {
+                local town = managed_towns.rawin(row.town_id) ? managed_towns[row.town_id] : null;
+                row.applied <- town != null && town.funding_applied != null ? town.funding_applied : 0;
+            }
+            company.RecordTaxFunding(year, month, funding_rows[company.id]);
         }
 
         // Reset the monthly growth accumulator after the tax rebate has read it

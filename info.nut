@@ -322,6 +322,19 @@ class MainClass extends GSInfo
             custom_value = 0,
             flags = CONFIG_INGAME, min_value = 0, max_value = 1000, step_size = 1});
 
+        AddSetting({
+            name = "tax_split_mode",
+            description = "Taxes: How tax funding is split between contributed towns",
+            easy_value = 0,
+            medium_value = 0,
+            hard_value = 0,
+            custom_value = 0,
+            flags = CONFIG_INGAME, min_value = 0, max_value = 2});
+        AddLabels("tax_split_mode", {
+                    _0 = "Equal shares",
+                    _1 = "By population",
+                    _2 = "Smallest towns first"});
+
         for (local i = 1; i <= 6; i++) {
             AddSetting({
                 name = "category_" + i + "_min_pop",

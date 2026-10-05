@@ -43,15 +43,15 @@ SuperLib <- {
 dofile("src/version.nut", true);
 dofile("src/industry.nut", true);
 dofile("src/cargo.nut", true);
-// Enums compile into the constant table, so a file compiled earlier needs a runtime alias
-TaxSplit <- { EQUAL = 0, POPULATION = 1, UNDERDOG = 2 };
 dofile("src/taxes.nut", true);
 dofile("src/company.nut", true);
 dofile("src/subsidies.nut", true);
 dofile("src/story.nut", true);
 dofile("src/main.nut", true);
-Randomization <- { INDUSTRY_DESC = 2, INDUSTRY_ASC = 3 };
 dofile("src/town.nut", true);
+// Enums compile into the constant table, so this file, compiled earlier, reads them at runtime
+TaxSplit <- getconsttable().TaxSplit;
+Randomization <- getconsttable().Randomization;
 
 function GoalTown::DebugCargoTable(cargo_table) {}
 

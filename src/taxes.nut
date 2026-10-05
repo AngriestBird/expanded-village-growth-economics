@@ -109,6 +109,25 @@ function GetTaxRateSetting(name)
     return value < 0 ? 0 : value;
 }
 
+/* Combine the per-town rating multipliers into one for the bill. Each town
+ * weighs in by population, so a few well-rated villages cannot hide a poorly
+ * rated city. Towns without population count as one resident so they still
+ * take part. No towns leaves the bill undiscounted. Kept free of GS API calls
+ * so tests/ can exercise the arithmetic without a running game.
+ */
+function CalculateRatingMultiplier(towns)
+{
+    local weighted = 0.0;
+    local total_weight = 0.0;
+    foreach (town in towns) {
+        local weight = town.weight > 0 ? town.weight : 1;
+        weighted += town.multiplier * weight;
+        total_weight += weight;
+    }
+
+    return total_weight > 0 ? weighted / total_weight : 1.0;
+}
+
 function GetTownTaxMultiplier(town_id, company_id, rating_discount)
 {
     local rating_class = GSTown.GetRating(town_id, company_id);
@@ -176,27 +195,27 @@ function ChargeTaxes(companies, towns_by_contributor, date)
             continue;
         }
 
-        // Bonus for each large town the company actively serves (monitored, above the raw-food threshold)
+        // Bonus for each large town the company actively serves (monitored, above the raw-food threshold),
+        // and the population-weighted rating discount across those towns
         local num_big_towns = 0;
-        local rating_multiplier = 1.0;
-        local town_rating_total = 0.0;
-        local rated_towns = 0;
+        local rated_towns = [];
         local tile = GSCompany.GetCompanyHQ(company.id);
         if (towns_by_contributor.rawin(company.id)) {
             foreach (town in towns_by_contributor[company.id]) {
                 if (!town.is_monitored)
                     continue;
-                if (GSTown.GetPopulation(town.id) > 500)
+                local population = GSTown.GetPopulation(town.id);
+                if (population > 500)
                     ++num_big_towns;
-                town_rating_total += GetTownTaxMultiplier(town.id, company.id, rating_discount);
-                ++rated_towns;
+                rated_towns.append({
+                    multiplier = GetTownTaxMultiplier(town.id, company.id, rating_discount),
+                    weight = population
+                });
                 if (!GSMap.IsValidTile(tile))
                     tile = GSTown.GetLocation(town.id);
             }
-
-            if (rated_towns > 0)
-                rating_multiplier = town_rating_total / rated_towns;
         }
+        local rating_multiplier = CalculateRatingMultiplier(rated_towns);
 
         local network_base = tax_rate * infra + canal_tax_rate * canals;
         local station_base = dock_tax_rate * docks + airport_tax_rate * airports;

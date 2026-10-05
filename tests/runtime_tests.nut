@@ -44,6 +44,8 @@ class GSDate
 class GSCompany
 {
     static COMPANY_INVALID = -1;
+    static COMPANY_FIRST = 0;
+    static COMPANY_LAST = 14;
     static EXPENSES_OTHER = 0;
     static function ResolveCompanyID(id) {
         return ::stub_valid_companies.rawin(id) ? id : -1;
@@ -95,6 +97,7 @@ class GSGameSettings
 class GSGame
 {
     static function IsPaused() { return false; }
+    static function IsMultiplayer() { return false; }
 }
 
 class GSGoal
@@ -366,6 +369,89 @@ monthly.ManageTowns();
 Check("boost off records no funding rows", !company.tax_history[1].rawin("town_funding"));
 CheckEqual("boost off stores unboosted sample", active.tgr_array[1], 100);
 CheckEqual("deliveries refresh contributor", active.contributor, 0);
+
+print("Forced initialization pass\n");
+::stub_settings.tax_growth_boost = 10;
+::stub_date = 1031;
+local forced = MainClass();
+::SettingsTable.use_town_sign <- false;
+::SettingsTable.randomization <- Randomization.INDUSTRY_ASC;
+forced.current_date = 1030;
+forced.current_month = 3;
+forced.current_year = 2040;
+forced.story_editor = StoryEditor();
+company = TestCompany(0);
+company.points_this_month = 10;
+forced.companies = [company];
+local forced_town = CheckedTown(73, 600, true);
+forced_town.contributor = 0;
+::stub_pickups[73] <- 5;
+::stub_ratings[73] <- 0;
+forced.towns = [forced_town];
+forced.finish_init_pass = true;
+forced.ManageTowns();
+CheckEqual("forced pass settles town growth", forced_town.tgr_array[0], 100);
+CheckEqual("forced pass charges no tax", company.tax_history.len(), 0);
+CheckEqual("forced pass keeps pending growth points", company.points_this_month, 10);
+Check("forced pass clears its flag", !forced.finish_init_pass);
+CheckEqual("forced pass keeps the current month", forced.current_month, 3);
+::stub_date = 1032;
+forced.ManageTowns();
+CheckEqual("same month after forced pass runs no monthly update", forced_town.tgr_array[1], 0);
+::stub_month = 4;
+::stub_date = 1061;
+forced.ManageTowns();
+CheckEqual("next month after forced pass charges tax once", company.tax_history.len(), 1);
+::stub_month = 3;
+::stub_date = 1030;
+::stub_settings.tax_growth_boost = 0;
+
+print("Forced initialization pass landing in a new month\n");
+::stub_month = 4;
+::stub_date = 1031;
+local forced_new = MainClass();
+::SettingsTable.use_town_sign <- false;
+::SettingsTable.randomization <- Randomization.INDUSTRY_ASC;
+forced_new.current_date = 1030;
+forced_new.current_month = 3;
+forced_new.current_year = 2040;
+forced_new.story_editor = StoryEditor();
+company = TestCompany(0);
+company.points_this_month = 10;
+forced_new.companies = [company];
+local forced_new_town = CheckedTown(76, 600, true);
+forced_new_town.contributor = 0;
+::stub_pickups[76] <- 5;
+::stub_ratings[76] <- 0;
+forced_new.towns = [forced_new_town];
+forced_new.finish_init_pass = true;
+forced_new.ManageTowns();
+CheckEqual("forced pass in a new month records one tax entry", company.tax_history.len(), 1);
+CheckEqual("forced pass in a new month resets growth points", company.points_this_month, 0);
+Check("forced pass in a new month clears its flag", !forced_new.finish_init_pass);
+CheckEqual("forced pass in a new month advances the month", forced_new.current_month, 4);
+::stub_month = 3;
+::stub_date = 1030;
+
+print("Company removal clears contributors\n");
+local removal = MainClass();
+::SettingsTable.use_town_sign <- false;
+::SettingsTable.randomization <- Randomization.INDUSTRY_ASC;
+local gone_company = TestCompany(5);
+local kept_company = TestCompany(0);
+removal.companies = [gone_company, kept_company];
+local gone_town = CheckedTown(74, 600, true);
+gone_town.contributor = 5;
+local kept_town = CheckedTown(75, 600, true);
+kept_town.contributor = 0;
+removal.towns = [gone_town, kept_town];
+removal.UpdateCompanyList();
+Check("removed company drops out of the company list", removal.companies.find(gone_company) == null);
+CheckEqual("removed company loses its town", gone_town.contributor, -1);
+CheckEqual("surviving company keeps its town", kept_town.contributor, 0);
+::stub_population[74] <- 700;
+removal.DailyManageTownPopulation();
+CheckEqual("growth in a dropped town earns nobody points", kept_company.points_this_month, 0);
 
 print("Tax funding Story Book command workload\n");
 company = TestCompany(0);

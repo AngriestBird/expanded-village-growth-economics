@@ -514,6 +514,64 @@ CheckEqual("permille follows the sort",
            ::CargoPermille[0] + "," + ::CargoPermille[1] + "," + ::CargoPermille[2], "60,10,40");
 
 
+print("Settings metadata\n");
+
+local settings_env = {
+    GSInfo = class {
+        static CONFIG_NONE = 0;
+        static CONFIG_BOOLEAN = 1;
+        static CONFIG_INGAME = 2;
+        settings = null;
+        constructor() { this.settings = {}; }
+        function AddSetting(setting) { this.settings[setting.name] <- setting; }
+        function AddLabels(name, labels) {}
+    },
+    registered = null,
+    function RegisterGS(info) { this.registered = info; }
+};
+settings_env.setdelegate(getroottable());
+local info_script = loadfile("info.nut", true);
+info_script.setroot(settings_env);
+info_script.call(settings_env);
+settings_env.registered.GetSettings();
+local declared_settings = settings_env.registered.settings;
+local tax_labels = {
+    tax_enable = "Taxes: Monthly infrastructure tax",
+    tax_rate = "Taxes: Rate per rail/road piece",
+    tax_dock_rate = "Taxes: Rate per dock station",
+    tax_airport_rate = "Taxes: Rate per airport station",
+    tax_canal_rate = "Taxes: Rate per canal/lock piece",
+    tax_big_town_bonus = "Taxes: Extra per town over 500 population [%]",
+    tax_rating_discount = "Taxes: Maximum town rating discount [%]",
+    tax_growth_rebate = "Taxes: Rebate per growth point",
+    tax_growth_boost = "Taxes: Growth days per 1000 tax per town",
+    tax_split_mode = "Taxes: Split funding between towns"
+};
+foreach (name, label in tax_labels) {
+    CheckEqual(name + " has its compact label", declared_settings[name].description, label);
+    Check(name + " remains changeable in game", declared_settings[name].flags & settings_env.GSInfo.CONFIG_INGAME);
+}
+foreach (name in ["tax_rate", "tax_dock_rate", "tax_airport_rate", "tax_canal_rate"]) {
+    local setting = declared_settings[name];
+    CheckEqual(name + " keeps its minimum", setting.min_value, 0);
+    CheckEqual(name + " keeps its maximum", setting.max_value, 1000);
+    CheckEqual(name + " keeps single-unit steps", setting.step_size, 1);
+    CheckEqual(name + " keeps its easy default", setting.easy_value, 2);
+    CheckEqual(name + " keeps its medium default", setting.medium_value, 3);
+    CheckEqual(name + " keeps its hard default", setting.hard_value, 5);
+    CheckEqual(name + " keeps its custom default", setting.custom_value, 3);
+}
+foreach (name in ["tax_enable", "tax_growth_rebate", "tax_growth_boost"]) {
+    local setting = declared_settings[name];
+    foreach (preset in ["easy_value", "medium_value", "hard_value", "custom_value"])
+        CheckEqual(name + " stays off for " + preset, setting[preset], 0);
+}
+for (local i = 1; i <= 6; i++) {
+    local name = "category_" + i + "_min_pop";
+    CheckEqual(name + " is start-only", declared_settings[name].flags, settings_env.GSInfo.CONFIG_NONE);
+}
+
+
 dofile("tests/runtime_tests.nut", true);
 
 print("\n" + tests_run + " checks, " + tests_failed + " failed\n");

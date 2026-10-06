@@ -241,9 +241,15 @@ Subsidies:
 Taxes:
 These settings add a monthly infrastructure tax. The tax is a money sink
 and has no solvency check, so companies can go into debt.
-- "Taxes: Charge companies a monthly infrastructure tax": enable/disable the
-  tax. Off by default.
-- "Taxes: Rate per rail/road infrastructure piece": base charge per rail and
+The four rates use currency units per owned piece or station per month,
+from 0 to 1000 in steps of 1. Defaults are 2 on easy, 3 on normal/custom
+and 5 on hard. The bill is multiplied by "Difficulty level" / 100 before
+surcharges, rating discounts and growth rebates.
+- "Taxes: Monthly infrastructure tax": enable/disable the tax. Off by
+  default for every difficulty. Hosts can toggle it during play with no
+  penalty. If it is off when the script runs the monthly billing pass, that
+  month's bill is skipped with no catch-up charge.
+- "Taxes: Rate per rail/road piece": base charge per rail and
   road infrastructure piece the company owns. The total is also scaled by the
   "Difficulty level" setting.
 - "Taxes: Rate per dock station": base charge per dock station the company
@@ -251,29 +257,34 @@ and has no solvency check, so companies can go into debt.
   "Difficulty level" setting too.
 - "Taxes: Rate per airport station": base charge per airport the company owns,
   counted the same way as docks.
-- "Taxes: Rate per canal infrastructure piece": base charge per canal and lock
-  piece the company owns, counted the same way as rail and road.
-- "Taxes: Extra percentage per contributed town over 500 population": adds this
-  percentage to the bill for each town the company actively serves (still
-  monitored) that is larger than 500 population.
-- "Taxes: Max rating-based discount from contributed towns": rating determines
+- "Taxes: Rate per canal/lock piece": base charge per canal and lock piece the
+  company owns, counted the same way as rail and road.
+- "Taxes: Extra per town over 500 population [%]": adds this percentage to the
+  bill for each town the company actively serves (still monitored) that is
+  larger than 500 population. Defaults to 5% on easy/normal/custom and 10%
+  on hard.
+- "Taxes: Maximum town rating discount [%]": rating determines
   a reduction to each month's tax, with excellent towns giving a large rebate
   when this is set (for example 30 for a 30% maximum discount at top rating).
   Only towns the company currently serves (still monitored) count, and each
   town weighs in by its population, so a few well-rated villages cannot hide
-  a poorly rated city.
-- "Taxes: Rebate per population your towns gained last month": turns town growth
-  into a tax rebate for the same month. Only towns the company currently serves
-  (still monitored) count.
-- "Taxes: Days of town growth per 1000 tax per contributed town": the tax a
+  a poorly rated city. Defaults to 30% for every difficulty.
+- "Taxes: Rebate per growth point": currency units of rebate per growth point
+  earned since the previous monthly bill. Each new resident above a town's
+  previous maximum population earns its contributor one point. The rebate
+  is also scaled by "Difficulty level" / 100 and cannot exceed the bill.
+  Off by default (0) for every difficulty.
+- "Taxes: Growth days per 1000 tax per town": the tax a
   company pays each month is split between its contributed towns that are
   still monitored and have at least 100 population. Each share gives that
   town faster growth (days off its growth rate). A share can at most halve the
   town's growth rate, so taxes accelerate growth instead of buying it
   outright. The company still pays the full bill; this only changes what
   the money buys. Towns the growth limiter has stopped get nothing and their
-  share goes to the others. Off by default (0).
-- "Taxes: How tax funding is split between contributed towns": "Equal shares"
+  share goes to the others. The value is days per 1000 currency units of
+  that town's share, not the company's whole bill. Off by default (0) for
+  every difficulty.
+- "Taxes: Split funding between towns": "Equal shares"
   gives every funded town the same amount. "By population" gives bigger towns
   more, so a city pulls ahead. "Smallest towns first" weights by inverse
   population, so villages catch up. The Tax funding page shows each town's
@@ -292,7 +303,7 @@ growth rate builds up over several months. It shows one funded month and up
 to 20 towns at a time. Use
 Older/Newer for months and Previous towns/More towns for the remaining rows.
 All funded rows in the 36-month history remain available. No new funding is
-recorded while the "Days of town growth" setting is 0.
+recorded while the "Growth days per 1000 tax per town" setting is 0.
 
 Category settings:
 These settings change the cargo category values and can only be changed

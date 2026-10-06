@@ -3,10 +3,10 @@ Expanded Village Growth + Economics Changelog
 Version 1.3.0 (unreleased)
 - added: taxes can now fund town growth. A company's monthly tax is split
   between its actively served towns and each share reduces that town's
-  growth rate by up to half (new "Taxes: Days of town growth per 1000 tax
-  per contributed town" setting, off by default). A "Tax funding by town"
+  growth rate by up to half (new "Taxes: Growth days per 1000 tax per town"
+  setting, off by default). A "Tax funding by town"
   Story Book page breaks down where each month's tax went
-- added: "Taxes: How tax funding is split between contributed towns" setting.
+- added: "Taxes: Split funding between towns" setting.
   Equal shares as before, by population so cities pull ahead, or smallest
   towns first so villages catch up. Towns the growth limiter has stopped are
   skipped and their share goes to the towns that can grow
@@ -53,6 +53,10 @@ Version 1.3.0 (unreleased)
 - changed: the tax funding page shows one month and 20 towns at a time, with
   buttons to browse all saved funding rows
 - fixed: FIRS 2 economy labels showed FIRS 1 in several languages
+- changed: shortened tax setting labels, marked percentages and documented
+  units, defaults and in-game toggling. Tax rates and balance are unchanged
+- fixed: category population settings are now locked after game start,
+  matching when the script reads them
 
 Version 1.2.0 (2026-07-24)
 - added: Docks are now properly taxed like every other asset

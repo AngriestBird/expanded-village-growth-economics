@@ -243,7 +243,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_enable",
-            description = "Taxes: Charge companies a monthly infrastructure tax",
+            description = "Taxes: Monthly infrastructure tax",
             easy_value = 0,
             medium_value = 0,
             hard_value = 0,
@@ -252,7 +252,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_rate",
-            description = "Taxes: Rate per rail/road infrastructure piece",
+            description = "Taxes: Rate per rail/road piece",
             easy_value = 2,
             medium_value = 3,
             hard_value = 5,
@@ -279,7 +279,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_canal_rate",
-            description = "Taxes: Rate per canal infrastructure piece",
+            description = "Taxes: Rate per canal/lock piece",
             easy_value = 2,
             medium_value = 3,
             hard_value = 5,
@@ -288,7 +288,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_big_town_bonus",
-            description = "Taxes: Extra percentage per contributed town over 500 population",
+            description = "Taxes: Extra per town over 500 population [%]",
             easy_value = 5,
             medium_value = 5,
             hard_value = 10,
@@ -297,7 +297,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_rating_discount",
-            description = "Taxes: Max rating-based discount from contributed towns",
+            description = "Taxes: Maximum town rating discount [%]",
             easy_value = 30,
             medium_value = 30,
             hard_value = 30,
@@ -306,7 +306,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_growth_rebate",
-            description = "Taxes: Rebate per population your towns gained last month",
+            description = "Taxes: Rebate per growth point",
             easy_value = 0,
             medium_value = 0,
             hard_value = 0,
@@ -315,7 +315,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_growth_boost",
-            description = "Taxes: Days of town growth per 1000 tax per contributed town",
+            description = "Taxes: Growth days per 1000 tax per town",
             easy_value = 0,
             medium_value = 0,
             hard_value = 0,
@@ -324,7 +324,7 @@ class MainClass extends GSInfo
 
         AddSetting({
             name = "tax_split_mode",
-            description = "Taxes: How tax funding is split between contributed towns",
+            description = "Taxes: Split funding between towns",
             easy_value = 0,
             medium_value = 0,
             hard_value = 0,
@@ -343,7 +343,7 @@ class MainClass extends GSInfo
                 medium_value = -1,
                 hard_value = -1,
                 custom_value = -1,
-                flags = CONFIG_INGAME, min_value = -1, max_value = 100000, step_size = 100});
+                flags = CONFIG_NONE, min_value = -1, max_value = 100000, step_size = 100});
         }
 
         AddSetting({ name = "town_growth_factor",
